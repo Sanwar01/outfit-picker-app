@@ -12,6 +12,8 @@ import {
 } from "@/lib/ai/outfit-rules";
 import { generateOutfitWithAI } from "@/lib/ai/generate-outfit";
 import { getSignedImageUrls } from "@/lib/storage";
+import { CATEGORY_LABELS } from "@/lib/types/clothing";
+import type { ClothingCategory } from "@/lib/types/database";
 
 export interface GeneratedOutfitResponse {
   item_ids: string[];
@@ -109,8 +111,15 @@ export async function generateOutfitForUser(
 
   if (!wardrobeHasMinimumItems(activeItems)) {
     const missing = getMissingSlots(activeItems);
+    const labels = missing.map(
+      (slot) => CATEGORY_LABELS[slot as ClothingCategory].toLowerCase()
+    );
+    const need =
+      labels.length === 1
+        ? `a ${labels[0]}`
+        : `${labels.slice(0, -1).join(", ")} and a ${labels[labels.length - 1]}`;
     throw new Error(
-      `Add ${missing.join(", ")} to your wardrobe to get outfit suggestions.`
+      `Add ${need} to your wardrobe — I'll take care of the outfit from there.`
     );
   }
 
@@ -125,7 +134,7 @@ export async function generateOutfitForUser(
 
   if (!wardrobeHasMinimumItems(filtered)) {
     throw new Error(
-      "No suitable items for today's weather. Try adding outerwear or different shoes."
+      "Nothing in your closet fits today's weather. A different layer or pair of shoes might do the trick."
     );
   }
 

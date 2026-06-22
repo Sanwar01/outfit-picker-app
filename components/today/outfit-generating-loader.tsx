@@ -14,22 +14,22 @@ import { cn } from '@/lib/utils';
 const STEPS = [
   {
     id: 'weather',
-    label: "Reading today's forecast",
+    label: 'Checking the forecast',
     icon: CloudSun,
   },
   {
     id: 'wardrobe',
-    label: 'Browsing your wardrobe',
+    label: 'Looking through your closet',
     icon: Shirt,
   },
   {
     id: 'match',
-    label: 'Matching layers & colors',
+    label: 'Balancing layers and colors',
     icon: Layers,
   },
   {
     id: 'style',
-    label: 'Putting your look together',
+    label: 'Finalizing your look',
     icon: Sparkles,
   },
 ] as const;
@@ -70,13 +70,13 @@ export function OutfitGeneratingLoader({
       <div className="relative space-y-6 p-5 sm:p-6">
         <div className="space-y-1 text-center">
           <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-stone-400">
-            {variant === 'shuffle' ? 'New look' : "Today's outfit"}
+            {variant === 'shuffle' ? 'Another idea' : 'Your look today'}
           </p>
           <h2 className="text-lg font-semibold text-stone-900">
-            Curating your look
+            Putting something together
           </h2>
           <p className="text-sm text-stone-500">
-            Weather-aware styling from your wardrobe
+            Based on your clothes and today&apos;s weather
           </p>
         </div>
 
