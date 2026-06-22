@@ -4,6 +4,7 @@ import {
   type ResponseSchema,
 } from "@google/generative-ai";
 import { z } from "zod";
+import { getTagModel, withGeminiRetry } from "@/lib/ai/gemini";
 import type { ClothingCategory } from "@/lib/types/database";
 
 const ClothingTagSchema = z.object({
@@ -55,9 +56,6 @@ const RESPONSE_SCHEMA: ResponseSchema = {
   ],
 };
 
-const GEMINI_MODEL =
-  process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
-
 async function fetchImageAsBase64(
   imageUrl: string
 ): Promise<{ data: string; mimeType: string }> {
@@ -71,19 +69,15 @@ async function fetchImageAsBase64(
   return { data: buffer.toString("base64"), mimeType };
 }
 
-export async function tagClothingFromImage(
-  imageUrl: string
+async function callTagGemini(
+  imageUrl: string,
+  apiKey: string
 ): Promise<ClothingTagResult> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error("GEMINI_API_KEY is not configured");
-  }
-
   const { data, mimeType } = await fetchImageAsBase64(imageUrl);
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: GEMINI_MODEL,
+    model: getTagModel(),
     systemInstruction: SYSTEM_PROMPT,
     generationConfig: {
       responseMimeType: "application/json",
@@ -112,4 +106,15 @@ export async function tagClothingFromImage(
     ...parsed,
     category: parsed.category as ClothingCategory,
   };
+}
+
+export async function tagClothingFromImage(
+  imageUrl: string
+): Promise<ClothingTagResult> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is not configured");
+  }
+
+  return withGeminiRetry(() => callTagGemini(imageUrl, apiKey));
 }

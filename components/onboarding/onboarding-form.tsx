@@ -64,7 +64,7 @@ export function OnboardingForm({ userId }: { userId: string }) {
       .select("*", { count: "exact", head: true })
       .eq("user_id", userId);
 
-    router.push(count && count > 0 ? "/wardrobe" : "/wardrobe/add");
+    router.push(count && count > 0 ? "/today" : "/wardrobe/add");
     router.refresh();
   }
 

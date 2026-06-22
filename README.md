@@ -42,6 +42,15 @@ GEMINI_API_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
+Optional Gemini model overrides (defaults to `gemini-2.0-flash`):
+
+```bash
+GEMINI_OUTFIT_MODEL=gemini-2.0-flash
+GEMINI_TAG_MODEL=gemini-2.0-flash
+```
+
+Avoid `gemini-2.5-flash-lite` on the free tier — it often returns 503 under load. Outfit generation retries on transient errors and falls back to rules-based picks when AI is unavailable.
+
 Get a free API key at [Google AI Studio](https://aistudio.google.com/apikey).
 
 ### 3. Run locally
@@ -53,6 +62,12 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
+## Phase 2 features
+
+- **Today** tab with weather-aware outfit suggestions
+- AI outfit generator (Gemini) with shuffle, save, and wear logging
+- Saved outfits with favorites
+
 ## Phase 1 features
 
 - Email + password sign-up and sign-in
@@ -63,7 +78,16 @@ Open [http://localhost:3000](http://localhost:3000)
 - Wardrobe grid with search and category filters
 - Archive, delete, edit, and re-tag items
 
-## Phase 2 (not yet built)
+## Phase 3 (not yet built)
 
-- Weather-based outfit generator
-- Save and favorite outfits
+- Closet gap analysis and style insights
+
+## Phase 2 setup
+
+Run the Phase 2 migration:
+
+```bash
+supabase db push
+```
+
+Set your location in **Profile** (or during onboarding) for accurate weather.

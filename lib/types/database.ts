@@ -105,6 +105,75 @@ export interface Database {
         };
         Relationships: [];
       };
+      outfits: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string | null;
+          is_favorite: boolean;
+          weather_snapshot: Json | null;
+          ai_rationale: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name?: string | null;
+          is_favorite?: boolean;
+          weather_snapshot?: Json | null;
+          ai_rationale?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string | null;
+          is_favorite?: boolean;
+          weather_snapshot?: Json | null;
+          ai_rationale?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      outfit_items: {
+        Row: {
+          outfit_id: string;
+          clothing_item_id: string;
+          slot: ClothingCategory;
+        };
+        Insert: {
+          outfit_id: string;
+          clothing_item_id: string;
+          slot: ClothingCategory;
+        };
+        Update: {
+          outfit_id?: string;
+          clothing_item_id?: string;
+          slot?: ClothingCategory;
+        };
+        Relationships: [];
+      };
+      wear_log: {
+        Row: {
+          id: string;
+          user_id: string;
+          outfit_id: string | null;
+          worn_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          outfit_id?: string | null;
+          worn_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          outfit_id?: string | null;
+          worn_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -119,3 +188,6 @@ export interface Database {
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type ClothingItem =
   Database["public"]["Tables"]["clothing_items"]["Row"];
+export type Outfit = Database["public"]["Tables"]["outfits"]["Row"];
+export type OutfitItem = Database["public"]["Tables"]["outfit_items"]["Row"];
+export type WearLog = Database["public"]["Tables"]["wear_log"]["Row"];

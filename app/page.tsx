@@ -11,5 +11,5 @@ export default async function HomePage() {
     redirect("/login");
   }
 
-  redirect("/wardrobe");
+  redirect("/today");
 }

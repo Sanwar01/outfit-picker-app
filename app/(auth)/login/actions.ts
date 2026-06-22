@@ -29,7 +29,7 @@ export async function loginWithPassword(formData: FormData) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/wardrobe");
+  redirect("/today");
 }
 
 export async function signUpWithPassword(formData: FormData) {
@@ -69,7 +69,7 @@ export async function signUpWithPassword(formData: FormData) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/wardrobe");
+  redirect("/today");
 }
 
 export async function loginWithGoogle() {
