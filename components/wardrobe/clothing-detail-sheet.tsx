@@ -15,8 +15,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { CATEGORY_LABELS } from "@/lib/types/clothing";
-import type { ClothingItem } from "@/lib/types/database";
+import { CATEGORY_LABELS, FILTER_OPTIONS } from "@/lib/types/clothing";
+import type { ClothingCategory, ClothingItem } from "@/lib/types/database";
+
+const EDITABLE_CATEGORIES = FILTER_OPTIONS.filter(
+  (option) => option.value !== "all" && option.value !== "archived"
+).map((option) => option.value as ClothingCategory);
 
 interface ClothingDetailSheetProps {
   item: ClothingItem | null;
@@ -25,7 +29,7 @@ interface ClothingDetailSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdated: (item: ClothingItem) => void;
-  onDeleted: () => void;
+  onDeleted: (itemId: string) => void;
 }
 
 function ClothingDetailContent({
@@ -40,19 +44,31 @@ function ClothingDetailContent({
   imageUrl: string;
   userId: string;
   onUpdated: (item: ClothingItem) => void;
-  onDeleted: () => void;
+  onDeleted: (itemId: string) => void;
   onClose: () => void;
 }) {
   const router = useRouter();
   const supabase = createClient();
   const [name, setName] = useState(item.name);
+  const [category, setCategory] = useState<ClothingCategory>(item.category);
+  const [colorsText, setColorsText] = useState(item.colors.join(", "));
   const [loading, setLoading] = useState(false);
 
-  async function saveName() {
+  async function saveDetails() {
+    const colors = colorsText
+      .split(",")
+      .map((color) => color.trim())
+      .filter(Boolean);
+
+    if (colors.length === 0) {
+      toast.error("Add at least one color");
+      return;
+    }
+
     setLoading(true);
     const { data, error } = await supabase
       .from("clothing_items")
-      .update({ name })
+      .update({ name, category, colors })
       .eq("id", item.id)
       .eq("user_id", userId)
       .select()
@@ -60,12 +76,20 @@ function ClothingDetailContent({
 
     setLoading(false);
     if (error) {
-      toast.error("Failed to update name");
+      toast.error("Failed to update item");
       return;
     }
-    if (data) onUpdated(data);
-    toast.success("Name updated");
+    if (data) {
+      onUpdated(data);
+      toast.success("Item updated");
+      router.refresh();
+    }
   }
+
+  const detailsDirty =
+    name !== item.name ||
+    category !== item.category ||
+    colorsText !== item.colors.join(", ");
 
   async function toggleArchive() {
     const newStatus = item.status === "active" ? "archived" : "active";
@@ -109,7 +133,7 @@ function ClothingDetailContent({
     }
 
     toast.success("Item deleted");
-    onDeleted();
+    onDeleted(item.id);
     onClose();
     router.refresh();
   }
@@ -157,22 +181,49 @@ function ClothingDetailContent({
         ))}
       </div>
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-stone-700">Name</label>
-        <div className="flex gap-2">
+      <div className="space-y-3">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-stone-700">Name</label>
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="rounded-xl"
           />
-          <Button
-            onClick={saveName}
-            disabled={loading || name === item.name}
-            className="rounded-xl"
-          >
-            Save
-          </Button>
         </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-stone-700">Category</label>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value as ClothingCategory)}
+            className="h-9 w-full rounded-xl border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            {EDITABLE_CATEGORIES.map((value) => (
+              <option key={value} value={value}>
+                {CATEGORY_LABELS[value]}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-stone-700">Colors</label>
+          <Input
+            value={colorsText}
+            onChange={(e) => setColorsText(e.target.value)}
+            placeholder="navy, white"
+            className="rounded-xl"
+          />
+          <p className="text-xs text-stone-500">Comma-separated</p>
+        </div>
+
+        <Button
+          onClick={saveDetails}
+          disabled={loading || !detailsDirty}
+          className="w-full rounded-xl"
+        >
+          Save changes
+        </Button>
       </div>
 
       <div className="flex flex-col gap-2">

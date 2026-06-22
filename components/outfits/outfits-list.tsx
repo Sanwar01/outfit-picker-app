@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { Heart, Loader2 } from "lucide-react";
+import { Heart, Loader2, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { weatherConditionLabel } from "@/lib/weather/open-meteo";
 import type { SavedOutfit } from "@/lib/types/outfit";
@@ -54,6 +55,66 @@ export function OutfitsList() {
         o.id === outfit.id ? { ...o, is_favorite: !o.is_favorite } : o
       )
     );
+  }
+
+  async function renameOutfit(outfitId: string, name: string) {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      toast.error("Enter a name for this outfit");
+      return false;
+    }
+
+    const res = await fetch(`/api/outfits/${outfitId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: trimmed }),
+    });
+
+    if (!res.ok) {
+      toast.error("Failed to rename outfit");
+      return false;
+    }
+
+    setOutfits((prev) =>
+      prev.map((o) => (o.id === outfitId ? { ...o, name: trimmed } : o))
+    );
+    toast.success("Outfit renamed");
+    return true;
+  }
+
+  async function deleteOutfit(outfit: SavedOutfit) {
+    const label = outfit.name ?? "Saved outfit";
+    if (!window.confirm(`Delete "${label}"? This cannot be undone.`)) {
+      return;
+    }
+
+    const res = await fetch(`/api/outfits/${outfit.id}`, { method: "DELETE" });
+
+    if (!res.ok) {
+      toast.error("Failed to delete outfit");
+      return;
+    }
+
+    setOutfits((prev) => prev.filter((o) => o.id !== outfit.id));
+    toast.success("Outfit deleted");
+  }
+
+  async function wearOutfit(outfit: SavedOutfit) {
+    const res = await fetch("/api/outfits/wear", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        itemIds: outfit.items.map((item) => item.id),
+        outfitId: outfit.id,
+      }),
+    });
+
+    if (!res.ok) {
+      toast.error("Failed to log outfit");
+      return;
+    }
+
+    toast.success("Logged for today — enjoy your outfit!");
   }
 
   const visible = useMemo(() => {
@@ -106,6 +167,9 @@ export function OutfitsList() {
               key={outfit.id}
               outfit={outfit}
               onToggleFavorite={() => toggleFavorite(outfit)}
+              onRename={(name) => renameOutfit(outfit.id, name)}
+              onDelete={() => deleteOutfit(outfit)}
+              onWear={() => wearOutfit(outfit)}
             />
           ))}
         </div>
@@ -117,20 +181,83 @@ export function OutfitsList() {
 function OutfitCard({
   outfit,
   onToggleFavorite,
+  onRename,
+  onDelete,
+  onWear,
 }: {
   outfit: SavedOutfit;
   onToggleFavorite: () => void;
+  onRename: (name: string) => Promise<boolean>;
+  onDelete: () => void;
+  onWear: () => void;
 }) {
   const weather = outfit.weather_snapshot as WeatherSnapshot | null;
   const previewItems = outfit.items.slice(0, 4);
+  const [editing, setEditing] = useState(false);
+  const [editName, setEditName] = useState(outfit.name ?? "Saved outfit");
+  const [saving, setSaving] = useState(false);
+  const [wearing, setWearing] = useState(false);
+
+  async function handleSaveName() {
+    setSaving(true);
+    const ok = await onRename(editName);
+    setSaving(false);
+    if (ok) setEditing(false);
+  }
+
+  async function handleWear() {
+    setWearing(true);
+    await onWear();
+    setWearing(false);
+  }
 
   return (
     <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
       <div className="mb-3 flex items-start justify-between gap-2">
-        <div>
-          <p className="font-medium text-stone-900">
-            {outfit.name ?? "Saved outfit"}
-          </p>
+        <div className="min-w-0 flex-1">
+          {editing ? (
+            <div className="flex gap-2">
+              <Input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="h-8 rounded-lg"
+                maxLength={60}
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void handleSaveName();
+                  if (e.key === "Escape") {
+                    setEditName(outfit.name ?? "Saved outfit");
+                    setEditing(false);
+                  }
+                }}
+              />
+              <Button
+                size="sm"
+                className="rounded-lg"
+                onClick={handleSaveName}
+                disabled={saving}
+              >
+                {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <p className="truncate font-medium text-stone-900">
+                {outfit.name ?? "Saved outfit"}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditName(outfit.name ?? "Saved outfit");
+                  setEditing(true);
+                }}
+                className="shrink-0 rounded-full p-1 text-stone-400 hover:bg-stone-100 hover:text-stone-600"
+                aria-label="Rename outfit"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
           {weather && (
             <p className="text-xs text-stone-500">
               {weather.temp_c}°C · {weatherConditionLabel(weather.condition)}
@@ -141,7 +268,7 @@ function OutfitCard({
           type="button"
           variant="ghost"
           size="icon-sm"
-          className="rounded-full"
+          className="shrink-0 rounded-full"
           onClick={onToggleFavorite}
         >
           <Heart
@@ -173,8 +300,27 @@ function OutfitCard({
       </div>
 
       {outfit.ai_rationale && (
-        <p className="text-sm text-stone-600">{outfit.ai_rationale}</p>
+        <p className="mb-3 text-sm text-stone-600">{outfit.ai_rationale}</p>
       )}
+
+      <div className="flex gap-2">
+        <Button
+          size="sm"
+          className="flex-1 rounded-xl"
+          onClick={handleWear}
+          disabled={wearing}
+        >
+          {wearing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Wear"}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-xl text-red-600 hover:text-red-700"
+          onClick={onDelete}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </Button>
+      </div>
     </div>
   );
 }

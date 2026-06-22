@@ -14,12 +14,14 @@ AI-powered digital wardrobe and personal stylist. Phase 1: upload clothes, AI au
 ### 1. Supabase project
 
 1. Create a project at [supabase.com](https://supabase.com) named `outfit-picker`
-2. Run the migration in `supabase/migrations/20250622000000_phase1_schema.sql` via SQL Editor or:
+2. Run migrations in `supabase/migrations/` via SQL Editor or:
 
 ```bash
 supabase link --project-ref <your-ref>
 supabase db push
 ```
+
+This applies all migrations (Phase 1 schema, username column, Phase 2 outfits).
 
 1. Configure Auth email template (only needed if Google OAuth is enabled):
 
@@ -84,10 +86,6 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ## Phase 2 setup
 
-Run the Phase 2 migration:
-
-```bash
-supabase db push
-```
+Migrations are included in the main `supabase db push` step above. If you set up Phase 1 before Phase 2 was added, run `supabase db push` again to apply outfit tables.
 
 Set your location in **Profile** (or during onboarding) for accurate weather.
