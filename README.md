@@ -64,6 +64,10 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
+## Phase 3 (not yet built)
+
+- Closet gap analysis and style insights
+
 ## Phase 2 features
 
 - **Today** tab with weather-aware outfit suggestions
@@ -80,9 +84,9 @@ Open [http://localhost:3000](http://localhost:3000)
 - Wardrobe grid with search and category filters
 - Archive, delete, edit, and re-tag items
 
-## Phase 3 (not yet built)
+## Phase 4 (not yet built)
 
-- Closet gap analysis and style insights
+- Community, sharing, and discovery
 
 ## Phase 2 setup
 
