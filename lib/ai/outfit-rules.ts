@@ -26,6 +26,7 @@ export interface WardrobeItemForAI {
 export interface OutfitGenerationResult {
   item_ids: string[];
   rationale: string;
+  description: string;
   slots: Partial<Record<OutfitSlot, string>>;
 }
 
@@ -237,6 +238,7 @@ export function repairOutfitSelection(
   return {
     item_ids,
     rationale: result.rationale,
+    description: result.description,
     slots,
   };
 }

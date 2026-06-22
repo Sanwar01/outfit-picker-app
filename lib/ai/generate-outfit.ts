@@ -9,12 +9,14 @@ import {
   type WardrobeItemForAI,
   type OutfitGenerationResult,
 } from "@/lib/ai/outfit-rules";
+import type { OccasionId } from "@/lib/today/occasions";
 import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
 import { getOutfitModel, withGeminiRetry } from "@/lib/ai/gemini";
 
 const OutfitSchema = z.object({
   item_ids: z.array(z.string()),
   rationale: z.string(),
+  description: z.string().optional(),
   slots: z.object({
     top: z.string().optional(),
     bottom: z.string().optional(),
@@ -32,6 +34,7 @@ const RESPONSE_SCHEMA: ResponseSchema = {
       items: { type: SchemaType.STRING },
     },
     rationale: { type: SchemaType.STRING },
+    description: { type: SchemaType.STRING },
     slots: {
       type: SchemaType.OBJECT,
       properties: {
@@ -48,10 +51,10 @@ const RESPONSE_SCHEMA: ResponseSchema = {
 
 const SYSTEM_PROMPT = `You are a personal stylist. Pick ONE complete outfit from the provided wardrobe items only.
 Use item IDs exactly as given — never invent items.
-Consider weather, formality balance, and color harmony.
+Consider weather, formality balance, color harmony, and the occasion when provided.
 Prefer variety: avoid recently repeated items when alternatives exist.
 Must include top, bottom, and shoes. Add outerwear when weather is cool or rainy.
-Return friendly, specific rationale in one or two sentences.`;
+Return a short rationale (one sentence) and a description that names each selected piece by its exact wardrobe name.`;
 
 async function callGemini(
   input: {
@@ -59,6 +62,8 @@ async function callGemini(
     styleVibes: string[];
     wardrobe: WardrobeItemForAI[];
     excludeCombinations: string[][];
+    occasionId: OccasionId;
+    occasionHint: string;
   },
   apiKey: string
 ): Promise<OutfitGenerationResult> {
@@ -77,6 +82,11 @@ async function callGemini(
   const prompt = JSON.stringify({
     weather: input.weather,
     style_vibes: input.styleVibes,
+    occasion: input.occasionId,
+    occasion_guidance:
+      input.occasionId === "auto"
+        ? "Choose based on weather and style vibes."
+        : input.occasionHint,
     wardrobe: compactWardrobe,
     exclude_combinations: input.excludeCombinations,
   });
@@ -90,7 +100,13 @@ async function callGemini(
     throw new Error("Empty response from Gemini");
   }
 
-  return OutfitSchema.parse(JSON.parse(text));
+  const parsed = OutfitSchema.parse(JSON.parse(text));
+  return {
+    item_ids: parsed.item_ids,
+    rationale: parsed.rationale,
+    description: parsed.description ?? "",
+    slots: parsed.slots,
+  };
 }
 
 export async function generateOutfitWithAI(input: {
@@ -98,6 +114,8 @@ export async function generateOutfitWithAI(input: {
   styleVibes: string[];
   wardrobe: WardrobeItemForAI[];
   excludeCombinations: string[][];
+  occasionId: OccasionId;
+  occasionHint: string;
 }): Promise<OutfitGenerationResult> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {

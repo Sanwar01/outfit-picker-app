@@ -3,6 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { OutfitSuggestion } from "@/components/today/outfit-suggestion";
 import { checkWardrobeReadiness } from "@/lib/today/wardrobe-readiness";
+import { resolveWeatherBundle } from "@/lib/outfits/generate";
+import { defaultWeatherBundle } from "@/lib/weather/open-meteo";
+import { WeatherWidget } from "@/components/today/weather-widget";
 import type { ClothingItem } from "@/lib/types/database";
 
 export const dynamic = "force-dynamic";
@@ -36,10 +39,14 @@ export default async function TodayPage() {
   const name = profile?.display_name ?? "there";
   const readiness = checkWardrobeReadiness((wardrobe ?? []) as ClothingItem[]);
   const hasLocation = profile?.location_lat != null;
+  const weatherBundle = profile
+    ? await resolveWeatherBundle(profile)
+    : defaultWeatherBundle(null);
+  const weather = weatherBundle.current;
 
   const subtitle =
     readiness.status === "ready"
-      ? "Here's what I'd wear today"
+      ? "What's the plan today?"
       : readiness.status === "empty"
         ? "Add a few pieces and I'll handle the rest"
         : "You're close — one more category to go";
@@ -54,10 +61,13 @@ export default async function TodayPage() {
           <p className="mt-1 text-sm text-stone-500">{subtitle}</p>
         </div>
 
+        <WeatherWidget bundle={weatherBundle} hasLocation={hasLocation} />
+
         <OutfitSuggestion
           styleVibes={profile?.style_vibes ?? []}
           hasLocation={hasLocation}
           readiness={readiness}
+          weather={weather}
         />
       </div>
     </AppShell>

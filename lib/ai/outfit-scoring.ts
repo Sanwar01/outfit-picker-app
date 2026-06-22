@@ -203,21 +203,37 @@ export function shufflePenalty(
   return penalty;
 }
 
+export function occasionFitScore(
+  items: ClothingItem[],
+  formalityTarget: number
+): number {
+  const avgFormality =
+    items.reduce((sum, item) => sum + item.formality, 0) / items.length;
+  const distance = Math.abs(avgFormality - formalityTarget);
+  return clamp(100 - distance * 22, 0, 100);
+}
+
 export function scoreOutfitCombo(
   items: ClothingItem[],
   weather: WeatherSnapshot,
   excludeCombinations: string[][],
-  styleVibes: string[] = []
+  styleVibes: string[] = [],
+  formalityTarget?: number
 ): number {
   const penalty = shufflePenalty(items, excludeCombinations);
   if (penalty === Infinity) return -Infinity;
+
+  const vibeOrOccasion =
+    formalityTarget !== undefined
+      ? occasionFitScore(items, formalityTarget) * 0.12
+      : styleVibeScore(items, styleVibes) * 0.05;
 
   return (
     comboFreshnessScore(items) * 0.25 +
     formalityCohesionScore(items) * 0.25 +
     colorHarmonyScore(items) * 0.3 +
     weatherFitScore(items, weather) * 0.15 +
-    styleVibeScore(items, styleVibes) * 0.05 -
+    vibeOrOccasion -
     penalty
   );
 }

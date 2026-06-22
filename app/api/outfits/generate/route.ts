@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateOutfitForUser } from "@/lib/outfits/generate";
+import type { OccasionId } from "@/lib/today/occasions";
+import { PICKABLE_OCCASIONS } from "@/lib/today/occasions";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +20,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}));
     const excludeCombinations =
       (body.excludeCombinations as string[][]) ?? [];
+    const rawOccasion = (body.occasion as string) ?? "auto";
+    const occasion: OccasionId = PICKABLE_OCCASIONS.some(
+      (o) => o.id === rawOccasion
+    )
+      ? (rawOccasion as OccasionId)
+      : rawOccasion === "auto"
+        ? "auto"
+        : "auto";
 
     const [{ data: profile }, { data: wardrobe }] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", userId).single(),
@@ -36,7 +46,8 @@ export async function POST(request: NextRequest) {
       wardrobe ?? [],
       profile,
       excludeCombinations,
-      userId
+      userId,
+      occasion
     );
 
     return NextResponse.json(result);

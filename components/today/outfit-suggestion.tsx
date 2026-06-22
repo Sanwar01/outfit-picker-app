@@ -1,34 +1,39 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Bookmark, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Bookmark, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { OccasionPicker } from '@/components/today/occasion-picker';
 import { OutfitGeneratingLoader } from '@/components/today/outfit-generating-loader';
 import { SaveOutfitDialog } from '@/components/today/save-outfit-dialog';
 import { WardrobeNudge } from '@/components/today/wardrobe-nudge';
-import {
-  buildPersonalizationLine,
-  mapGenerateError,
-} from '@/lib/today/copy';
+import { mapGenerateError } from '@/lib/today/copy';
+import { occasionLabel, type OccasionId } from '@/lib/today/occasions';
 import type { WardrobeReadiness } from '@/lib/today/wardrobe-readiness';
 import { SLOT_ORDER, type GeneratedOutfit } from '@/lib/types/outfit';
+import type { WeatherSnapshot } from '@/lib/weather/open-meteo';
+
+type View = 'picker' | 'loading' | 'result' | 'error';
 
 interface OutfitSuggestionProps {
   styleVibes: string[];
   hasLocation: boolean;
   readiness: WardrobeReadiness;
+  weather: WeatherSnapshot;
 }
 
 export function OutfitSuggestion({
   styleVibes,
   hasLocation,
   readiness,
+  weather,
 }: OutfitSuggestionProps) {
+  const [view, setView] = useState<View>('picker');
   const [outfit, setOutfit] = useState<GeneratedOutfit | null>(null);
-  const [loading, setLoading] = useState(readiness.status === 'ready');
+  const [occasion, setOccasion] = useState<OccasionId | null>(null);
   const [isShuffle, setIsShuffle] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState<{ title: string; body: string } | null>(
@@ -40,82 +45,66 @@ export function OutfitSuggestion({
   );
   const [wornToday, setWornToday] = useState(false);
 
-  const generate = useCallback(async (exclude: string[][] = [], shuffle = false) => {
-    setLoading(true);
-    setIsShuffle(shuffle);
-    setError(null);
+  const generate = useCallback(
+    async (occasionId: OccasionId, exclude: string[][] = [], shuffle = false) => {
+      setView('loading');
+      setIsShuffle(shuffle);
+      setError(null);
+      setOccasion(occasionId);
 
-    try {
-      const res = await fetch('/api/outfits/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ excludeCombinations: exclude }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        const message = data.error ?? 'Something went wrong';
-        throw new Error(message);
-      }
-
-      setOutfit(data);
-      setWornToday(false);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Something went wrong';
-      setError(mapGenerateError(message));
-      if (shuffle) {
-        setOutfit(null);
-      }
-    } finally {
-      setLoading(false);
-      setIsShuffle(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (readiness.status !== 'ready') return;
-
-    let cancelled = false;
-
-    (async () => {
       try {
         const res = await fetch('/api/outfits/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ excludeCombinations: [] }),
+          body: JSON.stringify({
+            occasion: occasionId,
+            excludeCombinations: exclude,
+          }),
         });
 
         const data = await res.json();
-        if (cancelled) return;
-
         if (!res.ok) {
           const message = data.error ?? 'Something went wrong';
-          setError(mapGenerateError(message));
-          return;
+          throw new Error(message);
         }
 
         setOutfit(data);
+        setWornToday(false);
+        setView('result');
       } catch (err) {
-        if (!cancelled) {
-          const message =
-            err instanceof Error ? err.message : 'Something went wrong';
-          setError(mapGenerateError(message));
+        const message =
+          err instanceof Error ? err.message : 'Something went wrong';
+        setError(mapGenerateError(message));
+        setView('error');
+        if (shuffle) {
+          setOutfit(null);
         }
       } finally {
-        if (!cancelled) setLoading(false);
+        setIsShuffle(false);
       }
-    })();
+    },
+    [],
+  );
 
-    return () => {
-      cancelled = true;
-    };
-  }, [readiness.status]);
+  function handleOccasionSelect(occasionId: OccasionId) {
+    setExcludeCombinations([]);
+    void generate(occasionId, [], false);
+  }
 
   async function handleShuffle() {
-    if (!outfit) return;
+    if (!outfit || !occasion) return;
     const nextExclude = [...excludeCombinations, outfit.item_ids];
     setExcludeCombinations(nextExclude);
-    await generate(nextExclude, true);
+    await generate(occasion, nextExclude, true);
+  }
+
+  function handleChangePlan() {
+    setView('picker');
+    setOutfit(null);
+    setOccasion(null);
+    setError(null);
+    setExcludeCombinations([]);
+    setWornToday(false);
   }
 
   async function handleWear() {
@@ -143,11 +132,24 @@ export function OutfitSuggestion({
     return <WardrobeNudge readiness={readiness} />;
   }
 
-  if (loading) {
-    return <OutfitGeneratingLoader variant={isShuffle ? 'shuffle' : 'initial'} />;
+  if (view === 'picker') {
+    return (
+      <OccasionPicker
+        onSelect={handleOccasionSelect}
+        styleVibes={styleVibes}
+        hasLocation={hasLocation}
+        weather={weather}
+      />
+    );
   }
 
-  if (error) {
+  if (view === 'loading') {
+    return (
+      <OutfitGeneratingLoader variant={isShuffle ? 'shuffle' : 'initial'} />
+    );
+  }
+
+  if (view === 'error' && error) {
     return (
       <div className="rounded-3xl bg-white px-6 py-10 text-center shadow-sm ring-1 ring-stone-200/60">
         <p className="text-lg font-semibold text-stone-900">{error.title}</p>
@@ -155,11 +157,20 @@ export function OutfitSuggestion({
           {error.body}
         </p>
         <div className="mt-6 flex flex-col gap-2">
+          {occasion && (
+            <Button
+              className="rounded-xl"
+              onClick={() => generate(occasion, excludeCombinations, false)}
+            >
+              Try again
+            </Button>
+          )}
           <Button
-            className="rounded-xl"
-            onClick={() => generate(excludeCombinations, false)}
+            variant="ghost"
+            className="rounded-xl text-stone-600"
+            onClick={handleChangePlan}
           >
-            Try again
+            Change plan
           </Button>
           <Button
             variant="ghost"
@@ -182,11 +193,10 @@ export function OutfitSuggestion({
     return item ? [item] : [];
   });
 
-  const contextLine = buildPersonalizationLine(
-    styleVibes,
-    outfit.weather,
-    hasLocation,
-  );
+  const occasionText =
+    outfit.occasion && outfit.occasion !== 'auto'
+      ? occasionLabel(outfit.occasion as OccasionId)
+      : 'Your look for today';
 
   return (
     <div className="space-y-6">
@@ -196,7 +206,17 @@ export function OutfitSuggestion({
         onOpenChange={setSaveDialogOpen}
       />
 
-      <p className="text-center text-sm text-stone-500">{contextLine}</p>
+      <div className="flex items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={handleChangePlan}
+          className="inline-flex items-center gap-1 text-sm text-stone-500 transition-colors hover:text-stone-800"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Change plan
+        </button>
+        <span className="text-sm font-medium text-stone-700">{occasionText}</span>
+      </div>
 
       <div className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-stone-200/60">
         <div className="grid grid-cols-2 gap-px bg-stone-100">
@@ -212,10 +232,13 @@ export function OutfitSuggestion({
             </div>
           ))}
         </div>
-        <div className="px-4 py-4">
-          <p className="text-sm leading-relaxed text-stone-600">
-            {outfit.rationale}
+        <div className="space-y-2 px-4 py-4">
+          <p className="text-sm leading-relaxed text-stone-800">
+            {outfit.description}
           </p>
+          {outfit.rationale && outfit.rationale !== outfit.description && (
+            <p className="text-xs text-stone-500">{outfit.rationale}</p>
+          )}
         </div>
       </div>
 
@@ -223,13 +246,23 @@ export function OutfitSuggestion({
         <Button
           size="lg"
           className="h-12 w-full rounded-2xl text-base"
+          onClick={() => setSaveDialogOpen(true)}
+        >
+          <Bookmark className="mr-2 h-4 w-4" />
+          Save outfit
+        </Button>
+
+        <Button
+          size="lg"
+          variant="outline"
+          className="h-12 w-full rounded-2xl border-stone-200 text-base"
           onClick={handleWear}
           disabled={actionLoading || wornToday}
         >
           {wornToday ? 'Logged for today' : 'Wear this'}
         </Button>
 
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-center pt-1">
           <button
             type="button"
             onClick={handleShuffle}
@@ -238,26 +271,8 @@ export function OutfitSuggestion({
             <RefreshCw className="h-3.5 w-3.5" />
             Try another look
           </button>
-          <span className="text-stone-300">·</span>
-          <button
-            type="button"
-            onClick={() => setSaveDialogOpen(true)}
-            className="inline-flex items-center gap-1.5 text-sm text-stone-500 transition-colors hover:text-stone-800"
-          >
-            <Bookmark className="h-3.5 w-3.5" />
-            Save for later
-          </button>
         </div>
       </div>
-
-      {!hasLocation && (
-        <p className="text-center text-xs text-stone-400">
-          <Link href="/profile" className="underline underline-offset-2">
-            Add your location
-          </Link>{' '}
-          for weather-aware picks
-        </p>
-      )}
     </div>
   );
 }

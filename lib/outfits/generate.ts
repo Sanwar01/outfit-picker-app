@@ -1,6 +1,6 @@
 import type { ClothingItem, Profile } from "@/lib/types/database";
-import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
-import { fetchWeather } from "@/lib/weather/open-meteo";
+import { fetchWeatherDetail, defaultWeatherBundle } from "@/lib/weather/open-meteo";
+import type { WeatherBundle, WeatherSnapshot } from "@/lib/weather/open-meteo";
 import {
   filterWardrobeForWeather,
   generateOutfitLocally,
@@ -14,10 +14,18 @@ import { generateOutfitWithAI } from "@/lib/ai/generate-outfit";
 import { getSignedImageUrls } from "@/lib/storage";
 import { CATEGORY_LABELS } from "@/lib/types/clothing";
 import type { ClothingCategory } from "@/lib/types/database";
+import { getOccasion } from "@/lib/today/occasions";
+import {
+  buildOutfitDescription,
+  buildShortRationale,
+} from "@/lib/today/descriptions";
+import type { OccasionId } from "@/lib/today/occasions";
 
 export interface GeneratedOutfitResponse {
   item_ids: string[];
   rationale: string;
+  description: string;
+  occasion: OccasionId;
   slots: Record<string, string>;
   items: ClothingItem[];
   imageUrls: Record<string, string>;
@@ -34,12 +42,13 @@ const outfitCache = new Map<
 function buildCacheKey(
   userId: string,
   weather: WeatherSnapshot,
+  occasionId: OccasionId,
   excludeCombinations: string[][]
 ): string | null {
   if (excludeCombinations.length > 0) return null;
 
   const today = new Date().toISOString().slice(0, 10);
-  return `${userId}:${today}:${weather.temp_c}:${weather.condition}:${weather.precip_chance}`;
+  return `${userId}:${today}:${occasionId}:${weather.temp_c}:${weather.condition}:${weather.precip_chance}`;
 }
 
 function getCachedOutfit(
@@ -61,26 +70,32 @@ function setCachedOutfit(key: string | null, result: GeneratedOutfitResponse) {
 }
 
 export async function resolveWeather(profile: Profile): Promise<WeatherSnapshot> {
+  const bundle = await resolveWeatherBundle(profile);
+  return bundle.current;
+}
+
+export async function resolveWeatherBundle(profile: Profile): Promise<WeatherBundle> {
   if (profile.location_lat != null && profile.location_lng != null) {
-    return fetchWeather(
+    return fetchWeatherDetail(
       profile.location_lat,
       profile.location_lng,
       profile.location_city
     );
   }
 
-  return {
-    temp_c: 18,
-    condition: "cloudy",
-    precip_chance: 20,
-    city: profile.location_city,
-  };
+  return defaultWeatherBundle(profile.location_city);
 }
 
 async function buildResponse(
-  aiResult: { item_ids: string[]; rationale: string; slots: Record<string, string> },
+  aiResult: {
+    item_ids: string[];
+    rationale: string;
+    description?: string;
+    slots: Record<string, string>;
+  },
   filtered: ClothingItem[],
   weather: WeatherSnapshot,
+  occasionId: OccasionId,
   generated_by: "ai" | "rules"
 ): Promise<GeneratedOutfitResponse> {
   const selectedItems = filtered.filter((i) =>
@@ -90,10 +105,19 @@ async function buildResponse(
     selectedItems.map((i) => i.image_url)
   );
 
+  const slots = aiResult.slots;
+  const description =
+    aiResult.description?.trim() ||
+    buildOutfitDescription(selectedItems, slots, occasionId, weather);
+  const rationale =
+    aiResult.rationale?.trim() || buildShortRationale(occasionId, weather);
+
   return {
     item_ids: aiResult.item_ids,
-    rationale: aiResult.rationale,
-    slots: aiResult.slots,
+    rationale,
+    description,
+    occasion: occasionId,
+    slots,
     items: selectedItems,
     imageUrls,
     weather,
@@ -105,7 +129,8 @@ export async function generateOutfitForUser(
   wardrobe: ClothingItem[],
   profile: Profile,
   excludeCombinations: string[][] = [],
-  userId?: string
+  userId?: string,
+  occasionId: OccasionId = "auto"
 ): Promise<GeneratedOutfitResponse> {
   const activeItems = wardrobe.filter((i) => i.status === "active");
 
@@ -125,7 +150,7 @@ export async function generateOutfitForUser(
 
   const weather = await resolveWeather(profile);
   const cacheKey = userId
-    ? buildCacheKey(userId, weather, excludeCombinations)
+    ? buildCacheKey(userId, weather, occasionId, excludeCombinations)
     : null;
   const cached = getCachedOutfit(cacheKey);
   if (cached) return cached;
@@ -139,6 +164,7 @@ export async function generateOutfitForUser(
   }
 
   const wardrobeForAI = toWardrobeForAI(filtered);
+  const occasion = getOccasion(occasionId);
 
   let generated_by: "ai" | "rules" = "ai";
   let aiResult;
@@ -149,6 +175,8 @@ export async function generateOutfitForUser(
       styleVibes: profile.style_vibes ?? [],
       wardrobe: wardrobeForAI,
       excludeCombinations,
+      occasionId,
+      occasionHint: occasion.aiHint,
     });
     aiResult = repairOutfitSelection(aiResult, filtered, weather);
   } catch (error) {
@@ -159,6 +187,7 @@ export async function generateOutfitForUser(
       weather,
       excludeCombinations,
       styleVibes: profile.style_vibes ?? [],
+      occasionId,
     });
   }
 
@@ -169,6 +198,7 @@ export async function generateOutfitForUser(
       weather,
       excludeCombinations,
       styleVibes: profile.style_vibes ?? [],
+      occasionId,
     });
   }
 
@@ -180,10 +210,12 @@ export async function generateOutfitForUser(
     {
       item_ids: aiResult.item_ids,
       rationale: aiResult.rationale,
+      description: aiResult.description,
       slots,
     },
     filtered,
     weather,
+    occasionId,
     generated_by
   );
 

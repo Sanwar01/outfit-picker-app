@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { resolveWeather } from "@/lib/outfits/generate";
+import { resolveWeatherBundle } from "@/lib/outfits/generate";
 
 export const dynamic = "force-dynamic";
 
@@ -23,8 +23,8 @@ export async function GET() {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
-    const weather = await resolveWeather(profile);
-    return NextResponse.json(weather);
+    const bundle = await resolveWeatherBundle(profile);
+    return NextResponse.json(bundle);
   } catch (error) {
     console.error("Weather error:", error);
     return NextResponse.json(

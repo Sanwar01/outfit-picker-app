@@ -27,8 +27,10 @@ export function missingSlotsHeadline(missing: OutfitSlot[]): string {
 export function buildPersonalizationLine(
   styleVibes: string[],
   weather: WeatherSnapshot,
-  hasLocation: boolean
+  hasLocation: boolean,
+  options: { includeWeather?: boolean } = {}
 ): string {
+  const includeWeather = options.includeWeather ?? true;
   const parts: string[] = [];
 
   if (styleVibes.length > 0) {
@@ -39,14 +41,16 @@ export function buildPersonalizationLine(
     parts.push(vibeText);
   }
 
-  if (hasLocation && weather.city) {
-    parts.push(
-      `${weather.temp_c}° in ${weather.city} · ${weatherConditionLabel(weather.condition)}`
-    );
-  } else if (hasLocation) {
-    parts.push(
-      `${weather.temp_c}° · ${weatherConditionLabel(weather.condition)}`
-    );
+  if (includeWeather) {
+    if (hasLocation && weather.city) {
+      parts.push(
+        `${weather.temp_c}° in ${weather.city} · ${weatherConditionLabel(weather.condition)}`
+      );
+    } else if (hasLocation) {
+      parts.push(
+        `${weather.temp_c}° · ${weatherConditionLabel(weather.condition)}`
+      );
+    }
   }
 
   if (parts.length === 0) {

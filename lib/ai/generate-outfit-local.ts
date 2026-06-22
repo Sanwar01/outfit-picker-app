@@ -4,12 +4,17 @@ import {
   ACCESSORY_SCORE_THRESHOLD,
   CANDIDATES_PER_SLOT,
   accessoryFitScore,
-  buildLocalRationale,
   needsOuterwear,
   rankCandidates,
   scoreOutfitCombo,
 } from "@/lib/ai/outfit-scoring";
 import type { OutfitGenerationResult, OutfitSlot } from "@/lib/ai/outfit-rules";
+import {
+  buildOutfitDescription,
+  buildShortRationale,
+} from "@/lib/today/descriptions";
+import type { OccasionId } from "@/lib/today/occasions";
+import { getOccasion } from "@/lib/today/occasions";
 
 const ROTATE_SLOTS: OutfitSlot[] = ["top", "bottom", "shoes", "outerwear"];
 
@@ -86,7 +91,8 @@ function pickBestCoreCombo(
   combos: CoreCombo[],
   weather: WeatherSnapshot,
   excludeCombinations: string[][],
-  styleVibes: string[]
+  styleVibes: string[],
+  formalityTarget?: number
 ): CoreCombo | null {
   const scored = combos
     .map((combo) => {
@@ -97,7 +103,8 @@ function pickBestCoreCombo(
           items,
           weather,
           excludeCombinations,
-          styleVibes
+          styleVibes,
+          formalityTarget
         ),
       };
     })
@@ -120,7 +127,8 @@ function pickBestOuterwear(
   candidates: ClothingItem[],
   weather: WeatherSnapshot,
   excludeCombinations: string[][],
-  styleVibes: string[]
+  styleVibes: string[],
+  formalityTarget?: number
 ): ClothingItem | undefined {
   if (!needsOuterwear(weather) || candidates.length === 0) return undefined;
 
@@ -130,7 +138,8 @@ function pickBestOuterwear(
       [...core, candidate],
       weather,
       excludeCombinations,
-      styleVibes
+      styleVibes,
+      formalityTarget
     );
     if (!best || score > best.score) {
       best = { item: candidate, score };
@@ -164,8 +173,12 @@ export function generateOutfitLocally(input: {
   weather: WeatherSnapshot;
   excludeCombinations: string[][];
   styleVibes?: string[];
+  occasionId: OccasionId;
 }): OutfitGenerationResult {
   const styleVibes = input.styleVibes ?? [];
+  const occasion = getOccasion(input.occasionId);
+  const formalityTarget =
+    input.occasionId === "auto" ? undefined : occasion.formalityTarget;
   const byCategory = groupByCategory(input.wardrobe);
 
   const rotateSlot =
@@ -191,7 +204,8 @@ export function generateOutfitLocally(input: {
     enumerateCoreCombos(pools),
     input.weather,
     input.excludeCombinations,
-    styleVibes
+    styleVibes,
+    formalityTarget
   );
 
   if (!bestCore) {
@@ -208,7 +222,8 @@ export function generateOutfitLocally(input: {
       }),
       input.weather,
       input.excludeCombinations,
-      styleVibes
+      styleVibes,
+      formalityTarget
     );
   }
 
@@ -216,6 +231,7 @@ export function generateOutfitLocally(input: {
     return {
       item_ids: [],
       rationale: "Could not build an outfit from your wardrobe.",
+      description: "Could not build an outfit from your wardrobe.",
       slots: {},
     };
   }
@@ -232,7 +248,8 @@ export function generateOutfitLocally(input: {
     pools.outerwear,
     input.weather,
     input.excludeCombinations,
-    styleVibes
+    styleVibes,
+    formalityTarget
   );
   if (outerwear) {
     slots.outerwear = outerwear.id;
@@ -254,9 +271,19 @@ export function generateOutfitLocally(input: {
     ...(accessory ? [accessory] : []),
   ];
 
+  const slotsRecord = Object.fromEntries(
+    Object.entries(slots).filter(([, id]) => !!id)
+  ) as Record<string, string>;
+
   return {
     item_ids: selectedItems.map((item) => item.id),
-    rationale: buildLocalRationale(selectedItems, input.weather),
+    rationale: buildShortRationale(input.occasionId, input.weather),
+    description: buildOutfitDescription(
+      selectedItems,
+      slotsRecord,
+      input.occasionId,
+      input.weather
+    ),
     slots,
   };
 }

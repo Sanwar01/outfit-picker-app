@@ -57,7 +57,7 @@ function SaveOutfitForm({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         slots: outfit.slots,
-        rationale: outfit.rationale,
+        rationale: outfit.description || outfit.rationale,
         weather: outfit.weather,
         name: trimmed,
       }),

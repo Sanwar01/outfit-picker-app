@@ -4,6 +4,8 @@ import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
 export interface GeneratedOutfit {
   item_ids: string[];
   rationale: string;
+  description: string;
+  occasion: string;
   slots: Record<string, string>;
   items: ClothingItem[];
   imageUrls: Record<string, string>;

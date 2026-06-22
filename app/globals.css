@@ -128,3 +128,64 @@
     @apply font-sans;
   }
 }
+
+@keyframes weather-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes weather-sun-pulse {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.06) rotate(8deg);
+    opacity: 0.92;
+  }
+}
+
+@keyframes weather-rain-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(3px);
+  }
+}
+
+@keyframes weather-storm-flash {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.65;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.weather-animate-float {
+  animation: weather-float 4s ease-in-out infinite;
+}
+
+.weather-animate-sun {
+  animation: weather-sun-pulse 5s ease-in-out infinite;
+}
+
+.weather-animate-rain {
+  animation: weather-rain-bob 2.5s ease-in-out infinite;
+}
+
+.weather-animate-storm {
+  animation: weather-storm-flash 3s ease-in-out infinite;
+}
