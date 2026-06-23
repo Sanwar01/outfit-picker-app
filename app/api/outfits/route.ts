@@ -25,6 +25,26 @@ export async function GET(request: Request) {
     const userId = claimsData.claims.sub as string;
     const { searchParams } = new URL(request.url);
     const favoritesOnly = searchParams.get("favorites") === "true";
+    const itemId = searchParams.get("itemId");
+
+    let outfitIdsForItem: string[] | null = null;
+
+    if (itemId) {
+      const { data: links, error: linksError } = await supabase
+        .from("outfit_items")
+        .select("outfit_id")
+        .eq("clothing_item_id", itemId);
+
+      if (linksError) {
+        return NextResponse.json({ error: linksError.message }, { status: 500 });
+      }
+
+      outfitIdsForItem = [...new Set((links ?? []).map((row) => row.outfit_id))];
+
+      if (outfitIdsForItem.length === 0) {
+        return NextResponse.json([]);
+      }
+    }
 
     let query = supabase
       .from("outfits")
@@ -34,6 +54,10 @@ export async function GET(request: Request) {
 
     if (favoritesOnly) {
       query = query.eq("is_favorite", true);
+    }
+
+    if (outfitIdsForItem) {
+      query = query.in("id", outfitIdsForItem);
     }
 
     const { data: outfits, error } = await query;

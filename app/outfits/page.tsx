@@ -5,9 +5,14 @@ import { OutfitsList } from "@/components/outfits/outfits-list";
 
 export const dynamic = "force-dynamic";
 
-export default async function OutfitsPage() {
+export default async function OutfitsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ itemId?: string }>;
+}) {
   const supabase = await createClient();
   const { data: claimsData } = await supabase.auth.getClaims();
+  const { itemId } = await searchParams;
 
   if (!claimsData?.claims?.sub) {
     redirect("/login");
@@ -19,7 +24,7 @@ export default async function OutfitsPage() {
         <h1 className="mb-6 text-xl font-semibold text-stone-900">
           Saved outfits
         </h1>
-        <OutfitsList />
+        <OutfitsList itemId={itemId} />
       </div>
     </AppShell>
   );

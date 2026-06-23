@@ -11,7 +11,11 @@ import { weatherConditionLabel } from "@/lib/weather/open-meteo";
 import type { SavedOutfit } from "@/lib/types/outfit";
 import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
 
-export function OutfitsList() {
+interface OutfitsListProps {
+  itemId?: string;
+}
+
+export function OutfitsList({ itemId }: OutfitsListProps) {
   const [outfits, setOutfits] = useState<SavedOutfit[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "favorites">("all");
@@ -21,10 +25,11 @@ export function OutfitsList() {
 
     (async () => {
       setLoading(true);
-      const url =
-        filter === "favorites"
-          ? "/api/outfits?favorites=true"
-          : "/api/outfits";
+      const params = new URLSearchParams();
+      if (filter === "favorites") params.set("favorites", "true");
+      if (itemId) params.set("itemId", itemId);
+      const query = params.toString();
+      const url = query ? `/api/outfits?${query}` : "/api/outfits";
       const res = await fetch(url);
       const data = await res.json();
       if (!cancelled) {
@@ -36,7 +41,7 @@ export function OutfitsList() {
     return () => {
       cancelled = true;
     };
-  }, [filter]);
+  }, [filter, itemId]);
 
   async function toggleFavorite(outfit: SavedOutfit) {
     const res = await fetch(`/api/outfits/${outfit.id}`, {
@@ -134,6 +139,11 @@ export function OutfitsList() {
 
   return (
     <div className="space-y-4">
+      {itemId && (
+        <p className="rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-600">
+          Showing outfits that include this item.
+        </p>
+      )}
       <div className="flex gap-2">
         {(["all", "favorites"] as const).map((value) => (
           <button

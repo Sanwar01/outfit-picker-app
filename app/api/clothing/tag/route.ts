@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
       .update({
         name: tags.name,
         category: tags.category,
+        sub_category: tags.sub_category,
         colors: tags.colors,
         season: tags.season,
         pattern: tags.pattern,

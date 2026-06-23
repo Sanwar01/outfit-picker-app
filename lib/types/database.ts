@@ -69,6 +69,17 @@ export interface Database {
           ai_confidence: number | null;
           wear_count: number;
           last_worn_at: string | null;
+          brand: string | null;
+          material: string | null;
+          warmth: number | null;
+          notes: string | null;
+          care_instructions: string | null;
+          occasions: string[];
+          style_tags: string[];
+          is_favorite: boolean;
+          purchase_price: number | null;
+          description: string | null;
+          sub_category: string | null;
           created_at: string;
         };
         Insert: {
@@ -85,6 +96,17 @@ export interface Database {
           ai_confidence?: number | null;
           wear_count?: number;
           last_worn_at?: string | null;
+          brand?: string | null;
+          material?: string | null;
+          warmth?: number | null;
+          notes?: string | null;
+          care_instructions?: string | null;
+          occasions?: string[];
+          style_tags?: string[];
+          is_favorite?: boolean;
+          purchase_price?: number | null;
+          description?: string | null;
+          sub_category?: string | null;
           created_at?: string;
         };
         Update: {
@@ -101,6 +123,41 @@ export interface Database {
           ai_confidence?: number | null;
           wear_count?: number;
           last_worn_at?: string | null;
+          brand?: string | null;
+          material?: string | null;
+          warmth?: number | null;
+          notes?: string | null;
+          care_instructions?: string | null;
+          occasions?: string[];
+          style_tags?: string[];
+          is_favorite?: boolean;
+          purchase_price?: number | null;
+          description?: string | null;
+          sub_category?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      clothing_item_images: {
+        Row: {
+          id: string;
+          clothing_item_id: string;
+          image_url: string;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          clothing_item_id: string;
+          image_url: string;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          clothing_item_id?: string;
+          image_url?: string;
+          sort_order?: number;
           created_at?: string;
         };
         Relationships: [];
@@ -188,6 +245,8 @@ export interface Database {
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type ClothingItem =
   Database["public"]["Tables"]["clothing_items"]["Row"];
+export type ClothingItemImage =
+  Database["public"]["Tables"]["clothing_item_images"]["Row"];
 export type Outfit = Database["public"]["Tables"]["outfits"]["Row"];
 export type OutfitItem = Database["public"]["Tables"]["outfit_items"]["Row"];
 export type WearLog = Database["public"]["Tables"]["wear_log"]["Row"];

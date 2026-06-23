@@ -10,6 +10,7 @@ import type { ClothingCategory } from "@/lib/types/database";
 const ClothingTagSchema = z.object({
   name: z.string(),
   category: z.enum(["top", "bottom", "outerwear", "shoes", "accessory"]),
+  sub_category: z.string(),
   colors: z.array(z.string()),
   pattern: z.string(),
   season: z.array(z.string()),
@@ -22,6 +23,7 @@ export type ClothingTagResult = z.infer<typeof ClothingTagSchema>;
 const SYSTEM_PROMPT = `You are a wardrobe cataloging assistant. Analyze the clothing item in the image.
 Return structured data for the primary visible item only.
 Categories: top, bottom, outerwear, shoes, accessory.
+sub_category should be a specific garment type (e.g. Overshirt, Chinos, Sneakers, Tote bag).
 Lower confidence if uncertain. Do not invent items not visible in the image.`;
 
 const RESPONSE_SCHEMA: ResponseSchema = {
@@ -33,6 +35,7 @@ const RESPONSE_SCHEMA: ResponseSchema = {
       format: "enum" as const,
       enum: ["top", "bottom", "outerwear", "shoes", "accessory"],
     },
+    sub_category: { type: SchemaType.STRING },
     colors: {
       type: SchemaType.ARRAY,
       items: { type: SchemaType.STRING },
@@ -48,6 +51,7 @@ const RESPONSE_SCHEMA: ResponseSchema = {
   required: [
     "name",
     "category",
+    "sub_category",
     "colors",
     "pattern",
     "season",
