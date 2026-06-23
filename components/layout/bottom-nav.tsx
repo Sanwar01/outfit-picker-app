@@ -17,8 +17,8 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-stone-200 bg-white/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-lg items-center justify-around px-2 pb-safe">
+    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-4">
+      <div className="pointer-events-auto flex h-16 w-full max-w-md items-center justify-around rounded-full bg-neutral-950 px-3 shadow-2xl">
         {NAV_ITEMS.map((item) => {
           const isActive =
             item.href === "/wardrobe/add"
@@ -31,7 +31,7 @@ export function BottomNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex h-11 w-11 -translate-y-2 items-center justify-center rounded-full bg-stone-900 text-white shadow-lg"
+                className="flex h-11 w-11 -translate-y-3 items-center justify-center rounded-full bg-white text-neutral-950 shadow-lg"
               >
                 <Icon className="h-5 w-5" />
                 <span className="sr-only">{item.label}</span>
@@ -44,11 +44,11 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex min-w-0 flex-col items-center gap-0.5 text-[10px]",
-                isActive ? "text-stone-900" : "text-stone-400"
+                "flex min-w-0 flex-col items-center gap-0.5 text-[10px] font-medium",
+                isActive ? "text-white" : "text-neutral-500",
               )}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="h-5 w-5" strokeWidth={isActive ? 2 : 1.75} />
               <span className="truncate">{item.label}</span>
             </Link>
           );

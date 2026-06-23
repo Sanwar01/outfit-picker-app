@@ -60,22 +60,22 @@ export function OutfitGeneratingLoader({
 
   return (
     <div
-      className="relative overflow-hidden rounded-3xl border border-stone-200/80 bg-linear-to-b from-stone-50 via-white to-amber-50/40 shadow-sm"
+      className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-linear-to-b from-neutral-50 via-white to-neutral-100 shadow-sm"
       aria-busy="true"
       aria-label="Generating outfit"
     >
-      <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-amber-100/50 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-16 -left-8 h-36 w-36 rounded-full bg-stone-200/40 blur-3xl" />
+      <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-neutral-200/50 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-16 -left-8 h-36 w-36 rounded-full bg-neutral-200/40 blur-3xl" />
 
       <div className="relative space-y-6 p-5 sm:p-6">
         <div className="space-y-1 text-center">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-stone-400">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">
             {variant === 'shuffle' ? 'Another idea' : 'Your look today'}
           </p>
-          <h2 className="text-lg font-semibold text-stone-900">
+          <h2 className="text-lg font-semibold text-neutral-950">
             Putting something together
           </h2>
-          <p className="text-sm text-stone-500">
+          <p className="text-sm text-neutral-500">
             Based on your clothes and today&apos;s weather
           </p>
         </div>

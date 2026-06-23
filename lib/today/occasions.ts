@@ -5,6 +5,7 @@ export type OccasionId =
   | "date_night"
   | "gym"
   | "formal"
+  | "travel"
   | "auto";
 
 export interface Occasion {
@@ -57,6 +58,13 @@ export const PICKABLE_OCCASIONS: Occasion[] = [
     description: "Your most polished pieces",
     formalityTarget: 5,
     aiHint: "Formal occasion — most polished, dressy combination from the wardrobe.",
+  },
+  {
+    id: "travel",
+    label: "Travel",
+    description: "Comfortable layers for being on the move",
+    formalityTarget: 2.5,
+    aiHint: "Travel-friendly outfit — comfortable, versatile layers and practical shoes.",
   },
 ];
 

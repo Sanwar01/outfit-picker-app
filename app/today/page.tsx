@@ -2,7 +2,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { OutfitSuggestion } from "@/components/today/outfit-suggestion";
+import { TodayHeader } from "@/components/today/today-header";
 import { checkWardrobeReadiness } from "@/lib/today/wardrobe-readiness";
+import { getWardrobeInsight } from "@/lib/today/wardrobe-insight";
 import { resolveWeatherBundle } from "@/lib/outfits/generate";
 import { defaultWeatherBundle } from "@/lib/weather/open-meteo";
 import { WeatherWidget } from "@/components/today/weather-widget";
@@ -36,38 +38,36 @@ export default async function TodayPage() {
       .eq("status", "active"),
   ]);
 
+  const items = (wardrobe ?? []) as ClothingItem[];
   const name = profile?.display_name ?? "there";
-  const readiness = checkWardrobeReadiness((wardrobe ?? []) as ClothingItem[]);
+  const readiness = checkWardrobeReadiness(items);
   const hasLocation = profile?.location_lat != null;
   const weatherBundle = profile
     ? await resolveWeatherBundle(profile)
     : defaultWeatherBundle(null);
-  const weather = weatherBundle.current;
+  const wardrobeInsight = getWardrobeInsight(items);
 
   const subtitle =
     readiness.status === "ready"
-      ? "What's the plan today?"
+      ? "Here's what I recommend for you today"
       : readiness.status === "empty"
         ? "Add a few pieces and I'll handle the rest"
         : "You're close — one more category to go";
 
   return (
     <AppShell>
-      <div className="px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight text-stone-900">
-            {getGreeting()}, {name}
-          </h1>
-          <p className="mt-1 text-sm text-stone-500">{subtitle}</p>
-        </div>
+      <div className="px-4 py-5">
+        <TodayHeader
+          greeting={`${getGreeting()}, ${name}`}
+          subtitle={subtitle}
+        />
 
         <WeatherWidget bundle={weatherBundle} hasLocation={hasLocation} />
 
         <OutfitSuggestion
           styleVibes={profile?.style_vibes ?? []}
-          hasLocation={hasLocation}
           readiness={readiness}
-          weather={weather}
+          wardrobeInsight={wardrobeInsight}
         />
       </div>
     </AppShell>

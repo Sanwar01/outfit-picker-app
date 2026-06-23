@@ -38,10 +38,10 @@ export function WeatherForecastDrawer({
       >
         <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-stone-200" />
         <SheetHeader className="border-b border-stone-100 px-5 pb-4 text-left">
-          <p className="text-[10px] font-semibold tracking-[0.2em] text-rose-400 uppercase">
+          <p className="text-[10px] font-semibold tracking-[0.2em] text-neutral-400 uppercase">
             Weather
           </p>
-          <SheetTitle className="font-serif text-2xl font-normal text-stone-900">
+          <SheetTitle className="text-2xl font-semibold text-neutral-950">
             5-day forecast
           </SheetTitle>
           <SheetDescription className="text-sm text-stone-500">

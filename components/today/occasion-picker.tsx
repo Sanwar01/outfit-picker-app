@@ -5,6 +5,7 @@ import {
   Dumbbell,
   Footprints,
   Heart,
+  Plane,
   Shirt,
   Sparkles,
   Wand2,
@@ -27,6 +28,7 @@ const OCCASION_ICONS: Record<Occasion['id'], typeof Shirt> = {
   date_night: Heart,
   gym: Dumbbell,
   formal: Sparkles,
+  travel: Plane,
   auto: Wand2,
 };
 
