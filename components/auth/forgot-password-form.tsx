@@ -68,7 +68,7 @@ export function ForgotPasswordForm({ error, sent }: ForgotPasswordFormProps) {
   if (sent) {
     return (
       <ForgotPasswordShell>
-        <h1 className="mt-8 text-center font-[family-name:var(--font-auth-serif)] text-[1.75rem] leading-tight tracking-tight text-[#1a1a1a]">
+        <h1 className="mt-8 text-center font-(family-name:--font-auth-serif) text-[1.75rem] leading-tight tracking-tight text-[#1a1a1a]">
           Check your email
         </h1>
         <p className="mx-auto mt-3 max-w-xs text-center text-sm leading-relaxed text-[#6b6560]">
@@ -90,7 +90,7 @@ export function ForgotPasswordForm({ error, sent }: ForgotPasswordFormProps) {
 
   return (
     <ForgotPasswordShell>
-      <h1 className="mt-8 text-center font-[family-name:var(--font-auth-serif)] text-[1.75rem] leading-tight tracking-tight text-[#1a1a1a]">
+      <h1 className="mt-8 text-center font-(family-name:--font-auth-serif) text-[1.75rem] leading-tight tracking-tight text-[#1a1a1a]">
         Forgot your password?
       </h1>
       <p className="mx-auto mt-3 max-w-xs text-center text-sm leading-relaxed text-[#6b6560]">
@@ -130,7 +130,7 @@ export function ForgotPasswordForm({ error, sent }: ForgotPasswordFormProps) {
         Remember your password?{' '}
         <Link
           href="/login"
-          className="font-[family-name:var(--font-auth-serif)] text-[#8b7355] hover:underline"
+          className="font-(family-name:--font-auth-serif) text-[#8b7355] hover:underline"
         >
           Log in
         </Link>

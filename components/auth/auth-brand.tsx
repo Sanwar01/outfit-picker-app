@@ -71,7 +71,7 @@ export function AuthBrand({ variant = "inline" }: AuthBrandProps) {
     return (
       <div className="flex flex-col items-center text-center">
         <HangerLogo />
-        <p className="mt-3 font-[family-name:var(--font-auth-serif)] text-2xl leading-none text-[#1a1a1a]">
+        <p className="mt-3 font-(family-name:--font-auth-serif) text-2xl leading-none text-[#1a1a1a]">
           Wardrobe
         </p>
         <p className="mt-1 text-[10px] font-medium tracking-[0.2em] text-[#8b7355]">
@@ -85,7 +85,7 @@ export function AuthBrand({ variant = "inline" }: AuthBrandProps) {
     <div className="flex items-center gap-3">
       <HangerLogo />
       <div>
-        <p className="font-[family-name:var(--font-auth-serif)] text-2xl leading-none text-[#1a1a1a]">
+        <p className="font-(family-name:--font-auth-serif) text-2xl leading-none text-[#1a1a1a]">
           Wardrobe
         </p>
         <p className="mt-1 text-[10px] font-medium tracking-[0.2em] text-[#8b7355]">
@@ -134,7 +134,7 @@ export function AuthHeroBackground() {
         className="object-cover object-top opacity-30"
         sizes="(max-width: 512px) 100vw, 448px"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#f4efe6]/70 via-[#f4efe6]/85 to-[#f4efe6]" />
+      <div className="absolute inset-0 bg-linear-to-b from-[#f4efe6]/70 via-[#f4efe6]/85 to-[#f4efe6]" />
     </div>
   );
 }

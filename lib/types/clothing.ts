@@ -2,11 +2,12 @@ import type { ClothingCategory, ClothingItem } from "./database";
 
 export const STYLE_VIBES = [
   "Minimal",
+  "Classic",
+  "Casual",
   "Streetwear",
   "Smart casual",
-  "Sporty",
-  "Classic",
-  "Bold",
+  "Elegant",
+  "Other",
 ] as const;
 
 export type StyleVibe = (typeof STYLE_VIBES)[number];

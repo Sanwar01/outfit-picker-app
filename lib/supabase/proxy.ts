@@ -9,6 +9,10 @@ function isPublicPath(pathname: string) {
   );
 }
 
+function isOnboardingPath(pathname: string) {
+  return pathname === "/onboarding" || pathname.startsWith("/onboarding/");
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -52,7 +56,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && pathname !== "/onboarding" && !isPublicPath(pathname) && !pathname.startsWith("/api")) {
+  if (user && !isOnboardingPath(pathname) && !isPublicPath(pathname) && !pathname.startsWith("/api")) {
     const { data: profile } = await supabase
       .from("profiles")
       .select("onboarding_complete")
@@ -66,7 +70,7 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  if (user && pathname === "/onboarding") {
+  if (user && isOnboardingPath(pathname)) {
     const { data: profile } = await supabase
       .from("profiles")
       .select("onboarding_complete")

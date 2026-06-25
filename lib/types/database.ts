@@ -27,6 +27,8 @@ export interface Database {
           location_lng: number | null;
           location_city: string | null;
           style_vibes: string[];
+          style_goals: string[];
+          onboarding_audience: string | null;
           onboarding_complete: boolean;
           created_at: string;
         };
@@ -38,6 +40,8 @@ export interface Database {
           location_lng?: number | null;
           location_city?: string | null;
           style_vibes?: string[];
+          style_goals?: string[];
+          onboarding_audience?: string | null;
           onboarding_complete?: boolean;
           created_at?: string;
         };
@@ -49,6 +53,8 @@ export interface Database {
           location_lng?: number | null;
           location_city?: string | null;
           style_vibes?: string[];
+          style_goals?: string[];
+          onboarding_audience?: string | null;
           onboarding_complete?: boolean;
           created_at?: string;
         };
