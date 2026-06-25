@@ -10,6 +10,7 @@ interface AuthFieldProps {
   name: string;
   type: AuthFieldType;
   placeholder: string;
+  label?: string;
   autoComplete?: string;
   required?: boolean;
   defaultValue?: string;
@@ -28,6 +29,7 @@ export function AuthField({
   name,
   type,
   placeholder,
+  label,
   autoComplete,
   required,
   defaultValue,
@@ -48,13 +50,23 @@ export function AuthField({
       : { defaultValue };
 
   return (
-    <div className="relative">
-      <Icon
-        className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-[#a39e97]"
-        strokeWidth={1.5}
-      />
-      <input
-        name={name}
+    <div className={label ? "space-y-2" : undefined}>
+      {label && (
+        <label
+          htmlFor={name}
+          className="block text-sm font-semibold text-[#1a1a1a]"
+        >
+          {label}
+        </label>
+      )}
+      <div className="relative">
+        <Icon
+          className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-[#a39e97]"
+          strokeWidth={1.5}
+        />
+        <input
+          id={name}
+          name={name}
         type={isPassword && showPassword ? "text" : type}
         placeholder={placeholder}
         autoComplete={autoComplete}
@@ -80,6 +92,7 @@ export function AuthField({
           )}
         </button>
       )}
+      </div>
     </div>
   );
 }

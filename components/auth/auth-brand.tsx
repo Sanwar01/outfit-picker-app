@@ -43,25 +43,49 @@ const AUTH_FEATURE_ITEMS: {
   },
 ];
 
-export function AuthBrand() {
+interface AuthBrandProps {
+  variant?: "inline" | "centered";
+}
+
+function HangerLogo() {
+  return (
+    <div className="flex size-11 items-center justify-center rounded-2xl bg-[#ebe4d8] shadow-sm">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        className="size-5 text-[#1a1a1a]"
+        aria-hidden
+      >
+        <path d="M6 4h12l-1.2 3H7.2L6 4Z" />
+        <path d="M7 7v2.5c0 2.5 2 4.5 5 4.5s5-2 5-4.5V7" />
+        <path d="M5 7h14" strokeLinecap="round" />
+      </svg>
+    </div>
+  );
+}
+
+export function AuthBrand({ variant = "inline" }: AuthBrandProps) {
+  if (variant === "centered") {
+    return (
+      <div className="flex flex-col items-center text-center">
+        <HangerLogo />
+        <p className="mt-3 font-[family-name:var(--font-auth-serif)] text-2xl leading-none text-[#1a1a1a]">
+          Wardrobe
+        </p>
+        <p className="mt-1 text-[10px] font-medium tracking-[0.2em] text-[#8b7355]">
+          WEAR BETTER. EVERY DAY.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center gap-3">
-      <div className="flex size-11 items-center justify-center rounded-2xl bg-[#ebe4d8] shadow-sm">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          className="size-5 text-[#1a1a1a]"
-          aria-hidden
-        >
-          <path d="M6 4h12l-1.2 3H7.2L6 4Z" />
-          <path d="M7 7v2.5c0 2.5 2 4.5 5 4.5s5-2 5-4.5V7" />
-          <path d="M5 7h14" strokeLinecap="round" />
-        </svg>
-      </div>
+      <HangerLogo />
       <div>
-        <p className="font-(family-name:--font-auth-serif) text-2xl leading-none text-[#1a1a1a]">
+        <p className="font-[family-name:var(--font-auth-serif)] text-2xl leading-none text-[#1a1a1a]">
           Wardrobe
         </p>
         <p className="mt-1 text-[10px] font-medium tracking-[0.2em] text-[#8b7355]">
@@ -110,7 +134,7 @@ export function AuthHeroBackground() {
         className="object-cover object-top opacity-30"
         sizes="(max-width: 512px) 100vw, 448px"
       />
-      <div className="absolute inset-0 bg-linear-to-b from-[#f4efe6]/70 via-[#f4efe6]/85 to-[#f4efe6]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#f4efe6]/70 via-[#f4efe6]/85 to-[#f4efe6]" />
     </div>
   );
 }

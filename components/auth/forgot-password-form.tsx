@@ -1,14 +1,63 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { ArrowLeft, Lock } from 'lucide-react';
 import { requestPasswordReset } from '@/app/(auth)/login/actions';
 import { useRememberedEmail } from '@/lib/auth/use-remembered-email';
+import { AuthBrand } from '@/components/auth/auth-brand';
 import { AuthField } from '@/components/auth/auth-field';
 
 interface ForgotPasswordFormProps {
   error?: string;
   sent?: boolean;
+}
+
+function SecurityNotice() {
+  return (
+    <div className="mt-8 flex gap-3 rounded-2xl bg-[#ebe4d8]/80 p-4">
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f4efe6]">
+        <Lock className="size-4 text-[#8b7355]" strokeWidth={1.5} />
+      </div>
+      <div className="space-y-1 text-xs leading-relaxed text-[#6b6560]">
+        <p className="font-semibold text-[#1a1a1a]">Your security matters</p>
+        <p>We&apos;ll never share your email with anyone.</p>
+        <p>Check your spam folder if you don&apos;t see the email.</p>
+      </div>
+    </div>
+  );
+}
+
+function ForgotPasswordShell({ children }: { children: React.ReactNode }) {
+  return (
+    <section className="flex min-h-dvh flex-col px-6 pb-10 pt-6">
+      <Link
+        href="/login"
+        className="mb-8 inline-flex size-10 items-center justify-center rounded-full bg-white/90 text-[#1a1a1a] shadow-sm transition-colors hover:bg-white"
+        aria-label="Back to log in"
+      >
+        <ArrowLeft className="size-5" strokeWidth={1.5} />
+      </Link>
+
+      <div className="mx-auto w-full max-w-md">
+        <AuthBrand variant="centered" />
+
+        <div className="relative mx-auto mt-8 h-40 w-full max-w-[220px]">
+          <Image
+            src="/auth/forgot-password-hero.png"
+            alt=""
+            fill
+            priority
+            className="object-contain object-center"
+            sizes="220px"
+          />
+        </div>
+
+        {children}
+      </div>
+    </section>
+  );
 }
 
 export function ForgotPasswordForm({ error, sent }: ForgotPasswordFormProps) {
@@ -18,69 +67,76 @@ export function ForgotPasswordForm({ error, sent }: ForgotPasswordFormProps) {
 
   if (sent) {
     return (
-      <section className="flex min-h-dvh flex-col justify-center px-6 py-12">
-        <div className="mx-auto w-full max-w-md rounded-t-[2rem] bg-white px-6 py-10 shadow-sm">
-          <h1 className="font-(family-name:--font-auth-serif) text-3xl tracking-tight text-[#1a1a1a]">
-            Check your email
-          </h1>
-          <p className="mt-3 text-sm leading-relaxed text-[#6b6560]">
-            If an account exists for that address, we sent a link to reset your
-            password.
-          </p>
-          <Link
-            href="/login"
-            className="mt-8 inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333]"
-          >
-            Back to log in
-          </Link>
-        </div>
-      </section>
+      <ForgotPasswordShell>
+        <h1 className="mt-8 text-center font-[family-name:var(--font-auth-serif)] text-[1.75rem] leading-tight tracking-tight text-[#1a1a1a]">
+          Check your email
+        </h1>
+        <p className="mx-auto mt-3 max-w-xs text-center text-sm leading-relaxed text-[#6b6560]">
+          If an account exists for that address, we sent a link to reset your
+          password.
+        </p>
+
+        <Link
+          href="/login"
+          className="mt-8 inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333]"
+        >
+          Back to log in
+        </Link>
+
+        <SecurityNotice />
+      </ForgotPasswordShell>
     );
   }
 
   return (
-    <section className="flex min-h-dvh flex-col justify-center px-6 py-12">
-      <div className="mx-auto w-full max-w-md rounded-t-[2rem] bg-white px-6 py-10 shadow-sm">
-        <h1 className="font-(family-name:--font-auth-serif) text-3xl tracking-tight text-[#1a1a1a]">
-          Reset password
-        </h1>
-        <p className="mt-2 text-sm text-[#8b8178]">
-          Enter your email and we&apos;ll send you a reset link.
+    <ForgotPasswordShell>
+      <h1 className="mt-8 text-center font-[family-name:var(--font-auth-serif)] text-[1.75rem] leading-tight tracking-tight text-[#1a1a1a]">
+        Forgot your password?
+      </h1>
+      <p className="mx-auto mt-3 max-w-xs text-center text-sm leading-relaxed text-[#6b6560]">
+        No worries! Enter your email address and we&apos;ll send you a link to
+        reset your password.
+      </p>
+
+      {error && (
+        <p className="mt-6 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
         </p>
+      )}
 
-        {error && (
-          <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </p>
-        )}
+      <form
+        action={requestPasswordReset}
+        className={`space-y-5 ${error ? 'mt-4' : 'mt-8'}`}
+      >
+        <AuthField
+          name="email"
+          type="email"
+          label="Email address"
+          placeholder="Enter your email address"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={setEmailOverride}
+        />
+        <button
+          type="submit"
+          className="h-12 w-full rounded-2xl bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333]"
+        >
+          Send reset link
+        </button>
+      </form>
 
-        <form action={requestPasswordReset} className="mt-6 space-y-4">
-          <AuthField
-            name="email"
-            type="email"
-            placeholder="Email address"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={setEmailOverride}
-          />
-          <button
-            type="submit"
-            className="h-12 w-full rounded-2xl bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333]"
-          >
-            Send reset link
-          </button>
-        </form>
+      <p className="mt-6 text-center text-sm text-[#8b8178]">
+        Remember your password?{' '}
+        <Link
+          href="/login"
+          className="font-[family-name:var(--font-auth-serif)] text-[#8b7355] hover:underline"
+        >
+          Log in
+        </Link>
+      </p>
 
-        <p className="mt-6 text-center text-sm text-[#8b8178]">
-          <Link
-            href="/login"
-            className="font-(family-name:--font-auth-serif) text-[#8b7355] hover:underline"
-          >
-            Back to log in
-          </Link>
-        </p>
-      </div>
-    </section>
+      <SecurityNotice />
+    </ForgotPasswordShell>
   );
 }

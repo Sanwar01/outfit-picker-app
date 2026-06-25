@@ -1,6 +1,6 @@
-import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
+import { ForgotPasswordForm } from '@/components/auth/forgot-password-form';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export default async function ForgotPasswordPage({
   searchParams,
@@ -10,10 +10,10 @@ export default async function ForgotPasswordPage({
   const params = await searchParams;
 
   return (
-    <main className="mx-auto w-full max-w-lg">
+    <main className="mx-auto min-h-dvh w-full max-w-lg">
       <ForgotPasswordForm
         error={params.error ? decodeURIComponent(params.error) : undefined}
-        sent={params.sent === "1"}
+        sent={params.sent === '1'}
       />
     </main>
   );
