@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isGeminiUnavailableError } from "@/lib/ai/gemini";
 import { tagClothingFromImage } from "@/lib/ai/tag-clothing";
+import type { TagClothingResponse } from "@/lib/wardrobe/tagging";
 import type { ClothingItem } from "@/lib/types/database";
 
 export const dynamic = "force-dynamic";
@@ -49,7 +51,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const tags = await tagClothingFromImage(signedUrlData.signedUrl);
+    let tags;
+    try {
+      tags = await tagClothingFromImage(signedUrlData.signedUrl);
+    } catch (error) {
+      if (isGeminiUnavailableError(error)) {
+        console.warn("AI tagging unavailable, keeping existing item:", error);
+        const response: TagClothingResponse = {
+          ...clothingItem,
+          retagged: false,
+        };
+        return NextResponse.json(response);
+      }
+      throw error;
+    }
 
     const { data: updated, error: updateError } = await supabase
       .from("clothing_items")
@@ -75,7 +90,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(updated as ClothingItem);
+    const response: TagClothingResponse = {
+      ...(updated as ClothingItem),
+      retagged: true,
+    };
+    return NextResponse.json(response);
   } catch (error) {
     console.error("Tag clothing error:", error);
     return NextResponse.json(

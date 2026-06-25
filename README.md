@@ -6,7 +6,7 @@ AI-powered digital wardrobe and personal stylist. Phase 1: upload clothes, AI au
 
 - Next.js 16 (App Router)
 - Supabase (Auth, Postgres, Storage)
-- Google Gemini (vision tagging, free tier via AI Studio)
+- Google Gemini via `@google/genai` (vision tagging, outfit generation)
 - Tailwind CSS + shadcn/ui
 
 ## Setup

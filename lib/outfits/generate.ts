@@ -11,6 +11,7 @@ import {
   wardrobeHasMinimumItems,
 } from "@/lib/ai/outfit-rules";
 import { generateOutfitWithAI } from "@/lib/ai/generate-outfit";
+import { isGeminiRulesOnly } from "@/lib/ai/gemini";
 import { getSignedImageUrls } from "@/lib/storage";
 import { CATEGORY_LABELS } from "@/lib/types/clothing";
 import type { ClothingCategory } from "@/lib/types/database";
@@ -163,25 +164,15 @@ export async function generateOutfitForUser(
     );
   }
 
-  const wardrobeForAI = toWardrobeForAI(filtered);
   const occasion = getOccasion(occasionId);
 
-  let generated_by: "ai" | "rules" = "ai";
+  const rulesOnly =
+    isGeminiRulesOnly() || excludeCombinations.length > 0;
+
+  let generated_by: "ai" | "rules" = rulesOnly ? "rules" : "ai";
   let aiResult;
 
-  try {
-    aiResult = await generateOutfitWithAI({
-      weather,
-      styleVibes: profile.style_vibes ?? [],
-      wardrobe: wardrobeForAI,
-      excludeCombinations,
-      occasionId,
-      occasionHint: occasion.aiHint,
-    });
-    aiResult = repairOutfitSelection(aiResult, filtered, weather);
-  } catch (error) {
-    console.warn("AI outfit generation failed, using rules fallback:", error);
-    generated_by = "rules";
+  if (rulesOnly) {
     aiResult = generateOutfitLocally({
       wardrobe: filtered,
       weather,
@@ -189,6 +180,29 @@ export async function generateOutfitForUser(
       styleVibes: profile.style_vibes ?? [],
       occasionId,
     });
+  } else {
+    const wardrobeForAI = toWardrobeForAI(filtered);
+    try {
+      aiResult = await generateOutfitWithAI({
+        weather,
+        styleVibes: profile.style_vibes ?? [],
+        wardrobe: wardrobeForAI,
+        excludeCombinations,
+        occasionId,
+        occasionHint: occasion.aiHint,
+      });
+      aiResult = repairOutfitSelection(aiResult, filtered, weather);
+    } catch (error) {
+      console.warn("AI outfit generation failed, using rules fallback:", error);
+      generated_by = "rules";
+      aiResult = generateOutfitLocally({
+        wardrobe: filtered,
+        weather,
+        excludeCombinations,
+        styleVibes: profile.style_vibes ?? [],
+        occasionId,
+      });
+    }
   }
 
   if (!validateOutfitSelection(aiResult.item_ids, filtered)) {

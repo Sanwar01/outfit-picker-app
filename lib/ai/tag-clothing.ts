@@ -1,10 +1,10 @@
+import { z, toJSONSchema } from "zod";
 import {
-  GoogleGenerativeAI,
-  SchemaType,
-  type ResponseSchema,
-} from "@google/generative-ai";
-import { z } from "zod";
-import { getTagModel, withGeminiRetry } from "@/lib/ai/gemini";
+  getGeminiClient,
+  getTagModel,
+  isGeminiRulesOnly,
+  withGeminiRetry,
+} from "@/lib/ai/gemini";
 import type { ClothingCategory } from "@/lib/types/database";
 
 const ClothingTagSchema = z.object({
@@ -26,40 +26,6 @@ Categories: top, bottom, outerwear, shoes, accessory.
 sub_category should be a specific garment type (e.g. Overshirt, Chinos, Sneakers, Tote bag).
 Lower confidence if uncertain. Do not invent items not visible in the image.`;
 
-const RESPONSE_SCHEMA: ResponseSchema = {
-  type: SchemaType.OBJECT,
-  properties: {
-    name: { type: SchemaType.STRING },
-    category: {
-      type: SchemaType.STRING,
-      format: "enum" as const,
-      enum: ["top", "bottom", "outerwear", "shoes", "accessory"],
-    },
-    sub_category: { type: SchemaType.STRING },
-    colors: {
-      type: SchemaType.ARRAY,
-      items: { type: SchemaType.STRING },
-    },
-    pattern: { type: SchemaType.STRING },
-    season: {
-      type: SchemaType.ARRAY,
-      items: { type: SchemaType.STRING },
-    },
-    formality: { type: SchemaType.INTEGER },
-    confidence: { type: SchemaType.NUMBER },
-  },
-  required: [
-    "name",
-    "category",
-    "sub_category",
-    "colors",
-    "pattern",
-    "season",
-    "formality",
-    "confidence",
-  ],
-};
-
 async function fetchImageAsBase64(
   imageUrl: string
 ): Promise<{ data: string; mimeType: string }> {
@@ -73,33 +39,29 @@ async function fetchImageAsBase64(
   return { data: buffer.toString("base64"), mimeType };
 }
 
-async function callTagGemini(
-  imageUrl: string,
-  apiKey: string
-): Promise<ClothingTagResult> {
+async function callTagGemini(imageUrl: string): Promise<ClothingTagResult> {
   const { data, mimeType } = await fetchImageAsBase64(imageUrl);
+  const ai = getGeminiClient();
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
+  const response = await ai.models.generateContent({
     model: getTagModel(),
-    systemInstruction: SYSTEM_PROMPT,
-    generationConfig: {
+    contents: [
+      {
+        inlineData: {
+          mimeType,
+          data,
+        },
+      },
+      { text: "Tag this clothing item for a digital wardrobe catalog." },
+    ],
+    config: {
+      systemInstruction: SYSTEM_PROMPT,
       responseMimeType: "application/json",
-      responseSchema: RESPONSE_SCHEMA,
+      responseJsonSchema: toJSONSchema(ClothingTagSchema),
     },
   });
 
-  const result = await model.generateContent([
-    {
-      inlineData: {
-        mimeType,
-        data,
-      },
-    },
-    { text: "Tag this clothing item for a digital wardrobe catalog." },
-  ]);
-
-  const text = result.response.text();
+  const text = response.text;
   if (!text) {
     throw new Error("Empty response from Gemini");
   }
@@ -115,10 +77,8 @@ async function callTagGemini(
 export async function tagClothingFromImage(
   imageUrl: string
 ): Promise<ClothingTagResult> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error("GEMINI_API_KEY is not configured");
+  if (isGeminiRulesOnly()) {
+    throw new Error("AI tagging is disabled (GEMINI_RULES_ONLY)");
   }
-
-  return withGeminiRetry(() => callTagGemini(imageUrl, apiKey));
+  return withGeminiRetry(() => callTagGemini(imageUrl));
 }

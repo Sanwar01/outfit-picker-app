@@ -38,6 +38,10 @@ import type { ClothingCategory, ClothingItem } from '@/lib/types/database';
 import type { StyleCompanion } from '@/lib/wardrobe/item-detail-data';
 import { getItemImagePaths } from '@/lib/wardrobe/item-images';
 import {
+  TAG_UNAVAILABLE_TOAST,
+  type TagClothingResponse,
+} from '@/lib/wardrobe/tagging';
+import {
   colorSwatchHex,
   costPerWearLabel,
   formatItemDate,
@@ -175,7 +179,13 @@ export function ClothingItemDetail({
     setLoading(false);
 
     if (!res.ok) {
-      toast.error('Tagging failed');
+      toast.error('Something went wrong — try again in a moment');
+      return;
+    }
+
+    const data = (await res.json()) as TagClothingResponse;
+    if (!data.retagged) {
+      toast.message(TAG_UNAVAILABLE_TOAST);
       return;
     }
 

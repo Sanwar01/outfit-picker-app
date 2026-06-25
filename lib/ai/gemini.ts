@@ -1,4 +1,21 @@
-const RETRYABLE_STATUS = new Set([429, 500, 503, 504]);
+import { GoogleGenAI } from "@google/genai";
+
+/** When true, outfit generation uses rules only and tagging is skipped. */
+export function isGeminiRulesOnly(): boolean {
+  const value = process.env.GEMINI_RULES_ONLY?.toLowerCase();
+  return value === "true" || value === "1";
+}
+
+const RETRYABLE_STATUS = new Set([500, 503, 504]);
+
+export function getGeminiClient(): GoogleGenAI {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is not configured");
+  }
+
+  return new GoogleGenAI({ apiKey });
+}
 
 export function getOutfitModel(): string {
   return (
@@ -16,16 +33,45 @@ export function getTagModel(): string {
   );
 }
 
+export function isQuotaOrRateLimitError(error: unknown): boolean {
+  if (error && typeof error === "object" && "status" in error) {
+    const status = (error as { status: number }).status;
+    if (status === 429 || status === 403) return true;
+  }
+  if (!(error instanceof Error)) return false;
+  const message = error.message.toLowerCase();
+  const status = extractStatusCode(message);
+  return (
+    status === 429 ||
+    status === 403 ||
+    message.includes("rate limit") ||
+    message.includes("resource exhausted") ||
+    message.includes("quota")
+  );
+}
+
+/** True when Gemini cannot run (quota, rules-only, or tagging disabled). */
+export function isGeminiUnavailableError(error: unknown): boolean {
+  if (isGeminiRulesOnly()) return true;
+  if (isQuotaOrRateLimitError(error)) return true;
+  if (
+    error instanceof Error &&
+    error.message.includes("AI tagging is disabled")
+  ) {
+    return true;
+  }
+  return false;
+}
+
 function isRetryableError(error: unknown): boolean {
+  if (isQuotaOrRateLimitError(error)) return false;
   if (!(error instanceof Error)) return false;
   const message = error.message.toLowerCase();
   return (
     RETRYABLE_STATUS.has(extractStatusCode(message)) ||
     message.includes("high demand") ||
     message.includes("overloaded") ||
-    message.includes("unavailable") ||
-    message.includes("resource exhausted") ||
-    message.includes("rate limit")
+    message.includes("unavailable")
   );
 }
 

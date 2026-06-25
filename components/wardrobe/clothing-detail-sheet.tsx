@@ -27,6 +27,10 @@ import {
   SUB_CATEGORY_OPTIONS,
 } from '@/lib/wardrobe/item-edit';
 import { getItemImagePaths } from '@/lib/wardrobe/item-images';
+import {
+  TAG_UNAVAILABLE_TOAST,
+  type TagClothingResponse,
+} from '@/lib/wardrobe/tagging';
 import { cn } from '@/lib/utils';
 
 const EDITABLE_CATEGORIES: ClothingCategory[] = [
@@ -174,26 +178,36 @@ function ClothingDetailContent({
 
   async function handleRetag() {
     setTaggingLoading(true);
-    const res = await fetch('/api/clothing/tag', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ itemId: item.id }),
-    });
-    setTaggingLoading(false);
+    try {
+      const res = await fetch('/api/clothing/tag', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId: item.id }),
+      });
 
-    if (!res.ok) {
-      toast.error('Re-tag failed');
-      return;
+      if (!res.ok) {
+        toast.error('Something went wrong — try again in a moment');
+        return;
+      }
+
+      const data = (await res.json()) as TagClothingResponse;
+      if (!data.retagged) {
+        toast.message(TAG_UNAVAILABLE_TOAST);
+        return;
+      }
+
+      setName(data.name);
+      setCategory(data.category);
+      setFormality(data.formality);
+      setSubCategory(data.sub_category ?? '');
+      onUpdated(data);
+      toast.success('Item re-tagged');
+      router.refresh();
+    } catch {
+      toast.error('Something went wrong — try again in a moment');
+    } finally {
+      setTaggingLoading(false);
     }
-
-    const data = (await res.json()) as ClothingItem;
-    setName(data.name);
-    setCategory(data.category);
-    setFormality(data.formality);
-    setSubCategory(data.sub_category ?? '');
-    onUpdated(data);
-    toast.success('Item re-tagged');
-    router.refresh();
   }
 
   async function deleteItem() {
