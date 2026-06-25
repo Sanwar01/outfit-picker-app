@@ -18,13 +18,15 @@ export default async function OutfitsPage({
     redirect("/login");
   }
 
+  const userId = claimsData.claims.sub as string;
+
   return (
     <AppShell>
       <div className="px-4 py-6">
         <h1 className="mb-6 text-xl font-semibold text-stone-900">
           Saved outfits
         </h1>
-        <OutfitsList itemId={itemId} />
+        <OutfitsList itemId={itemId} userId={userId} />
       </div>
     </AppShell>
   );

@@ -39,7 +39,6 @@ export default async function WardrobePage() {
         <ClothingGrid
           items={items ?? []}
           imageUrls={imageUrls}
-          userId={userId}
         />
       </div>
     </AppShell>

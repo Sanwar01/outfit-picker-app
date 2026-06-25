@@ -15,6 +15,13 @@ const NAV_ITEMS = [
 
 function isNavActive(pathname: string, href: string): boolean {
   if (href === "/wardrobe/add") return pathname === "/wardrobe/add";
+  if (href === "/wardrobe") {
+    return (
+      pathname === "/wardrobe" ||
+      (pathname.startsWith("/wardrobe/") &&
+        !pathname.startsWith("/wardrobe/add"))
+    );
+  }
   return pathname === href;
 }
 

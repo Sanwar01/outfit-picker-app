@@ -12,6 +12,7 @@ interface OutfitRecommendationCardProps {
   styleVibes: string[];
   onShuffle: () => void;
   shuffleDisabled?: boolean;
+  onItemClick?: (item: ClothingItem) => void;
 }
 
 function pickHeroItem(items: ClothingItem[]): ClothingItem {
@@ -29,6 +30,7 @@ export function OutfitRecommendationCard({
   styleVibes,
   onShuffle,
   shuffleDisabled,
+  onItemClick,
 }: OutfitRecommendationCardProps) {
   const sortedItems = SLOT_ORDER.flatMap((slot) => {
     const itemId = outfit.slots[slot];
@@ -80,25 +82,32 @@ export function OutfitRecommendationCard({
 
         <ul className="min-w-0 flex-1 space-y-3.5 pt-1">
           {sortedItems.map((item) => (
-            <li key={item.id} className="flex items-center gap-2.5">
-              <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100">
-                <Image
-                  src={outfit.imageUrls[item.image_url] ?? ''}
-                  alt={item.name}
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-neutral-950">
-                  {item.name}
-                </p>
-                <p className="text-xs text-neutral-400">
-                  {item.brand ??
-                    CATEGORY_LABELS[item.category as ClothingCategory]}
-                </p>
-              </div>
+            <li key={item.id}>
+              <button
+                type="button"
+                onClick={() => onItemClick?.(item)}
+                disabled={!onItemClick}
+                className="flex w-full items-center gap-2.5 text-left disabled:cursor-default"
+              >
+                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100">
+                  <Image
+                    src={outfit.imageUrls[item.image_url] ?? ''}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-neutral-950">
+                    {item.name}
+                  </p>
+                  <p className="text-xs text-neutral-400">
+                    {item.brand ??
+                      CATEGORY_LABELS[item.category as ClothingCategory]}
+                  </p>
+                </div>
+              </button>
             </li>
           ))}
         </ul>

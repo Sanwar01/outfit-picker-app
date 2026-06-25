@@ -23,7 +23,6 @@ import { Button } from '@/components/ui/button';
 import { CATEGORY_LABELS } from '@/lib/types/clothing';
 import type { ClothingCategory, ClothingItem } from '@/lib/types/database';
 import {
-  FORMALITY_OPTIONS,
   SUB_CATEGORY_OPTIONS,
 } from '@/lib/wardrobe/item-edit';
 import { getItemImagePaths } from '@/lib/wardrobe/item-images';
@@ -72,7 +71,6 @@ function ClothingDetailContent({
 
   const [name, setName] = useState(item.name);
   const [category, setCategory] = useState<ClothingCategory>(item.category);
-  const [formality, setFormality] = useState(item.formality);
   const [subCategory, setSubCategory] = useState(item.sub_category ?? '');
   const [previewUrl, setPreviewUrl] = useState(imageUrl);
   const [imagePath, setImagePath] = useState(item.image_url);
@@ -123,12 +121,6 @@ function ClothingDetailContent({
       sub_category: nextSubCategory,
     });
     if (saved) toast.success('Category updated');
-  }
-
-  async function handleFormalityChange(value: number) {
-    setFormality(value);
-    const saved = await saveField({ formality: value });
-    if (saved) toast.success('Style updated');
   }
 
   async function handleSubCategoryChange(value: string) {
@@ -198,7 +190,6 @@ function ClothingDetailContent({
 
       setName(data.name);
       setCategory(data.category);
-      setFormality(data.formality);
       setSubCategory(data.sub_category ?? '');
       onUpdated(data);
       toast.success('Item re-tagged');
@@ -374,27 +365,6 @@ function ClothingDetailContent({
           </select>
         </Field>
 
-        <Field label="Style">
-          <div className="flex flex-wrap gap-2">
-            {FORMALITY_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => handleFormalityChange(option.value)}
-                disabled={busy}
-                className={cn(
-                  'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
-                  formality === option.value
-                    ? 'border-neutral-950 bg-neutral-950 text-white'
-                    : 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50',
-                )}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </Field>
-
         <Field label="Sub-category">
           <select
             value={
@@ -484,7 +454,7 @@ export function ClothingDetailSheet({
         className="max-h-[92vh] overflow-y-auto rounded-t-2xl px-4 pt-4 pb-8"
       >
         <ClothingDetailContent
-          key={`${item.id}-${item.name}-${item.category}-${item.formality}-${item.sub_category}-${item.image_url}`}
+          key={`${item.id}-${item.name}-${item.category}-${item.sub_category}-${item.image_url}`}
           item={item}
           imageUrl={imageUrl}
           userId={userId}

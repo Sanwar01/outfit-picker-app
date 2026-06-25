@@ -19,8 +19,6 @@ import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { compressImage } from '@/lib/image/compress';
 import { WARDROBE_BUCKET } from '@/lib/constants';
-import { ColorSwatchPicker } from '@/components/wardrobe/color-swatch-picker';
-import { RatingScale } from '@/components/wardrobe/rating-scale';
 import { Button } from '@/components/ui/button';
 import { CATEGORY_LABELS } from '@/lib/types/clothing';
 import type {
@@ -29,14 +27,10 @@ import type {
   ClothingItemImage,
 } from '@/lib/types/database';
 import {
-  CARE_OPTIONS,
   DESCRIPTION_MAX_LENGTH,
-  lastWornLabel,
-  MATERIAL_OPTIONS,
   normalizeSeasonId,
   NOTES_MAX_LENGTH,
   SEASON_OPTIONS,
-  wearFrequencyLabel,
 } from '@/lib/wardrobe/item-edit';
 import { getItemImagePaths } from '@/lib/wardrobe/item-images';
 import { cn } from '@/lib/utils';
@@ -84,19 +78,11 @@ export function EditItemForm({
   const [name, setName] = useState(item.name);
   const [brand, setBrand] = useState(item.brand ?? '');
   const [description, setDescription] = useState(item.description ?? '');
-  const [purchasePrice, setPurchasePrice] = useState(
-    item.purchase_price != null ? String(item.purchase_price) : '',
-  );
   const [category, setCategory] = useState<ClothingCategory>(item.category);
-  const [colors, setColors] = useState<string[]>(item.colors);
-  const [material, setMaterial] = useState(item.material ?? '');
   const [seasons, setSeasons] = useState<string[]>(
     item.season.map(normalizeSeasonId),
   );
-  const [warmth, setWarmth] = useState(item.warmth ?? 3);
-  const [formality, setFormality] = useState(item.formality);
   const [notes, setNotes] = useState(item.notes ?? '');
-  const [care, setCare] = useState(item.care_instructions ?? '');
   const [previewUrl, setPreviewUrl] = useState(imageUrl);
   const [imagePath, setImagePath] = useState(item.image_url);
   const [extraImages, setExtraImages] = useState(initialExtraImages);
@@ -214,22 +200,6 @@ export function EditItemForm({
       toast.error('Enter a name for this item');
       return;
     }
-    if (colors.length === 0) {
-      toast.error('Select at least one colour');
-      return;
-    }
-
-    const parsedPrice = purchasePrice.trim()
-      ? Number.parseFloat(purchasePrice)
-      : null;
-
-    if (
-      purchasePrice.trim() &&
-      (parsedPrice == null || Number.isNaN(parsedPrice) || parsedPrice < 0)
-    ) {
-      toast.error('Enter a valid purchase price');
-      return;
-    }
 
     setSaving(true);
     const { error } = await supabase
@@ -238,15 +208,9 @@ export function EditItemForm({
         name: trimmedName,
         brand: brand.trim() || null,
         description: description.trim() || null,
-        purchase_price: parsedPrice,
         category,
-        colors,
-        material: material || null,
         season: seasons,
-        warmth,
-        formality,
         notes: notes.trim() || null,
-        care_instructions: care || null,
         image_url: imagePath,
       })
       .eq('id', item.id)
@@ -260,7 +224,7 @@ export function EditItemForm({
     }
 
     toast.success('Changes saved');
-    router.push('/wardrobe');
+    router.push(`/wardrobe/${item.id}`);
     router.refresh();
   }
 
@@ -292,9 +256,9 @@ export function EditItemForm({
     <div className="pb-8">
       <div className="mb-5 flex items-center justify-between">
         <Link
-          href="/wardrobe"
+          href={`/wardrobe/${item.id}`}
           className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-800"
-          aria-label="Back to wardrobe"
+          aria-label="Back to item"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
@@ -314,7 +278,9 @@ export function EditItemForm({
       </div>
 
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-neutral-950">Edit item</h1>
+        <h1 className="font-(family-name:--font-auth-serif) text-[1.75rem] leading-tight text-neutral-950">
+          Edit item
+        </h1>
         <p className="mt-1 text-sm text-neutral-500">
           Make changes to your item details
         </p>
@@ -443,13 +409,10 @@ export function EditItemForm({
               />
             </div>
           </Field>
-          <Field label="Colour">
-            <ColorSwatchPicker selected={colors} onChange={setColors} />
-          </Field>
         </div>
       </div>
 
-      <section className="mb-4 rounded-2xl border border-neutral-200 bg-white p-4">
+      <section className="mb-6 rounded-2xl border border-neutral-200 bg-white p-4">
         <h2 className="mb-4 text-sm font-semibold text-neutral-950">Details</h2>
         <div className="space-y-4">
           <Field label="Description">
@@ -462,33 +425,6 @@ export function EditItemForm({
               placeholder="Short description for the detail page"
               className={cn(inputClass, 'resize-none py-2.5')}
             />
-          </Field>
-
-          <Field label="Purchase price">
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={purchasePrice}
-              onChange={(e) => setPurchasePrice(e.target.value)}
-              placeholder="0.00"
-              className={inputClass}
-            />
-          </Field>
-
-          <Field label="Material">
-            <select
-              value={material}
-              onChange={(e) => setMaterial(e.target.value)}
-              className={inputClass}
-            >
-              <option value="">Select material</option>
-              {MATERIAL_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
           </Field>
 
           <Field label="Season">
@@ -514,20 +450,6 @@ export function EditItemForm({
             </div>
           </Field>
 
-          <RatingScale
-            label="Warmth"
-            hint="How warm is this item?"
-            value={warmth}
-            onChange={setWarmth}
-          />
-
-          <RatingScale
-            label="Formality"
-            hint="How formal is this item?"
-            value={formality}
-            onChange={setFormality}
-          />
-
           <Field label="Notes">
             <textarea
               value={notes}
@@ -541,37 +463,6 @@ export function EditItemForm({
             <p className="mt-1 text-right text-xs text-neutral-400">
               {notes.length}/{NOTES_MAX_LENGTH}
             </p>
-          </Field>
-        </div>
-      </section>
-
-      <section className="mb-6 rounded-2xl border border-neutral-200 bg-white p-4">
-        <h2 className="mb-4 text-sm font-semibold text-neutral-950">
-          Wear &amp; care
-        </h2>
-        <div className="space-y-4">
-          <ReadOnlyField
-            label="Frequency"
-            value={wearFrequencyLabel(item.wear_count)}
-            hint="How often do you wear this?"
-          />
-          <ReadOnlyField
-            label="Last worn"
-            value={lastWornLabel(item.last_worn_at)}
-          />
-          <Field label="Care instructions">
-            <select
-              value={care}
-              onChange={(e) => setCare(e.target.value)}
-              className={inputClass}
-            >
-              <option value="">Select care</option>
-              {CARE_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
           </Field>
         </div>
       </section>
@@ -609,26 +500,6 @@ function Field({
     <div className="space-y-1.5">
       <label className="text-xs font-medium text-neutral-600">{label}</label>
       {children}
-    </div>
-  );
-}
-
-function ReadOnlyField({
-  label,
-  value,
-  hint,
-}: {
-  label: string;
-  value: string;
-  hint?: string;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <p className="text-xs font-medium text-neutral-600">{label}</p>
-      {hint && <p className="text-xs text-neutral-400">{hint}</p>}
-      <div className="flex h-10 items-center rounded-xl border border-neutral-100 bg-neutral-50 px-3 text-sm text-neutral-800">
-        {value}
-      </div>
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { OutfitGeneratingLoader } from '@/components/today/outfit-generating-loa
 import { OutfitRecommendationCard } from '@/components/today/outfit-recommendation-card';
 import { SaveOutfitDialog } from '@/components/today/save-outfit-dialog';
 import { WardrobeNudge } from '@/components/today/wardrobe-nudge';
+import { useQuickEditItemSheet } from '@/components/wardrobe/use-quick-edit-item-sheet';
 import { mapGenerateError } from '@/lib/today/copy';
 import type { OccasionId } from '@/lib/today/occasions';
 import type { WardrobeReadiness } from '@/lib/today/wardrobe-readiness';
@@ -20,11 +21,13 @@ type View = 'loading' | 'result' | 'error';
 interface OutfitSuggestionProps {
   styleVibes: string[];
   readiness: WardrobeReadiness;
+  userId: string;
 }
 
 export function OutfitSuggestion({
   styleVibes,
   readiness,
+  userId,
 }: OutfitSuggestionProps) {
   const [view, setView] = useState<View>('loading');
   const [outfit, setOutfit] = useState<GeneratedOutfit | null>(null);
@@ -40,6 +43,7 @@ export function OutfitSuggestion({
   );
   const [wornToday, setWornToday] = useState(false);
   const initialLoadDone = useRef(false);
+  const { openQuickEdit, quickEditSheet } = useQuickEditItemSheet(userId);
 
   const generate = useCallback(
     async (
@@ -182,6 +186,9 @@ export function OutfitSuggestion({
         styleVibes={styleVibes}
         onShuffle={handleShuffle}
         shuffleDisabled={isShuffle}
+        onItemClick={(item) =>
+          openQuickEdit(item, outfit.imageUrls[item.image_url] ?? '')
+        }
       />
 
       <div className="grid grid-cols-2 gap-3">
@@ -210,6 +217,8 @@ export function OutfitSuggestion({
         onSelect={handleAlternateOccasion}
         disabled={isShuffle}
       />
+
+      {quickEditSheet}
     </div>
   );
 }

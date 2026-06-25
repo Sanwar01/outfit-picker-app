@@ -64,6 +64,7 @@ export default async function TodayPage() {
         <OutfitSuggestion
           styleVibes={profile?.style_vibes ?? []}
           readiness={readiness}
+          userId={userId}
         />
       </div>
     </AppShell>

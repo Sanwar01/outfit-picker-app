@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { ClothingCard } from "@/components/wardrobe/clothing-card";
 import { CategoryBrowseGrid } from "@/components/wardrobe/category-browse-grid";
-import { ClothingDetailSheet } from "@/components/wardrobe/clothing-detail-sheet";
 import { ClothingFilters } from "@/components/wardrobe/clothing-filters";
 import { RecentlyAddedStrip } from "@/components/wardrobe/recently-added-strip";
 import { WardrobeFilterSheet } from "@/components/wardrobe/wardrobe-filter-sheet";
@@ -25,12 +24,9 @@ import type { ClothingCategory, ClothingItem } from "@/lib/types/database";
 interface ClothingGridProps {
   items: ClothingItem[];
   imageUrls: Record<string, string>;
-  userId: string;
 }
 
-export function ClothingGrid({ items, imageUrls, userId }: ClothingGridProps) {
-  const [patchById, setPatchById] = useState<Record<string, ClothingItem>>({});
-  const [hiddenIds, setHiddenIds] = useState<Set<string>>(() => new Set());
+export function ClothingGrid({ items, imageUrls }: ClothingGridProps) {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] =
     useState<CategoryChipFilter>("all");
@@ -39,18 +35,9 @@ export function ClothingGrid({ items, imageUrls, userId }: ClothingGridProps) {
     useState<WardrobeStatusFilter>("active");
   const [showAllItems, setShowAllItems] = useState(false);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
-  const [selected, setSelected] = useState<ClothingItem | null>(null);
-
-  const wardrobeItems = useMemo(
-    () =>
-      items
-        .filter((item) => !hiddenIds.has(item.id))
-        .map((item) => patchById[item.id] ?? item),
-    [items, patchById, hiddenIds],
-  );
 
   const filtered = useMemo(() => {
-    const matches = wardrobeItems.filter((item) => {
+    const matches = items.filter((item) => {
       const matchesSearch = item.name
         .toLowerCase()
         .includes(search.toLowerCase());
@@ -65,17 +52,14 @@ export function ClothingGrid({ items, imageUrls, userId }: ClothingGridProps) {
     });
 
     return sortWardrobeItems(matches, sort);
-  }, [wardrobeItems, search, categoryFilter, statusFilter, sort]);
+  }, [items, search, categoryFilter, statusFilter, sort]);
 
   const categorySummaries = useMemo(
-    () => buildCategorySummaries(wardrobeItems),
-    [wardrobeItems],
+    () => buildCategorySummaries(items),
+    [items],
   );
 
-  const recentlyAdded = useMemo(
-    () => getRecentlyAdded(wardrobeItems),
-    [wardrobeItems],
-  );
+  const recentlyAdded = useMemo(() => getRecentlyAdded(items), [items]);
 
   const activeFilterCount = countActiveFilters(sort, statusFilter);
 
@@ -112,16 +96,6 @@ export function ClothingGrid({ items, imageUrls, userId }: ClothingGridProps) {
     if (status === "archived") {
       setShowAllItems(true);
     }
-  }
-
-  function handleUpdated(updated: ClothingItem) {
-    setPatchById((prev) => ({ ...prev, [updated.id]: updated }));
-    setSelected(updated);
-  }
-
-  function handleDeleted(itemId: string) {
-    setHiddenIds((prev) => new Set(prev).add(itemId));
-    setSelected(null);
   }
 
   const gridTitle =
@@ -180,7 +154,6 @@ export function ClothingGrid({ items, imageUrls, userId }: ClothingGridProps) {
               <RecentlyAddedStrip
                 items={recentlyAdded}
                 imageUrls={imageUrls}
-                onSelectItem={setSelected}
               />
             </section>
           )}
@@ -188,7 +161,7 @@ export function ClothingGrid({ items, imageUrls, userId }: ClothingGridProps) {
       ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-neutral-200 bg-white px-6 py-12 text-center">
           <p className="text-sm text-neutral-500">
-            {wardrobeItems.length === 0
+            {items.length === 0
               ? "Your closet is empty. Add your first items to get started."
               : "No items match your search."}
           </p>
@@ -211,22 +184,11 @@ export function ClothingGrid({ items, imageUrls, userId }: ClothingGridProps) {
                 key={item.id}
                 item={item}
                 imageUrl={imageUrls[item.image_url] ?? ""}
-                onClick={() => setSelected(item)}
               />
             ))}
           </div>
         </section>
       )}
-
-      <ClothingDetailSheet
-        item={selected}
-        imageUrl={selected ? (imageUrls[selected.image_url] ?? "") : ""}
-        userId={userId}
-        open={!!selected}
-        onOpenChange={(open) => !open && setSelected(null)}
-        onUpdated={handleUpdated}
-        onDeleted={handleDeleted}
-      />
     </>
   );
 }

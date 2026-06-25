@@ -9,16 +9,20 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { weatherConditionLabel } from "@/lib/weather/open-meteo";
 import type { SavedOutfit } from "@/lib/types/outfit";
+import type { ClothingItem } from "@/lib/types/database";
 import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
+import { useQuickEditItemSheet } from "@/components/wardrobe/use-quick-edit-item-sheet";
 
 interface OutfitsListProps {
   itemId?: string;
+  userId: string;
 }
 
-export function OutfitsList({ itemId }: OutfitsListProps) {
+export function OutfitsList({ itemId, userId }: OutfitsListProps) {
   const [outfits, setOutfits] = useState<SavedOutfit[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "favorites">("all");
+  const { openQuickEdit, quickEditSheet } = useQuickEditItemSheet(userId);
 
   useEffect(() => {
     let cancelled = false;
@@ -180,10 +184,15 @@ export function OutfitsList({ itemId }: OutfitsListProps) {
               onRename={(name) => renameOutfit(outfit.id, name)}
               onDelete={() => deleteOutfit(outfit)}
               onWear={() => wearOutfit(outfit)}
+              onItemClick={(item) =>
+                openQuickEdit(item, outfit.imageUrls[item.image_url] ?? "")
+              }
             />
           ))}
         </div>
       )}
+
+      {quickEditSheet}
     </div>
   );
 }
@@ -194,12 +203,14 @@ function OutfitCard({
   onRename,
   onDelete,
   onWear,
+  onItemClick,
 }: {
   outfit: SavedOutfit;
   onToggleFavorite: () => void;
   onRename: (name: string) => Promise<boolean>;
   onDelete: () => void;
   onWear: () => void;
+  onItemClick: (item: ClothingItem) => void;
 }) {
   const weather = outfit.weather_snapshot as WeatherSnapshot | null;
   const previewItems = outfit.items.slice(0, 4);
@@ -294,9 +305,12 @@ function OutfitCard({
 
       <div className="mb-3 flex gap-2 overflow-x-auto">
         {previewItems.map((item) => (
-          <div
+          <button
             key={item.id}
+            type="button"
+            onClick={() => onItemClick(item)}
             className="relative h-20 w-16 shrink-0 overflow-hidden rounded-xl bg-stone-100"
+            aria-label={`Quick edit ${item.name}`}
           >
             <Image
               src={outfit.imageUrls[item.image_url] ?? ""}
@@ -305,7 +319,7 @@ function OutfitCard({
               className="object-cover"
               unoptimized
             />
-          </div>
+          </button>
         ))}
       </div>
 
