@@ -20,6 +20,7 @@ export interface SavedOutfit {
   weather_snapshot: WeatherSnapshot | null;
   ai_rationale: string | null;
   created_at: string;
+  last_worn_at?: string | null;
   items: ClothingItem[];
   imageUrls: Record<string, string>;
 }

@@ -73,6 +73,20 @@ export async function GET(request: Request) {
       return NextResponse.json([]);
     }
 
+    const { data: wearLogs } = await supabase
+      .from("wear_log")
+      .select("outfit_id, worn_at")
+      .eq("user_id", userId)
+      .in("outfit_id", outfitIds)
+      .order("worn_at", { ascending: false });
+
+    const lastWornByOutfit = new Map<string, string>();
+    for (const log of wearLogs ?? []) {
+      if (log.outfit_id && !lastWornByOutfit.has(log.outfit_id)) {
+        lastWornByOutfit.set(log.outfit_id, log.worn_at);
+      }
+    }
+
     const { data: outfitItems } = await supabase
       .from("outfit_items")
       .select("*")
@@ -100,7 +114,12 @@ export async function GET(request: Request) {
         .map((oi) => clothingMap.get(oi.clothing_item_id))
         .filter((item): item is ClothingItem => !!item);
 
-      return { ...outfit, items, imageUrls };
+      return {
+        ...outfit,
+        last_worn_at: lastWornByOutfit.get(outfit.id) ?? null,
+        items,
+        imageUrls,
+      };
     });
 
     return NextResponse.json(enriched);

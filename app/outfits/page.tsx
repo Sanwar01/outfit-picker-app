@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/app-shell";
-import { OutfitsList } from "@/components/outfits/outfits-list";
+import { OutfitsHub } from "@/components/outfits/outfits-hub";
 
 export const dynamic = "force-dynamic";
 
@@ -22,11 +22,8 @@ export default async function OutfitsPage({
 
   return (
     <AppShell>
-      <div className="px-4 py-6">
-        <h1 className="mb-6 text-xl font-semibold text-stone-900">
-          Saved outfits
-        </h1>
-        <OutfitsList itemId={itemId} userId={userId} />
+      <div className="px-4 py-5">
+        <OutfitsHub userId={userId} itemId={itemId} />
       </div>
     </AppShell>
   );
