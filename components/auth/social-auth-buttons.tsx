@@ -1,4 +1,9 @@
-import { loginWithApple, loginWithGoogle } from "@/app/(auth)/login/actions";
+import {
+  loginWithApple,
+  loginWithGoogle,
+  signUpWithApple,
+  signUpWithGoogle,
+} from "@/app/(auth)/login/actions";
 
 function AppleIcon() {
   return (
@@ -37,16 +42,23 @@ function GoogleIcon() {
 const socialButtonClass =
   "flex h-12 w-full items-center justify-center gap-3 rounded-2xl border border-[#e8e2d9] bg-white text-sm font-medium text-[#1a1a1a] transition-colors hover:bg-[#faf8f5]";
 
-export function SocialAuthButtons() {
+interface SocialAuthButtonsProps {
+  mode?: "login" | "signup";
+}
+
+export function SocialAuthButtons({ mode = "login" }: SocialAuthButtonsProps) {
+  const appleAction = mode === "signup" ? signUpWithApple : loginWithApple;
+  const googleAction = mode === "signup" ? signUpWithGoogle : loginWithGoogle;
+
   return (
     <div className="space-y-3">
-      <form action={loginWithApple}>
+      <form action={appleAction}>
         <button type="submit" className={socialButtonClass}>
           <AppleIcon />
           Continue with Apple
         </button>
       </form>
-      <form action={loginWithGoogle}>
+      <form action={googleAction}>
         <button type="submit" className={socialButtonClass}>
           <GoogleIcon />
           Continue with Google

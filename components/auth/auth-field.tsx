@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+type AuthFieldType = "text" | "email" | "password";
 
 interface AuthFieldProps {
   name: string;
-  type: "email" | "password";
+  type: AuthFieldType;
   placeholder: string;
   autoComplete?: string;
   required?: boolean;
@@ -15,6 +17,12 @@ interface AuthFieldProps {
   onChange?: (value: string) => void;
   minLength?: number;
 }
+
+const ICONS = {
+  text: User,
+  email: Mail,
+  password: Lock,
+} as const;
 
 export function AuthField({
   name,
@@ -29,7 +37,7 @@ export function AuthField({
 }: AuthFieldProps) {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === "password";
-  const Icon = isPassword ? Lock : Mail;
+  const Icon = ICONS[type];
   const inputProps =
     value !== undefined
       ? {

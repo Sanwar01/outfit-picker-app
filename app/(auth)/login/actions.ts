@@ -34,9 +34,22 @@ export async function loginWithPassword(formData: FormData) {
 }
 
 export async function signUpWithPassword(formData: FormData) {
+  const fullName = (formData.get("fullName") as string)?.trim();
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
+
+  if (!fullName || fullName.length < 2) {
+    redirect(
+      `/signup?error=${encodeURIComponent("Please enter your full name.")}`
+    );
+  }
+
+  if (formData.get("terms") !== "on") {
+    redirect(
+      `/signup?error=${encodeURIComponent("Please accept the terms to continue.")}`
+    );
+  }
 
   const emailError = validateEmail(email);
   if (emailError) {
@@ -60,7 +73,7 @@ export async function signUpWithPassword(formData: FormData) {
     password,
     options: {
       data: {
-        display_name: normalizedEmail.split("@")[0],
+        display_name: fullName,
       },
     },
   });
@@ -73,7 +86,10 @@ export async function signUpWithPassword(formData: FormData) {
   redirect("/today");
 }
 
-async function signInWithOAuth(provider: "google" | "apple") {
+async function signInWithOAuth(
+  provider: "google" | "apple",
+  errorPath: "/login" | "/signup" = "/login"
+) {
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
@@ -84,7 +100,7 @@ async function signInWithOAuth(provider: "google" | "apple") {
   });
 
   if (error) {
-    redirect(`/login?error=${encodeURIComponent(error.message)}`);
+    redirect(`${errorPath}?error=${encodeURIComponent(error.message)}`);
   }
 
   if (data.url) {
@@ -93,11 +109,19 @@ async function signInWithOAuth(provider: "google" | "apple") {
 }
 
 export async function loginWithGoogle() {
-  await signInWithOAuth("google");
+  await signInWithOAuth("google", "/login");
 }
 
 export async function loginWithApple() {
-  await signInWithOAuth("apple");
+  await signInWithOAuth("apple", "/login");
+}
+
+export async function signUpWithGoogle() {
+  await signInWithOAuth("google", "/signup");
+}
+
+export async function signUpWithApple() {
+  await signInWithOAuth("apple", "/signup");
 }
 
 export async function requestPasswordReset(formData: FormData) {
