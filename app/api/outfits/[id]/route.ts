@@ -1,7 +1,35 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getSavedOutfitById } from "@/lib/outfits/get-outfit";
 
 export const dynamic = "force-dynamic";
+
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+    const supabase = await createClient();
+    const { data: claimsData } = await supabase.auth.getClaims();
+
+    if (!claimsData?.claims?.sub) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = claimsData.claims.sub as string;
+    const outfit = await getSavedOutfitById(supabase, userId, id);
+
+    if (!outfit) {
+      return NextResponse.json({ error: "Outfit not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(outfit);
+  } catch (error) {
+    console.error("Get outfit error:", error);
+    return NextResponse.json({ error: "Failed to load outfit" }, { status: 500 });
+  }
+}
 
 export async function PATCH(
   request: Request,

@@ -22,6 +22,11 @@ function isNavActive(pathname: string, href: string): boolean {
         !pathname.startsWith("/wardrobe/add"))
     );
   }
+  if (href === "/outfits") {
+    return (
+      pathname === "/outfits" || pathname.startsWith("/outfits/")
+    );
+  }
   return pathname === href;
 }
 

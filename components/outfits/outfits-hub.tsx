@@ -106,53 +106,10 @@ export function OutfitsHub({ userId, itemId }: OutfitsHubProps) {
     return true;
   }
 
-  async function deleteOutfit(outfit: SavedOutfit) {
-    const label = outfit.name ?? "Saved outfit";
-    if (!window.confirm(`Delete "${label}"? This cannot be undone.`)) {
-      return;
-    }
-
-    const res = await fetch(`/api/outfits/${outfit.id}`, { method: "DELETE" });
-
-    if (!res.ok) {
-      toast.error("Failed to delete outfit");
-      return;
-    }
-
-    setOutfits((prev) => prev.filter((o) => o.id !== outfit.id));
-    toast.success("Outfit deleted");
-  }
-
-  async function wearOutfit(outfit: SavedOutfit) {
-    const res = await fetch("/api/outfits/wear", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        itemIds: outfit.items.map((item) => item.id),
-        outfitId: outfit.id,
-      }),
-    });
-
-    if (!res.ok) {
-      toast.error("Failed to log outfit");
-      return;
-    }
-
-    const now = new Date().toISOString();
-    setOutfits((prev) =>
-      prev.map((o) =>
-        o.id === outfit.id ? { ...o, last_worn_at: now } : o,
-      ),
-    );
-    toast.success("Logged for today — enjoy your outfit!");
-  }
-
   function renderOutfitActions(outfit: SavedOutfit) {
     return {
       onToggleFavorite: () => toggleFavorite(outfit),
       onRename: (name: string) => renameOutfit(outfit.id, name),
-      onDelete: () => deleteOutfit(outfit),
-      onWear: () => wearOutfit(outfit),
       onItemClick: (item: SavedOutfit["items"][number]) =>
         openQuickEdit(item, outfit.imageUrls[item.image_url] ?? ""),
     };

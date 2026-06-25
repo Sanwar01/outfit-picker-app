@@ -1,18 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ItemImageGalleryProps {
   imageUrls: string[];
   alt: string;
 }
 
+const SWIPE_THRESHOLD_PX = 40;
+
 export function ItemImageGallery({ imageUrls, alt }: ItemImageGalleryProps) {
   const validUrls = imageUrls.filter(Boolean);
   const [activeIndex, setActiveIndex] = useState(0);
+  const touchStartX = useRef<number | null>(null);
   const activeUrl = validUrls[activeIndex] ?? validUrls[0] ?? '';
+  const hasMultiple = validUrls.length > 1;
+
+  const goPrev = useCallback(() => {
+    setActiveIndex((index) => (index === 0 ? validUrls.length - 1 : index - 1));
+  }, [validUrls.length]);
+
+  const goNext = useCallback(() => {
+    setActiveIndex((index) => (index === validUrls.length - 1 ? 0 : index + 1));
+  }, [validUrls.length]);
+
+  function handleTouchStart(clientX: number) {
+    touchStartX.current = clientX;
+  }
+
+  function handleTouchEnd(clientX: number) {
+    if (touchStartX.current === null) return;
+
+    const delta = clientX - touchStartX.current;
+    if (Math.abs(delta) >= SWIPE_THRESHOLD_PX) {
+      if (delta < 0) goNext();
+      else goPrev();
+    }
+
+    touchStartX.current = null;
+  }
 
   if (!activeUrl) {
     return (
@@ -21,46 +49,43 @@ export function ItemImageGallery({ imageUrls, alt }: ItemImageGalleryProps) {
   }
 
   return (
-    <div className="space-y-2">
-      <div className="relative aspect-3/4 overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100">
-        <Image
-          src={activeUrl}
-          alt={alt}
-          fill
-          className="object-cover"
-          unoptimized
-        />
-        {validUrls.length > 1 && (
+    <div
+      className="relative aspect-3/4 overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100"
+      onTouchStart={(e) => handleTouchStart(e.touches[0]?.clientX ?? 0)}
+      onTouchEnd={(e) => handleTouchEnd(e.changedTouches[0]?.clientX ?? 0)}
+    >
+      <Image
+        key={activeUrl}
+        src={activeUrl}
+        alt={alt}
+        fill
+        className="object-cover"
+        unoptimized
+        draggable={false}
+      />
+
+      {hasMultiple && (
+        <>
+          <button
+            type="button"
+            onClick={goPrev}
+            className="absolute top-1/2 left-1 z-10 -translate-y-1/2 rounded-full p-1.5 text-neutral-400 transition-colors hover:text-neutral-950 active:text-neutral-950"
+            aria-label="Previous image"
+          >
+            <ChevronLeft className="h-5 w-5" strokeWidth={1.75} />
+          </button>
+          <button
+            type="button"
+            onClick={goNext}
+            className="absolute top-1/2 right-1 z-10 -translate-y-1/2 rounded-full p-1.5 text-neutral-400 transition-colors hover:text-neutral-950 active:text-neutral-950"
+            aria-label="Next image"
+          >
+            <ChevronRight className="h-5 w-5" strokeWidth={1.75} />
+          </button>
           <span className="absolute right-2 bottom-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-medium text-white">
             {activeIndex + 1} / {validUrls.length}
           </span>
-        )}
-      </div>
-
-      {validUrls.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {validUrls.map((url, index) => (
-            <button
-              key={`${url}-${index}`}
-              type="button"
-              onClick={() => setActiveIndex(index)}
-              className={cn(
-                'relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border-2 transition-colors',
-                index === activeIndex
-                  ? 'border-neutral-950'
-                  : 'border-neutral-200 opacity-80 hover:opacity-100',
-              )}
-            >
-              <Image
-                src={url}
-                alt=""
-                fill
-                className="object-cover"
-                unoptimized
-              />
-            </button>
-          ))}
-        </div>
+        </>
       )}
     </div>
   );
