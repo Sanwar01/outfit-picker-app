@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { StyleChips } from "@/components/onboarding/style-chips";
 import { LocationStep } from "@/components/onboarding/location-step";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -30,10 +33,33 @@ export function ProfileForm({
 }: ProfileFormProps) {
   const router = useRouter();
   const supabase = createClient();
+  const [displayName, setDisplayName] = useState(profile.display_name ?? "");
   const [vibes, setVibes] = useState<StyleVibe[]>(
-    (profile.style_vibes ?? []) as StyleVibe[]
+    (profile.style_vibes ?? []) as StyleVibe[],
   );
   const [saving, setSaving] = useState(false);
+
+  async function saveDisplayName() {
+    const trimmed = displayName.trim();
+    if (!trimmed) {
+      toast.error("Enter your name");
+      return;
+    }
+
+    setSaving(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ display_name: trimmed })
+      .eq("id", profile.id);
+
+    setSaving(false);
+    if (error) {
+      toast.error("Failed to save name");
+      return;
+    }
+    toast.success("Name saved");
+    router.refresh();
+  }
 
   async function saveVibes() {
     setSaving(true);
@@ -73,7 +99,43 @@ export function ProfileForm({
 
   return (
     <div className="space-y-6">
-      <Card className="rounded-2xl border-stone-200 shadow-sm">
+      <header className="flex items-center gap-3">
+        <Link
+          href="/profile"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-800"
+          aria-label="Back to profile"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Link>
+        <h1 className="font-(family-name:--font-auth-serif) text-xl text-neutral-950">
+          Edit profile
+        </h1>
+      </header>
+
+      <Card className="rounded-2xl border-neutral-200 shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-lg">Name</CardTitle>
+          <CardDescription>How we greet you in the app</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Input
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder="Your name"
+            className="rounded-xl"
+            maxLength={60}
+          />
+          <Button
+            onClick={saveDisplayName}
+            disabled={saving}
+            className="rounded-xl"
+          >
+            Save name
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-2xl border-neutral-200 shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg">Account</CardTitle>
           <CardDescription>Your profile overview</CardDescription>
@@ -95,7 +157,7 @@ export function ProfileForm({
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl border-stone-200 shadow-sm">
+      <Card className="rounded-2xl border-neutral-200 shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg">Style vibes</CardTitle>
           <CardDescription>Up to 3 preferences</CardDescription>
@@ -112,7 +174,7 @@ export function ProfileForm({
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl border-stone-200 shadow-sm">
+      <Card className="rounded-2xl border-neutral-200 shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg">Location</CardTitle>
           <CardDescription>Used for weather suggestions</CardDescription>

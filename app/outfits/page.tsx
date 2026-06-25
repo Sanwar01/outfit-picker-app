@@ -8,22 +8,23 @@ export const dynamic = "force-dynamic";
 export default async function OutfitsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ itemId?: string }>;
+  searchParams: Promise<{ itemId?: string; tab?: string }>;
 }) {
   const supabase = await createClient();
   const { data: claimsData } = await supabase.auth.getClaims();
-  const { itemId } = await searchParams;
+  const { itemId, tab } = await searchParams;
 
   if (!claimsData?.claims?.sub) {
     redirect("/login");
   }
 
   const userId = claimsData.claims.sub as string;
+  const initialTab = tab === "favorites" ? "favorites" : "all";
 
   return (
     <AppShell>
       <div className="px-4 py-5">
-        <OutfitsHub userId={userId} itemId={itemId} />
+        <OutfitsHub userId={userId} itemId={itemId} initialTab={initialTab} />
       </div>
     </AppShell>
   );

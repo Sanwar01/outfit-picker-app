@@ -22,12 +22,13 @@ import { cn } from "@/lib/utils";
 interface OutfitsHubProps {
   userId: string;
   itemId?: string;
+  initialTab?: OutfitTab;
 }
 
-export function OutfitsHub({ userId, itemId }: OutfitsHubProps) {
+export function OutfitsHub({ userId, itemId, initialTab = "all" }: OutfitsHubProps) {
   const [outfits, setOutfits] = useState<SavedOutfit[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<OutfitTab>("all");
+  const [tab, setTab] = useState<OutfitTab>(initialTab);
   const [sort, setSort] = useState<OutfitSort>("saved");
   const [view, setView] = useState<OutfitView>("grid");
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);

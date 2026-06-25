@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/app-shell";
-import { ProfileHub } from "@/components/profile/profile-hub";
+import { ProfileForm } from "@/components/profile/profile-form";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProfilePage() {
+export default async function ProfileEditPage() {
   const supabase = await createClient();
   const { data: claimsData } = await supabase.auth.getClaims();
 
@@ -35,7 +35,7 @@ export default async function ProfilePage() {
   return (
     <AppShell>
       <div className="px-4 py-5">
-        <ProfileHub
+        <ProfileForm
           profile={profile}
           email={email}
           wardrobeCount={count ?? 0}

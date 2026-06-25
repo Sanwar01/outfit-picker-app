@@ -27,6 +27,9 @@ function isNavActive(pathname: string, href: string): boolean {
       pathname === "/outfits" || pathname.startsWith("/outfits/")
     );
   }
+  if (href === "/profile") {
+    return pathname === "/profile" || pathname.startsWith("/profile/");
+  }
   return pathname === href;
 }
 
