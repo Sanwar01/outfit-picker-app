@@ -13,15 +13,21 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Outfit Picker",
-  description: "AI-powered digital wardrobe and personal stylist",
-};
-
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  themeColor: "#f4efe6",
+};
+
+export const metadata: Metadata = {
+  title: "Outfit Picker",
+  description: "AI-powered digital wardrobe and personal stylist",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Wardrobe",
+  },
 };
 
 export default function RootLayout({
