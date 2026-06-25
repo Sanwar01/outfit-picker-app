@@ -12,14 +12,14 @@ import {
   Wind,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { FilterValue } from '@/lib/types/clothing';
+import type { CategoryChipFilter } from '@/lib/wardrobe/filters';
 
 const CHIP_OPTIONS: {
-  value: FilterValue;
+  value: CategoryChipFilter;
   label: string;
   icon: typeof Shirt;
 }[] = [
-  { value: 'all', label: 'All items', icon: Grid2x2 },
+  { value: 'all', label: 'All Items', icon: Grid2x2 },
   { value: 'top', label: 'Tops', icon: Shirt },
   { value: 'bottom', label: 'Bottoms', icon: Columns2 },
   { value: 'outerwear', label: 'Outerwear', icon: Wind },
@@ -29,9 +29,9 @@ const CHIP_OPTIONS: {
 
 interface ClothingFiltersProps {
   search: string;
-  filter: FilterValue;
+  filter: CategoryChipFilter;
   onSearchChange: (value: string) => void;
-  onFilterChange: (value: FilterValue) => void;
+  onFilterChange: (value: CategoryChipFilter) => void;
 }
 
 export function ClothingFilters({
@@ -81,18 +81,6 @@ export function ClothingFilters({
             </button>
           );
         })}
-        <button
-          type="button"
-          onClick={() => onFilterChange('archived')}
-          className={cn(
-            'shrink-0 rounded-full border px-3.5 py-2 text-xs font-medium transition-colors',
-            filter === 'archived'
-              ? 'border-neutral-950 bg-neutral-950 text-white'
-              : 'border-neutral-200 bg-white text-neutral-500 hover:bg-neutral-50',
-          )}
-        >
-          Archived
-        </button>
       </div>
     </div>
   );

@@ -30,7 +30,7 @@ export function CategoryBrowseGrid({
                 src={imageUrls[category.coverItem.image_url] ?? ''}
                 alt={category.label}
                 fill
-                className="object-cover"
+                className="object-contain p-2"
                 sizes="50vw"
                 unoptimized
               />

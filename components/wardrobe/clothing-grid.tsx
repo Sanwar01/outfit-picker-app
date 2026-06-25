@@ -6,13 +6,21 @@ import { CategoryBrowseGrid } from "@/components/wardrobe/category-browse-grid";
 import { ClothingDetailSheet } from "@/components/wardrobe/clothing-detail-sheet";
 import { ClothingFilters } from "@/components/wardrobe/clothing-filters";
 import { RecentlyAddedStrip } from "@/components/wardrobe/recently-added-strip";
+import { WardrobeFilterSheet } from "@/components/wardrobe/wardrobe-filter-sheet";
+import { WardrobeHeader } from "@/components/wardrobe/wardrobe-header";
 import { WardrobeSectionHeader } from "@/components/wardrobe/wardrobe-section-header";
 import {
   buildCategorySummaries,
   getRecentlyAdded,
 } from "@/lib/wardrobe/grouping";
+import {
+  countActiveFilters,
+  sortWardrobeItems,
+  type CategoryChipFilter,
+  type WardrobeSort,
+  type WardrobeStatusFilter,
+} from "@/lib/wardrobe/filters";
 import type { ClothingCategory, ClothingItem } from "@/lib/types/database";
-import type { FilterValue } from "@/lib/types/clothing";
 
 interface ClothingGridProps {
   items: ClothingItem[];
@@ -24,8 +32,13 @@ export function ClothingGrid({ items, imageUrls, userId }: ClothingGridProps) {
   const [patchById, setPatchById] = useState<Record<string, ClothingItem>>({});
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(() => new Set());
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<FilterValue>("all");
+  const [categoryFilter, setCategoryFilter] =
+    useState<CategoryChipFilter>("all");
+  const [sort, setSort] = useState<WardrobeSort>("recent");
+  const [statusFilter, setStatusFilter] =
+    useState<WardrobeStatusFilter>("active");
   const [showAllItems, setShowAllItems] = useState(false);
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [selected, setSelected] = useState<ClothingItem | null>(null);
 
   const wardrobeItems = useMemo(
@@ -33,42 +46,47 @@ export function ClothingGrid({ items, imageUrls, userId }: ClothingGridProps) {
       items
         .filter((item) => !hiddenIds.has(item.id))
         .map((item) => patchById[item.id] ?? item),
-    [items, patchById, hiddenIds]
+    [items, patchById, hiddenIds],
   );
 
   const filtered = useMemo(() => {
-    return wardrobeItems.filter((item) => {
+    const matches = wardrobeItems.filter((item) => {
       const matchesSearch = item.name
         .toLowerCase()
         .includes(search.toLowerCase());
+      const matchesStatus =
+        statusFilter === "archived"
+          ? item.status === "archived"
+          : item.status !== "archived";
+      const matchesCategory =
+        categoryFilter === "all" || item.category === categoryFilter;
 
-      if (filter === "archived") {
-        return matchesSearch && item.status === "archived";
-      }
-
-      if (item.status === "archived") return false;
-
-      if (filter === "all") return matchesSearch;
-
-      return matchesSearch && item.category === filter;
+      return matchesSearch && matchesStatus && matchesCategory;
     });
-  }, [wardrobeItems, search, filter]);
+
+    return sortWardrobeItems(matches, sort);
+  }, [wardrobeItems, search, categoryFilter, statusFilter, sort]);
 
   const categorySummaries = useMemo(
     () => buildCategorySummaries(wardrobeItems),
-    [wardrobeItems]
+    [wardrobeItems],
   );
 
   const recentlyAdded = useMemo(
     () => getRecentlyAdded(wardrobeItems),
-    [wardrobeItems]
+    [wardrobeItems],
   );
 
-  const showHub =
-    filter === "all" && search.trim() === "" && !showAllItems;
+  const activeFilterCount = countActiveFilters(sort, statusFilter);
 
-  function handleFilterChange(value: FilterValue) {
-    setFilter(value);
+  const showHub =
+    categoryFilter === "all" &&
+    search.trim() === "" &&
+    !showAllItems &&
+    statusFilter === "active";
+
+  function handleCategoryChange(value: CategoryChipFilter) {
+    setCategoryFilter(value);
     if (value !== "all") {
       setShowAllItems(true);
     } else {
@@ -84,9 +102,16 @@ export function ClothingGrid({ items, imageUrls, userId }: ClothingGridProps) {
   }
 
   function handleSelectCategory(category: ClothingCategory) {
-    setFilter(category);
+    setCategoryFilter(category);
     setShowAllItems(true);
     setSearch("");
+  }
+
+  function handleStatusChange(status: WardrobeStatusFilter) {
+    setStatusFilter(status);
+    if (status === "archived") {
+      setShowAllItems(true);
+    }
   }
 
   function handleUpdated(updated: ClothingItem) {
@@ -100,20 +125,36 @@ export function ClothingGrid({ items, imageUrls, userId }: ClothingGridProps) {
   }
 
   const gridTitle =
-    filter === "archived"
-      ? "Archived"
-      : filter === "all"
-        ? "All items"
-        : categorySummaries.find((c) => c.category === filter)?.label ??
-          "Items";
+    statusFilter === "archived"
+      ? categoryFilter === "all"
+        ? "Archived"
+        : `Archived ${categorySummaries.find((c) => c.category === categoryFilter)?.label?.toLowerCase() ?? "items"}`
+      : categoryFilter === "all"
+        ? "All Items"
+        : (categorySummaries.find((c) => c.category === categoryFilter)
+            ?.label ?? "Items");
 
   return (
     <>
+      <WardrobeHeader
+        onOpenFilters={() => setFilterSheetOpen(true)}
+        activeFilterCount={activeFilterCount}
+      />
+
+      <WardrobeFilterSheet
+        open={filterSheetOpen}
+        onOpenChange={setFilterSheetOpen}
+        sort={sort}
+        status={statusFilter}
+        onSortChange={setSort}
+        onStatusChange={handleStatusChange}
+      />
+
       <ClothingFilters
         search={search}
-        filter={filter}
+        filter={categoryFilter}
         onSearchChange={handleSearchChange}
-        onFilterChange={handleFilterChange}
+        onFilterChange={handleCategoryChange}
       />
 
       {showHub ? (
@@ -158,8 +199,9 @@ export function ClothingGrid({ items, imageUrls, userId }: ClothingGridProps) {
             title={gridTitle}
             actionLabel="Overview"
             onViewAll={() => {
-              setFilter("all");
+              setCategoryFilter("all");
               setSearch("");
+              setStatusFilter("active");
               setShowAllItems(false);
             }}
           />

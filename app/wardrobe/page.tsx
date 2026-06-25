@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { getSignedImageUrls } from "@/lib/storage";
 import { AppShell } from "@/components/layout/app-shell";
 import { ClothingGrid } from "@/components/wardrobe/clothing-grid";
-import { WardrobeHeader } from "@/components/wardrobe/wardrobe-header";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +36,6 @@ export default async function WardrobePage() {
   return (
     <AppShell>
       <div className="px-4 py-5">
-        <WardrobeHeader />
         <ClothingGrid
           items={items ?? []}
           imageUrls={imageUrls}

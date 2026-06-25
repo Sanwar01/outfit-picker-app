@@ -1,3 +1,5 @@
+import { ChevronRight } from "lucide-react";
+
 interface WardrobeSectionHeaderProps {
   title: string;
   onViewAll?: () => void;
@@ -16,9 +18,10 @@ export function WardrobeSectionHeader({
         <button
           type="button"
           onClick={onViewAll}
-          className="text-xs font-medium text-neutral-500 transition-colors hover:text-neutral-900"
+          className="inline-flex items-center gap-0.5 text-xs font-medium text-neutral-500 transition-colors hover:text-neutral-900"
         >
           {actionLabel}
+          <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} />
         </button>
       )}
     </div>
