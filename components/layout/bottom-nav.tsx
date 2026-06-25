@@ -18,7 +18,7 @@ export function BottomNav() {
 
   return (
     <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-4">
-      <div className="pointer-events-auto flex h-16 w-full max-w-md items-center justify-around rounded-full bg-neutral-950 px-3 shadow-2xl">
+      <div className="pointer-events-auto flex h-16 w-full max-w-md items-center justify-around rounded-full border border-neutral-200 bg-white/95 px-3 shadow-lg backdrop-blur-sm">
         {NAV_ITEMS.map((item) => {
           const isActive =
             item.href === "/wardrobe/add"
@@ -31,7 +31,7 @@ export function BottomNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex h-11 w-11 -translate-y-3 items-center justify-center rounded-full bg-white text-neutral-950 shadow-lg"
+                className="flex h-12 w-12 -translate-y-4 items-center justify-center rounded-full bg-neutral-950 text-white shadow-lg"
               >
                 <Icon className="h-5 w-5" />
                 <span className="sr-only">{item.label}</span>
@@ -45,7 +45,7 @@ export function BottomNav() {
               href={item.href}
               className={cn(
                 "flex min-w-0 flex-col items-center gap-0.5 text-[10px] font-medium",
-                isActive ? "text-white" : "text-neutral-500",
+                isActive ? "text-neutral-950" : "text-neutral-400",
               )}
             >
               <Icon className="h-5 w-5" strokeWidth={isActive ? 2 : 1.75} />

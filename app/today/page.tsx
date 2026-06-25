@@ -4,7 +4,6 @@ import { AppShell } from "@/components/layout/app-shell";
 import { OutfitSuggestion } from "@/components/today/outfit-suggestion";
 import { TodayHeader } from "@/components/today/today-header";
 import { checkWardrobeReadiness } from "@/lib/today/wardrobe-readiness";
-import { getWardrobeInsight } from "@/lib/today/wardrobe-insight";
 import { resolveWeatherBundle } from "@/lib/outfits/generate";
 import { defaultWeatherBundle } from "@/lib/weather/open-meteo";
 import { WeatherWidget } from "@/components/today/weather-widget";
@@ -45,8 +44,6 @@ export default async function TodayPage() {
   const weatherBundle = profile
     ? await resolveWeatherBundle(profile)
     : defaultWeatherBundle(null);
-  const wardrobeInsight = getWardrobeInsight(items);
-
   const subtitle =
     readiness.status === "ready"
       ? "Here's what I recommend for you today"
@@ -58,7 +55,7 @@ export default async function TodayPage() {
     <AppShell>
       <div className="px-4 py-5">
         <TodayHeader
-          greeting={`${getGreeting()}, ${name}`}
+          greeting={`${getGreeting()}, ${name} 👋`}
           subtitle={subtitle}
         />
 
@@ -67,7 +64,6 @@ export default async function TodayPage() {
         <OutfitSuggestion
           styleVibes={profile?.style_vibes ?? []}
           readiness={readiness}
-          wardrobeInsight={wardrobeInsight}
         />
       </div>
     </AppShell>

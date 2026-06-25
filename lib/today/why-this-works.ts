@@ -45,16 +45,7 @@ export function buildWhyThisWorks(
 ): string[] {
   const reasons: string[] = [];
 
-  const tempDescriptor =
-    weather.temp_c < 12
-      ? "cool"
-      : weather.temp_c > 24
-        ? "warm"
-        : "mild";
-
-  reasons.push(
-    `Works for ${weather.temp_c}°C ${tempDescriptor} weather`
-  );
+  reasons.push(`Perfect for ${weather.temp_c}°C weather`);
 
   if (weather.precip_chance >= 30) {
     reasons.push(
@@ -67,7 +58,7 @@ export function buildWhyThisWorks(
       styleVibes.length === 1
         ? styleVibes[0]
         : `${styleVibes[0]} and ${styleVibes[1]}`;
-    reasons.push(`Fits your ${vibeText.toLowerCase()} style`);
+    reasons.push(vibeText);
   } else {
     reasons.push(formalityLabel(items));
   }
@@ -79,13 +70,13 @@ export function buildWhyThisWorks(
   if (freshest && daysSince(freshest.last_worn_at) >= 7) {
     const days = daysSince(freshest.last_worn_at);
     reasons.push(
-      `You haven't worn your ${freshest.name.toLowerCase()} in ${days} days`
+      `You haven't worn this ${freshest.name.toLowerCase()} in ${days} days`
     );
   }
 
   reasons.push(
     hasNeutralPalette(items)
-      ? "Balanced, cohesive colours"
+      ? "Balanced, clean colours"
       : "Colours work well together"
   );
 

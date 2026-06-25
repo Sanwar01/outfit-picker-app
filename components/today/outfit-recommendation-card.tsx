@@ -48,7 +48,7 @@ export function OutfitRecommendationCard({
     <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm">
       <div className="border-b border-neutral-100 px-4 py-3.5">
         <h2 className="text-xs font-semibold tracking-[0.12em] text-neutral-950 uppercase">
-          Today&apos;s outfit
+          Today&apos;s outfit ✨
         </h2>
         <p className="mt-0.5 text-xs text-neutral-500">
           Recommended for the weather and your style
@@ -95,7 +95,8 @@ export function OutfitRecommendationCard({
                   {item.name}
                 </p>
                 <p className="text-xs text-neutral-400">
-                  {CATEGORY_LABELS[item.category as ClothingCategory]}
+                  {item.brand ??
+                    CATEGORY_LABELS[item.category as ClothingCategory]}
                 </p>
               </div>
             </li>

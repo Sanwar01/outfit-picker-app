@@ -10,9 +10,7 @@ import { OutfitGeneratingLoader } from '@/components/today/outfit-generating-loa
 import { OutfitRecommendationCard } from '@/components/today/outfit-recommendation-card';
 import { SaveOutfitDialog } from '@/components/today/save-outfit-dialog';
 import { WardrobeNudge } from '@/components/today/wardrobe-nudge';
-import { WardrobeInsightBanner } from '@/components/today/wardrobe-insight-banner';
 import { mapGenerateError } from '@/lib/today/copy';
-import type { WardrobeInsight } from '@/lib/today/wardrobe-insight';
 import type { OccasionId } from '@/lib/today/occasions';
 import type { WardrobeReadiness } from '@/lib/today/wardrobe-readiness';
 import type { GeneratedOutfit } from '@/lib/types/outfit';
@@ -22,13 +20,11 @@ type View = 'loading' | 'result' | 'error';
 interface OutfitSuggestionProps {
   styleVibes: string[];
   readiness: WardrobeReadiness;
-  wardrobeInsight: WardrobeInsight | null;
 }
 
 export function OutfitSuggestion({
   styleVibes,
   readiness,
-  wardrobeInsight,
 }: OutfitSuggestionProps) {
   const [view, setView] = useState<View>('loading');
   const [outfit, setOutfit] = useState<GeneratedOutfit | null>(null);
@@ -214,8 +210,6 @@ export function OutfitSuggestion({
         onSelect={handleAlternateOccasion}
         disabled={isShuffle}
       />
-
-      {wardrobeInsight && <WardrobeInsightBanner insight={wardrobeInsight} />}
     </div>
   );
 }
