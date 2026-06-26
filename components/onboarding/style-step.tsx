@@ -4,42 +4,32 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
-import { AudienceSelect } from '@/components/onboarding/audience-select';
 import { OnboardingShell } from '@/components/onboarding/onboarding-shell';
 import {
-  AudienceSectionIcon,
   GoalsSectionIcon,
   OnboardingSection,
   StyleSectionIcon,
 } from '@/components/onboarding/onboarding-section';
 import { StyleGoalsChips } from '@/components/onboarding/style-goals-chips';
 import { StyleVibeGrid } from '@/components/onboarding/style-vibe-grid';
-import type {
-  OnboardingAudience,
-  StyleGoalId,
-} from '@/lib/onboarding/constants';
+import type { StyleGoalId } from '@/lib/onboarding/constants';
 import type { StyleVibe } from '@/lib/types/clothing';
 
 interface StyleStepProps {
   userId: string;
   initialVibes: StyleVibe[];
   initialGoals: StyleGoalId[];
-  initialAudience: OnboardingAudience | null;
 }
 
 export function StyleStep({
   userId,
   initialVibes,
   initialGoals,
-  initialAudience,
 }: StyleStepProps) {
   const router = useRouter();
   const supabase = createClient();
   const [vibes, setVibes] = useState<StyleVibe[]>(initialVibes);
   const [goals, setGoals] = useState<StyleGoalId[]>(initialGoals);
-  const [audience, setAudience] = useState<OnboardingAudience | null>(
-    initialAudience ?? 'self',
-  );
   const [saving, setSaving] = useState(false);
 
   async function handleContinue() {
@@ -50,7 +40,6 @@ export function StyleStep({
       .update({
         style_vibes: vibes,
         style_goals: goals,
-        onboarding_audience: audience,
       })
       .eq('id', userId);
 
@@ -94,14 +83,6 @@ export function StyleStep({
         description="Choose all that apply."
       >
         <StyleGoalsChips selected={goals} onChange={setGoals} />
-      </OnboardingSection>
-
-      <OnboardingSection
-        icon={AudienceSectionIcon}
-        title="3. Who is this for?"
-        description="This helps us personalize your experience."
-      >
-        <AudienceSelect selected={audience} onChange={setAudience} />
       </OnboardingSection>
     </OnboardingShell>
   );

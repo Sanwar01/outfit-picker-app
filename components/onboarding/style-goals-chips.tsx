@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { Check } from "lucide-react";
+import { Check } from 'lucide-react';
 import {
   STYLE_GOAL_OPTIONS,
   type StyleGoalId,
-} from "@/lib/onboarding/constants";
-import { cn } from "@/lib/utils";
+} from '@/lib/onboarding/constants';
+import { cn } from '@/lib/utils';
 
 interface StyleGoalsChipsProps {
   selected: StyleGoalId[];
@@ -22,7 +22,7 @@ export function StyleGoalsChips({ selected, onChange }: StyleGoalsChipsProps) {
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2.5">
       {STYLE_GOAL_OPTIONS.map(({ id, label, icon: Icon }) => {
         const isSelected = selected.includes(id);
         return (
@@ -31,16 +31,28 @@ export function StyleGoalsChips({ selected, onChange }: StyleGoalsChipsProps) {
             type="button"
             onClick={() => toggle(id)}
             className={cn(
-              "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-left text-xs font-medium transition-colors",
+              'inline-flex items-center gap-2 rounded-xl border p-2.5 text-left text-xs font-medium transition-colors',
               isSelected
-                ? "border-[#8b7355] bg-[#f4efe6] text-[#1a1a1a]"
-                : "border-[#ebe4d8] bg-white text-[#1a1a1a]"
+                ? 'border-[#8b7355] bg-[#f4efe6] text-[#1a1a1a]'
+                : 'border-[#ebe4d8] bg-white text-[#1a1a1a]',
             )}
           >
-            <Icon className="size-3.5 shrink-0 text-[#8b7355]" strokeWidth={1.5} />
+            <Icon
+              className="size-3.5 shrink-0 text-[#8b7355]"
+              strokeWidth={1.5}
+            />
             <span>{label}</span>
             {isSelected && (
-              <Check className="size-3.5 shrink-0 text-[#8b7355]" strokeWidth={2.5} />
+              <div
+                className={cn(
+                  'flex size-4 shrink-0 items-center justify-center rounded-full border',
+                  isSelected
+                    ? 'border-[#8b7355] bg-[#8b7355] text-white'
+                    : 'border-[#d8d0c4] bg-white',
+                )}
+              >
+                {isSelected && <Check className="size-3" strokeWidth={2.5} />}
+              </div>
             )}
           </button>
         );

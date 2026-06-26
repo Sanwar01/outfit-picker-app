@@ -71,15 +71,15 @@ export const STYLE_GOAL_OPTIONS: {
 }[] = [
   { id: 'look_better_daily', label: 'Look better daily', icon: TrendingUp },
   { id: 'save_time', label: 'Save time', icon: Clock },
+  { id: 'dress_for_work', label: 'Dress for work', icon: Briefcase },
+  { id: 'dress_for_events', label: 'Dress for events', icon: Calendar },
+  { id: 'travel_light', label: 'Travel light', icon: Luggage },
+  { id: 'shop_smarter', label: 'Shop smarter', icon: Tag },
   {
     id: 'versatile_wardrobe',
     label: 'Build a versatile wardrobe',
     icon: Layers,
   },
-  { id: 'dress_for_work', label: 'Dress for work', icon: Briefcase },
-  { id: 'dress_for_events', label: 'Dress for events', icon: Calendar },
-  { id: 'travel_light', label: 'Travel light', icon: Luggage },
-  { id: 'shop_smarter', label: 'Shop smarter', icon: Tag },
   { id: 'boost_confidence', label: 'Boost confidence', icon: Star },
 ];
 

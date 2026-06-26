@@ -1,10 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { StyleStep } from '@/components/onboarding/style-step';
-import type {
-  OnboardingAudience,
-  StyleGoalId,
-} from '@/lib/onboarding/constants';
+import type { StyleGoalId } from '@/lib/onboarding/constants';
 import type { StyleVibe } from '@/lib/types/clothing';
 
 export const dynamic = 'force-dynamic';
@@ -39,9 +36,6 @@ export default async function OnboardingPage() {
       userId={userId}
       initialVibes={(profile?.style_vibes ?? []) as StyleVibe[]}
       initialGoals={(profile?.style_goals ?? []) as StyleGoalId[]}
-      initialAudience={
-        (profile?.onboarding_audience as OnboardingAudience | null) ?? 'self'
-      }
     />
   );
 }
