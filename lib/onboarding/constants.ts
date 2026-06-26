@@ -118,20 +118,40 @@ export const WARDROBE_TIPS = [
   },
   {
     icon: Shirt,
-    title: 'One item at a time',
-    body: 'Each photo should focus on one item.',
-  },
-  {
-    icon: Shirt,
     title: 'Include variety',
     body: 'Add tops, bottoms, shoes & more.',
   },
 ] as const;
 
 export const WARDROBE_CATEGORIES = [
-  { id: 'top', label: 'Tops' },
-  { id: 'bottom', label: 'Bottoms' },
-  { id: 'outerwear', label: 'Outerwear' },
-  { id: 'shoes', label: 'Shoes' },
-  { id: 'accessory', label: 'Accessories' },
+  { id: 'top', label: 'Tops', imageUrl: '/upload/tops.png' },
+  {
+    id: 'bottom',
+    label: 'Bottoms',
+    imageUrl: '/upload/bottoms.png',
+  },
+  {
+    id: 'outerwear',
+    label: 'Outerwear',
+    imageUrl: '/upload/outerwear.png',
+  },
+  { id: 'shoes', label: 'Shoes', imageUrl: '/upload/shoes.png' },
+  {
+    id: 'accessory',
+    label: 'Accessories',
+    imageUrl: '/upload/accessories.png',
+  },
 ] as const;
+
+export type WardrobeCategoryId = (typeof WARDROBE_CATEGORIES)[number]['id'];
+
+export const WARDROBE_CATEGORY_FRAMING: Record<
+  WardrobeCategoryId,
+  { scale: number; translateY: number }
+> = {
+  top: { scale: 1.5, translateY: 22 },
+  bottom: { scale: 2, translateY: 22 },
+  outerwear: { scale: 2, translateY: 24 },
+  shoes: { scale: 2, translateY: 25 },
+  accessory: { scale: 1.6, translateY: 22 },
+};
