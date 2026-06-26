@@ -18,6 +18,13 @@ import type { GeneratedOutfit } from '@/lib/types/outfit';
 
 type View = 'loading' | 'result' | 'error';
 
+const INITIAL_LOADER_MIN_MS = 700;
+const RESULT_FADE_MS = 300;
+
+function wait(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
 interface OutfitSuggestionProps {
   styleVibes: string[];
   readiness: WardrobeReadiness;
@@ -42,7 +49,10 @@ export function OutfitSuggestion({
     [],
   );
   const [wornToday, setWornToday] = useState(false);
+  const [resultVisible, setResultVisible] = useState(false);
   const initialLoadDone = useRef(false);
+  const hasShownOutfit = useRef(false);
+  const loaderStartedAt = useRef(0);
   const { openQuickEdit, quickEditSheet } = useQuickEditItemSheet(userId);
 
   const generate = useCallback(
@@ -53,9 +63,11 @@ export function OutfitSuggestion({
       resetExclude = false,
     ) => {
       setView('loading');
+      setResultVisible(false);
       setIsShuffle(shuffle);
       setError(null);
       setOccasion(occasionId);
+      loaderStartedAt.current = Date.now();
 
       if (resetExclude) {
         setExcludeCombinations([]);
@@ -77,9 +89,19 @@ export function OutfitSuggestion({
           throw new Error(message);
         }
 
+        if (!shuffle && !hasShownOutfit.current) {
+          const elapsed = Date.now() - loaderStartedAt.current;
+          const remaining = INITIAL_LOADER_MIN_MS - elapsed;
+          if (remaining > 0) {
+            await wait(remaining);
+          }
+        }
+
         setOutfit(data);
         setWornToday(false);
+        hasShownOutfit.current = true;
         setView('result');
+        window.requestAnimationFrame(() => setResultVisible(true));
       } catch (err) {
         const message =
           err instanceof Error ? err.message : 'Something went wrong';
@@ -139,7 +161,11 @@ export function OutfitSuggestion({
 
   if (view === 'loading') {
     return (
-      <OutfitGeneratingLoader variant={isShuffle ? 'shuffle' : 'initial'} />
+      <OutfitGeneratingLoader
+        key={isShuffle ? 'shuffle' : 'initial'}
+        variant={isShuffle ? 'shuffle' : 'initial'}
+        styleVibes={styleVibes}
+      />
     );
   }
 
@@ -174,7 +200,13 @@ export function OutfitSuggestion({
   if (!outfit) return null;
 
   return (
-    <div className="space-y-5">
+    <div
+      className="space-y-5 transition-opacity ease-out"
+      style={{
+        opacity: resultVisible ? 1 : 0,
+        transitionDuration: `${RESULT_FADE_MS}ms`,
+      }}
+    >
       <SaveOutfitDialog
         outfit={outfit}
         open={saveDialogOpen}

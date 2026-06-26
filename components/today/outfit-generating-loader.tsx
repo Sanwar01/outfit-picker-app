@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  CloudSun,
+  Check,
   Footprints,
   Layers,
   Shirt,
@@ -11,162 +11,218 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const STEPS = [
+const SLOTS = [
+  { label: 'Top', icon: Shirt },
+  { label: 'Bottom', icon: Layers },
+  { label: 'Shoes', icon: Footprints },
+  { label: 'Layer', icon: Wind },
+] as const;
+
+const STYLIST_PHASES = [
   {
-    id: 'weather',
-    label: 'Checking the forecast',
-    icon: CloudSun,
+    message: 'Reading what today calls for',
+    detail: 'Weather and comfort come first.',
   },
   {
-    id: 'wardrobe',
-    label: 'Looking through your closet',
-    icon: Shirt,
+    message: 'Browsing your wardrobe',
+    detail: 'Starting with pieces you actually own.',
   },
   {
-    id: 'match',
-    label: 'Balancing layers and colors',
-    icon: Layers,
+    message: 'Building the combination',
+    detail: 'Balancing layers, colour, and proportion.',
   },
   {
-    id: 'style',
-    label: 'Finalizing your look',
-    icon: Sparkles,
+    message: 'Refining the finish',
+    detail: 'Making sure it feels like you.',
+  },
+  {
+    message: 'Almost ready',
+    detail: 'One last look before I show you.',
   },
 ] as const;
 
-const SLOT_PLACEHOLDERS = [
-  { label: 'Top', icon: Shirt, delay: '0ms' },
-  { label: 'Bottom', icon: Layers, delay: '150ms' },
-  { label: 'Shoes', icon: Footprints, delay: '300ms' },
-  { label: 'Layer', icon: Wind, delay: '450ms' },
+const SHUFFLE_PHASES = [
+  {
+    message: 'Rethinking the combination',
+    detail: 'Same wardrobe — a fresh point of view.',
+  },
+  {
+    message: 'Trying a different pairing',
+    detail: 'Looking for another way this could work.',
+  },
+  {
+    message: 'Fine-tuning the details',
+    detail: 'Keeping it wearable for today.',
+  },
+  {
+    message: 'Nearly there',
+    detail: 'This alternative is coming together.',
+  },
 ] as const;
 
 interface OutfitGeneratingLoaderProps {
   variant?: 'initial' | 'shuffle';
+  styleVibes?: string[];
+}
+
+function formatVibeHint(vibes: string[]): string | null {
+  if (!vibes.length) return null;
+  if (vibes.length === 1) return `Leaning into your ${vibes[0].toLowerCase()} style`;
+  return `Guided by your ${vibes
+    .slice(0, 2)
+    .map((vibe) => vibe.toLowerCase())
+    .join(' and ')} taste`;
 }
 
 export function OutfitGeneratingLoader({
   variant = 'initial',
+  styleVibes = [],
 }: OutfitGeneratingLoaderProps) {
-  const [activeStep, setActiveStep] = useState(0);
+  const phases = variant === 'shuffle' ? SHUFFLE_PHASES : STYLIST_PHASES;
+  const [activePhase, setActivePhase] = useState(0);
+  const vibeHint = useMemo(() => formatVibeHint(styleVibes), [styleVibes]);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
-      setActiveStep((prev) => (prev < STEPS.length - 1 ? prev + 1 : prev));
-    }, 1400);
+      setActivePhase((prev) => (prev < phases.length - 1 ? prev + 1 : prev));
+    }, variant === 'shuffle' ? 1100 : 1300);
 
     return () => window.clearInterval(interval);
-  }, []);
+  }, [phases.length, variant]);
+
+  const revealedSlots = Math.min(
+    Math.ceil(((activePhase + 1) / phases.length) * SLOTS.length),
+    SLOTS.length,
+  );
+
+  const phase = phases[activePhase];
 
   return (
     <div
-      className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-linear-to-b from-neutral-50 via-white to-neutral-100 shadow-sm"
+      className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm"
       aria-busy="true"
-      aria-label="Generating outfit"
+      aria-label="Styling your outfit"
     >
-      <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-neutral-200/50 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-16 -left-8 h-36 w-36 rounded-full bg-neutral-200/40 blur-3xl" />
-
-      <div className="relative space-y-6 p-5 sm:p-6">
-        <div className="space-y-1 text-center">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">
-            {variant === 'shuffle' ? 'Another idea' : 'Your look today'}
-          </p>
-          <h2 className="text-lg font-semibold text-neutral-950">
-            Putting something together
+      <div className="border-b border-neutral-100 px-4 py-3.5">
+        <div className="flex items-center gap-2">
+          <h2 className="font-(family-name:--font-auth-serif) text-lg text-neutral-950">
+            {variant === 'shuffle'
+              ? 'Finding another option'
+              : "Styling today's outfit"}
           </h2>
-          <p className="text-sm text-neutral-500">
-            Based on your clothes and today&apos;s weather
-          </p>
+          <Sparkles className="h-4 w-4 animate-pulse text-neutral-400" />
         </div>
+        <p className="mt-0.5 text-xs text-neutral-500">
+          {variant === 'shuffle'
+            ? 'Putting together a fresh look from your wardrobe'
+            : 'Curated for you — not just generated'}
+        </p>
+      </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          {SLOT_PLACEHOLDERS.map((slot) => (
-            <div
-              key={slot.label}
-              className="overflow-hidden rounded-2xl border border-stone-200/70 bg-white/80 shadow-sm"
-              style={{ animationDelay: slot.delay }}
-            >
-              <div className="relative aspect-3/4 bg-stone-100/80">
-                <div className="absolute inset-0 animate-pulse bg-linear-to-br from-stone-100 via-stone-50 to-stone-200/60" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm">
-                    <slot.icon className="h-4 w-4 text-stone-400" />
-                  </div>
-                  <span className="text-[10px] font-medium uppercase tracking-wider text-stone-400">
-                    {slot.label}
-                  </span>
-                </div>
-                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-white/90 to-transparent" />
+      <div className="flex gap-3 p-4">
+        <div className="relative w-[50%] shrink-0">
+          <div className="relative aspect-3/4 overflow-hidden rounded-2xl bg-neutral-100">
+            <div className="absolute inset-0 animate-pulse bg-linear-to-br from-neutral-100 via-neutral-50 to-neutral-200/70" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex flex-col items-center gap-2 text-center">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/90 shadow-sm">
+                  <Sparkles
+                    className="h-5 w-5 text-neutral-500"
+                    strokeWidth={1.5}
+                  />
+                </span>
+                <span className="px-3 text-[11px] font-medium text-neutral-500">
+                  Choosing your hero piece
+                </span>
               </div>
             </div>
-          ))}
+            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-white/80 to-transparent" />
+          </div>
         </div>
 
-        <div className="space-y-3 rounded-2xl bg-white/70 px-4 py-3.5 backdrop-blur-sm">
-          <div className="flex gap-1">
-            {STEPS.map((step, index) => (
-              <div
-                key={step.id}
-                className={cn(
-                  'h-1 flex-1 rounded-full transition-all duration-700',
-                  index <= activeStep ? 'bg-stone-800' : 'bg-stone-200',
-                )}
-              />
-            ))}
-          </div>
+        <ul className="min-w-0 flex-1 space-y-3 pt-1">
+          {SLOTS.map((slot, index) => {
+            const Icon = slot.icon;
+            const isRevealed = index < revealedSlots;
+            const isBuilding = index === revealedSlots - 1;
 
-          <ul className="space-y-2">
-            {STEPS.map((step, index) => {
-              const Icon = step.icon;
-              const isActive = index === activeStep;
-              const isDone = index < activeStep;
-
-              return (
-                <li
-                  key={step.id}
+            return (
+              <li key={slot.label}>
+                <div
                   className={cn(
-                    'flex items-center gap-2.5 text-sm transition-all duration-500',
-                    isActive
-                      ? 'text-stone-900'
-                      : isDone
-                        ? 'text-stone-500'
-                        : 'text-stone-300',
+                    'flex items-center gap-2.5 rounded-xl border px-2 py-1.5 transition-all duration-700',
+                    isRevealed
+                      ? 'border-neutral-200 bg-white'
+                      : 'border-transparent bg-neutral-50/80',
+                    isBuilding && 'border-neutral-300 bg-neutral-50',
                   )}
                 >
-                  <span
+                  <div
                     className={cn(
-                      'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-all duration-500',
-                      isActive
-                        ? 'border-stone-800 bg-stone-800 text-white shadow-sm'
-                        : isDone
-                          ? 'border-stone-300 bg-stone-100 text-stone-600'
-                          : 'border-stone-200 bg-white text-stone-300',
+                      'relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border transition-all duration-700',
+                      isRevealed
+                        ? 'border-neutral-200 bg-neutral-100'
+                        : 'border-neutral-200/70 bg-neutral-100/80',
                     )}
                   >
-                    <Icon className="h-3.5 w-3.5" />
-                  </span>
-                  <span className={cn(isActive && 'font-medium')}>
-                    {step.label}
-                    {isActive && (
-                      <span className="ml-1 inline-flex gap-0.5 align-middle">
-                        <span className="animate-bounce [animation-delay:0ms]">
-                          .
-                        </span>
-                        <span className="animate-bounce [animation-delay:150ms]">
-                          .
-                        </span>
-                        <span className="animate-bounce [animation-delay:300ms]">
-                          .
-                        </span>
-                      </span>
+                    {isRevealed ? (
+                      <Icon className="h-4 w-4 text-neutral-500" />
+                    ) : (
+                      <div className="absolute inset-0 animate-pulse bg-linear-to-br from-neutral-100 to-neutral-200/60" />
                     )}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+                    {isBuilding && (
+                      <span className="absolute inset-0 animate-pulse ring-2 ring-neutral-300/70 ring-inset" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className={cn(
+                        'text-sm font-medium transition-colors duration-500',
+                        isRevealed ? 'text-neutral-950' : 'text-neutral-300',
+                      )}
+                    >
+                      {slot.label}
+                    </p>
+                    <p className="text-xs text-neutral-400">
+                      {isBuilding
+                        ? 'Selecting...'
+                        : isRevealed
+                          ? 'Shortlisted'
+                          : 'Waiting'}
+                    </p>
+                  </div>
+                  {isRevealed && !isBuilding && (
+                    <Check
+                      className="h-4 w-4 shrink-0 text-neutral-400"
+                      strokeWidth={2}
+                    />
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      <div
+        className="border-t border-neutral-100 bg-neutral-50/60 px-4 py-4"
+        aria-live="polite"
+      >
+        <p className="text-[10px] font-semibold tracking-[0.15em] text-neutral-400 uppercase">
+          Stylist note
+        </p>
+        <p className="mt-2 font-(family-name:--font-auth-serif) text-base leading-snug text-neutral-950">
+          {phase.message}
+          <span className="inline-flex gap-0.5 pl-0.5 align-middle">
+            <span className="animate-bounce [animation-delay:0ms]">.</span>
+            <span className="animate-bounce [animation-delay:150ms]">.</span>
+            <span className="animate-bounce [animation-delay:300ms]">.</span>
+          </span>
+        </p>
+        <p className="mt-1 text-sm text-neutral-500">{phase.detail}</p>
+        {vibeHint && variant === 'initial' && activePhase >= 1 && (
+          <p className="mt-3 text-xs font-medium text-neutral-600">{vibeHint}</p>
+        )}
       </div>
     </div>
   );
