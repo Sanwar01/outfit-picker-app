@@ -1,5 +1,5 @@
-import { ClipboardList, Shirt, UserRound } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { ClipboardList, Shirt, UserRound } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface OnboardingSectionProps {
   icon: LucideIcon;
@@ -21,10 +21,12 @@ export function OnboardingSection({
           <Icon className="size-4 text-[#8b7355]" strokeWidth={1.5} />
         </div>
         <div>
-          <h2 className="font-(family-name:--font-auth-serif) text-base text-[#1a1a1a]">
+          <h1 className="font-(family-name:--font-auth-serif) text-2xl text-[#1a1a1a] font-semibold">
             {title}
-          </h2>
-          <p className="mt-0.5 text-xs text-[#6b6560]">{description}</p>
+          </h1>
+          <p className="mt-0.5 text-sm leading-relaxed text-[#6b6560]">
+            {description}
+          </p>
         </div>
       </div>
       {children}
@@ -32,4 +34,8 @@ export function OnboardingSection({
   );
 }
 
-export { Shirt as StyleSectionIcon, ClipboardList as GoalsSectionIcon, UserRound as AudienceSectionIcon };
+export {
+  Shirt as StyleSectionIcon,
+  ClipboardList as GoalsSectionIcon,
+  UserRound as AudienceSectionIcon,
+};

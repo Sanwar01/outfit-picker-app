@@ -1,21 +1,24 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
-import { AudienceSelect } from "@/components/onboarding/audience-select";
-import { OnboardingShell } from "@/components/onboarding/onboarding-shell";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { createClient } from '@/lib/supabase/client';
+import { AudienceSelect } from '@/components/onboarding/audience-select';
+import { OnboardingShell } from '@/components/onboarding/onboarding-shell';
 import {
   AudienceSectionIcon,
   GoalsSectionIcon,
   OnboardingSection,
   StyleSectionIcon,
-} from "@/components/onboarding/onboarding-section";
-import { StyleGoalsChips } from "@/components/onboarding/style-goals-chips";
-import { StyleVibeGrid } from "@/components/onboarding/style-vibe-grid";
-import type { OnboardingAudience, StyleGoalId } from "@/lib/onboarding/constants";
-import type { StyleVibe } from "@/lib/types/clothing";
+} from '@/components/onboarding/onboarding-section';
+import { StyleGoalsChips } from '@/components/onboarding/style-goals-chips';
+import { StyleVibeGrid } from '@/components/onboarding/style-vibe-grid';
+import type {
+  OnboardingAudience,
+  StyleGoalId,
+} from '@/lib/onboarding/constants';
+import type { StyleVibe } from '@/lib/types/clothing';
 
 interface StyleStepProps {
   userId: string;
@@ -35,7 +38,7 @@ export function StyleStep({
   const [vibes, setVibes] = useState<StyleVibe[]>(initialVibes);
   const [goals, setGoals] = useState<StyleGoalId[]>(initialGoals);
   const [audience, setAudience] = useState<OnboardingAudience | null>(
-    initialAudience ?? "self"
+    initialAudience ?? 'self',
   );
   const [saving, setSaving] = useState(false);
 
@@ -43,21 +46,21 @@ export function StyleStep({
     setSaving(true);
 
     const { error } = await supabase
-      .from("profiles")
+      .from('profiles')
       .update({
         style_vibes: vibes,
         style_goals: goals,
         onboarding_audience: audience,
       })
-      .eq("id", userId);
+      .eq('id', userId);
 
     if (error) {
-      toast.error("Failed to save your preferences");
+      toast.error('Failed to save your preferences');
       setSaving(false);
       return;
     }
 
-    router.push("/onboarding/wardrobe");
+    router.push('/onboarding/wardrobe');
     router.refresh();
   }
 
@@ -71,9 +74,9 @@ export function StyleStep({
           type="button"
           onClick={handleContinue}
           disabled={saving}
-          className="h-12 w-full rounded-2xl bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333] disabled:opacity-50"
+          className="h-12 w-full rounded-2xl bg-[#1a1a1a] text-base font-medium text-white transition-colors hover:bg-[#333] disabled:opacity-50"
         >
-          {saving ? "Saving..." : "Continue"}
+          {saving ? 'Saving...' : 'Continue'}
         </button>
       }
     >
@@ -98,10 +101,7 @@ export function StyleStep({
         title="3. Who is this for?"
         description="This helps us personalize your experience."
       >
-        <AudienceSelect
-          selected={audience}
-          onChange={setAudience}
-        />
+        <AudienceSelect selected={audience} onChange={setAudience} />
       </OnboardingSection>
     </OnboardingShell>
   );
