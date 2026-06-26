@@ -38,7 +38,7 @@ export function OnboardingShell({
       </div>
 
       <div className="text-center">
-        <h1 className="font-(family-name:--font-auth-serif) text-4xl leading-tight tracking-tight text-[#1a1a1a] font-semibold">
+        <h1 className="font-(family-name:--font-auth-serif) text-4xl leading-tight tracking-wide text-[#1a1a1a] font-semibold">
           {title}
         </h1>
         <p className="mx-auto mt-2 max-w-xs text-base leading-relaxed text-[#6b6560]">
