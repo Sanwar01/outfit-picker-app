@@ -15,7 +15,7 @@ const AUTH_FEATURE_ITEMS: {
     plainLabel: "Organize your clothes",
     label: (
       <>
-        <span className="font-semibold text-[#1a1a1a]">Organize</span> your clothes
+        <span className="font-semibold text-foreground">Organize</span> your clothes
       </>
     ),
   },
@@ -25,7 +25,7 @@ const AUTH_FEATURE_ITEMS: {
     plainLabel: "Get outfits you'll love",
     label: (
       <>
-        <span className="font-semibold text-[#1a1a1a]">Get outfits</span> you&apos;ll
+        <span className="font-semibold text-foreground">Get outfits</span> you&apos;ll
         love
       </>
     ),
@@ -36,7 +36,7 @@ const AUTH_FEATURE_ITEMS: {
     plainLabel: "Daily picks for the weather",
     label: (
       <>
-        <span className="font-semibold text-[#1a1a1a]">Daily picks</span> for the
+        <span className="font-semibold text-foreground">Daily picks</span> for the
         weather
       </>
     ),
@@ -55,7 +55,7 @@ function HangerLogo() {
         fill="none"
         stroke="currentColor"
         strokeWidth="1.5"
-        className="size-5 text-[#1a1a1a]"
+        className="size-5 text-foreground"
         aria-hidden
       >
         <path d="M6 4h12l-1.2 3H7.2L6 4Z" />
@@ -71,10 +71,10 @@ export function AuthBrand({ variant = "inline" }: AuthBrandProps) {
     return (
       <div className="flex flex-col items-center text-center">
         <HangerLogo />
-        <p className="mt-3 font-(family-name:--font-auth-serif) text-2xl leading-none text-[#1a1a1a]">
+        <p className="mt-3 font-serif text-2xl leading-none text-foreground">
           Wardrobe
         </p>
-        <p className="mt-1 text-[10px] font-medium tracking-[0.2em] text-[#8b7355]">
+        <p className="mt-1 text-[10px] font-medium tracking-[0.2em] text-brand">
           WEAR BETTER. EVERY DAY.
         </p>
       </div>
@@ -85,10 +85,10 @@ export function AuthBrand({ variant = "inline" }: AuthBrandProps) {
     <div className="flex items-center gap-3">
       <HangerLogo />
       <div>
-        <p className="font-(family-name:--font-auth-serif) text-2xl leading-none text-[#1a1a1a]">
+        <p className="font-serif text-2xl leading-none text-foreground">
           Wardrobe
         </p>
-        <p className="mt-1 text-[10px] font-medium tracking-[0.2em] text-[#8b7355]">
+        <p className="mt-1 text-[10px] font-medium tracking-[0.2em] text-brand">
           WEAR BETTER. EVERY DAY.
         </p>
       </div>
@@ -114,7 +114,7 @@ export function AuthFeatureGrid({
           >
             <Icon className="size-5 text-[#5c534a]" strokeWidth={1.5} />
           </div>
-          <p className="mt-2 text-[11px] leading-snug text-[#6b6560]">
+          <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
             {variant === "signup" ? label : plainLabel}
           </p>
         </div>
@@ -134,7 +134,7 @@ export function AuthHeroBackground() {
         className="object-cover object-top opacity-30"
         sizes="(max-width: 512px) 100vw, 448px"
       />
-      <div className="absolute inset-0 bg-linear-to-b from-[#f4efe6]/70 via-[#f4efe6]/85 to-[#f4efe6]" />
+      <div className="absolute inset-0 bg-linear-to-b from-cream/70 via-cream/85 to-cream" />
     </div>
   );
 }

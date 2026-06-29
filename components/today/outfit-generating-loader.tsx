@@ -99,20 +99,20 @@ export function OutfitGeneratingLoader({
 
   return (
     <div
-      className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm"
+      className="overflow-hidden rounded-3xl border border-border bg-white shadow-sm"
       aria-busy="true"
       aria-label="Styling your outfit"
     >
-      <div className="border-b border-neutral-100 px-4 py-3.5">
+      <div className="border-b border-border px-4 py-3.5">
         <div className="flex items-center gap-2">
-          <h2 className="font-(family-name:--font-auth-serif) text-lg text-neutral-950">
+          <h2 className="font-serif text-lg text-foreground">
             {variant === 'shuffle'
               ? 'Finding another option'
               : "Styling today's outfit"}
           </h2>
-          <Sparkles className="h-4 w-4 animate-pulse text-neutral-400" />
+          <Sparkles className="h-4 w-4 animate-pulse text-ink-faint" />
         </div>
-        <p className="mt-0.5 text-xs text-neutral-500">
+        <p className="mt-0.5 text-xs text-muted-foreground">
           {variant === 'shuffle'
             ? 'Putting together a fresh look from your wardrobe'
             : 'Curated for you — not just generated'}
@@ -121,17 +121,17 @@ export function OutfitGeneratingLoader({
 
       <div className="flex gap-3 p-4">
         <div className="relative w-[50%] shrink-0">
-          <div className="relative aspect-3/4 overflow-hidden rounded-2xl bg-neutral-100">
-            <div className="absolute inset-0 animate-pulse bg-linear-to-br from-neutral-100 via-neutral-50 to-neutral-200/70" />
+          <div className="relative aspect-3/4 overflow-hidden rounded-2xl bg-muted">
+            <div className="absolute inset-0 animate-pulse bg-linear-to-br from-muted via-background to-cream-deep/70" />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="flex flex-col items-center gap-2 text-center">
                 <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/90 shadow-sm">
                   <Sparkles
-                    className="h-5 w-5 text-neutral-500"
+                    className="h-5 w-5 text-muted-foreground"
                     strokeWidth={1.5}
                   />
                 </span>
-                <span className="px-3 text-[11px] font-medium text-neutral-500">
+                <span className="px-3 text-[11px] font-medium text-muted-foreground">
                   Choosing your hero piece
                 </span>
               </div>
@@ -152,38 +152,38 @@ export function OutfitGeneratingLoader({
                   className={cn(
                     'flex items-center gap-2.5 rounded-xl border px-2 py-1.5 transition-all duration-700',
                     isRevealed
-                      ? 'border-neutral-200 bg-white'
-                      : 'border-transparent bg-neutral-50/80',
-                    isBuilding && 'border-neutral-300 bg-neutral-50',
+                      ? 'border-border bg-white'
+                      : 'border-transparent bg-background/80',
+                    isBuilding && 'border-border bg-background',
                   )}
                 >
                   <div
                     className={cn(
                       'relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border transition-all duration-700',
                       isRevealed
-                        ? 'border-neutral-200 bg-neutral-100'
-                        : 'border-neutral-200/70 bg-neutral-100/80',
+                        ? 'border-border bg-muted'
+                        : 'border-border/70 bg-muted/80',
                     )}
                   >
                     {isRevealed ? (
-                      <Icon className="h-4 w-4 text-neutral-500" />
+                      <Icon className="h-4 w-4 text-muted-foreground" />
                     ) : (
-                      <div className="absolute inset-0 animate-pulse bg-linear-to-br from-neutral-100 to-neutral-200/60" />
+                      <div className="absolute inset-0 animate-pulse bg-linear-to-br from-muted to-cream-deep/60" />
                     )}
                     {isBuilding && (
-                      <span className="absolute inset-0 animate-pulse ring-2 ring-neutral-300/70 ring-inset" />
+                      <span className="absolute inset-0 animate-pulse ring-2 ring-border/70 ring-inset" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p
                       className={cn(
                         'text-sm font-medium transition-colors duration-500',
-                        isRevealed ? 'text-neutral-950' : 'text-neutral-300',
+                        isRevealed ? 'text-foreground' : 'text-ink-faint',
                       )}
                     >
                       {slot.label}
                     </p>
-                    <p className="text-xs text-neutral-400">
+                    <p className="text-xs text-ink-faint">
                       {isBuilding
                         ? 'Selecting...'
                         : isRevealed
@@ -193,7 +193,7 @@ export function OutfitGeneratingLoader({
                   </div>
                   {isRevealed && !isBuilding && (
                     <Check
-                      className="h-4 w-4 shrink-0 text-neutral-400"
+                      className="h-4 w-4 shrink-0 text-ink-faint"
                       strokeWidth={2}
                     />
                   )}
@@ -205,13 +205,13 @@ export function OutfitGeneratingLoader({
       </div>
 
       <div
-        className="border-t border-neutral-100 bg-neutral-50/60 px-4 py-4"
+        className="border-t border-border bg-background/60 px-4 py-4"
         aria-live="polite"
       >
-        <p className="text-[10px] font-semibold tracking-[0.15em] text-neutral-400 uppercase">
+        <p className="text-[10px] font-semibold tracking-[0.15em] text-ink-faint uppercase">
           Stylist note
         </p>
-        <p className="mt-2 font-(family-name:--font-auth-serif) text-base leading-snug text-neutral-950">
+        <p className="mt-2 font-serif text-base leading-snug text-foreground">
           {phase.message}
           <span className="inline-flex gap-0.5 pl-0.5 align-middle">
             <span className="animate-bounce [animation-delay:0ms]">.</span>
@@ -219,9 +219,9 @@ export function OutfitGeneratingLoader({
             <span className="animate-bounce [animation-delay:300ms]">.</span>
           </span>
         </p>
-        <p className="mt-1 text-sm text-neutral-500">{phase.detail}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{phase.detail}</p>
         {vibeHint && variant === 'initial' && activePhase >= 1 && (
-          <p className="mt-3 text-xs font-medium text-neutral-600">{vibeHint}</p>
+          <p className="mt-3 text-xs font-medium text-muted-foreground">{vibeHint}</p>
         )}
       </div>
     </div>

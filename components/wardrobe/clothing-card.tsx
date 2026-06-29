@@ -15,9 +15,9 @@ export function ClothingCard({ item, imageUrl }: ClothingCardProps) {
   return (
     <Link
       href={`/wardrobe/${item.id}`}
-      className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white text-left shadow-sm transition-shadow hover:shadow-md"
+      className="group overflow-hidden rounded-2xl border border-border bg-white text-left shadow-sm transition-shadow hover:shadow-md"
     >
-      <div className="relative aspect-3/4 bg-neutral-100">
+      <div className="relative aspect-3/4 bg-muted">
         <Image
           src={imageUrl}
           alt={item.name}
@@ -31,7 +31,7 @@ export function ClothingCard({ item, imageUrl }: ClothingCardProps) {
         )}
       </div>
       <div className="space-y-1 p-3">
-        <p className="truncate text-sm font-medium text-neutral-950">
+        <p className="truncate text-sm font-medium text-foreground">
           {item.name}
         </p>
         <Badge variant="secondary" className="rounded-full text-xs">

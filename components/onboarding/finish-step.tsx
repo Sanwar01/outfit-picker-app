@@ -51,20 +51,20 @@ export function FinishStep({ userId }: FinishStepProps) {
           type="button"
           onClick={handleGetStarted}
           disabled={saving}
-          className="h-12 w-full rounded-2xl bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333] disabled:opacity-50"
+          className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
         >
           {saving ? "Starting..." : "Get started"}
         </button>
       }
     >
-      <div className="flex flex-col items-center rounded-2xl bg-[#f4efe6] px-6 py-10 text-center">
+      <div className="flex flex-col items-center rounded-2xl bg-cream px-6 py-10 text-center">
         <div className="flex size-16 items-center justify-center rounded-full bg-white shadow-sm">
-          <Sparkles className="size-7 text-[#8b7355]" strokeWidth={1.5} />
+          <Sparkles className="size-7 text-brand" strokeWidth={1.5} />
         </div>
-        <p className="mt-6 font-(family-name:--font-auth-serif) text-xl text-[#1a1a1a]">
+        <p className="mt-6 font-serif text-xl text-foreground">
           Ready when you are
         </p>
-        <p className="mt-2 max-w-xs text-sm leading-relaxed text-[#6b6560]">
+        <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
           We&apos;ll use your style preferences and wardrobe to suggest outfits
           you&apos;ll actually want to wear.
         </p>

@@ -102,17 +102,17 @@ export function ProfileForm({
       <header className="flex items-center gap-3">
         <Link
           href="/profile"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-800"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
           aria-label="Back to profile"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
-        <h1 className="font-(family-name:--font-auth-serif) text-xl text-neutral-950">
+        <h1 className="font-serif text-xl text-foreground">
           Edit profile
         </h1>
       </header>
 
-      <Card className="rounded-2xl border-neutral-200 shadow-sm">
+      <Card className="rounded-2xl border-border shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg">Name</CardTitle>
           <CardDescription>How we greet you in the app</CardDescription>
@@ -135,29 +135,29 @@ export function ProfileForm({
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl border-neutral-200 shadow-sm">
+      <Card className="rounded-2xl border-border shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg">Account</CardTitle>
           <CardDescription>Your profile overview</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           <p>
-            <span className="text-stone-500">Email:</span> {email}
+            <span className="text-muted-foreground">Email:</span> {email}
           </p>
           <p>
-            <span className="text-stone-500">Wardrobe:</span> {wardrobeCount}{" "}
+            <span className="text-muted-foreground">Wardrobe:</span> {wardrobeCount}{" "}
             items
           </p>
           {profile.location_city && (
             <p>
-              <span className="text-stone-500">Location:</span>{" "}
+              <span className="text-muted-foreground">Location:</span>{" "}
               {profile.location_city}
             </p>
           )}
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl border-neutral-200 shadow-sm">
+      <Card className="rounded-2xl border-border shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg">Style vibes</CardTitle>
           <CardDescription>Up to 3 preferences</CardDescription>
@@ -174,7 +174,7 @@ export function ProfileForm({
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl border-neutral-200 shadow-sm">
+      <Card className="rounded-2xl border-border shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg">Location</CardTitle>
           <CardDescription>Used for weather suggestions</CardDescription>

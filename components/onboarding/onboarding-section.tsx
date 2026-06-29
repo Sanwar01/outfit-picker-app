@@ -15,16 +15,16 @@ export function OnboardingSection({
   children,
 }: OnboardingSectionProps) {
   return (
-    <section className="border-b border-[#ebe4d8] py-6 first:pt-0 last:border-b-0 last:pb-0">
+    <section className="border-b border-border py-6 first:pt-0 last:border-b-0 last:pb-0">
       <div className="mb-4 flex items-start gap-3">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#f4efe6]">
-          <Icon className="size-4 text-[#8b7355]" strokeWidth={1.5} />
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-cream">
+          <Icon className="size-4 text-brand" strokeWidth={1.5} />
         </div>
         <div>
-          <h1 className="font-(family-name:--font-auth-serif) text-2xl text-[#1a1a1a] font-semibold">
+          <h1 className="font-serif text-2xl text-foreground font-semibold">
             {title}
           </h1>
-          <p className="mt-0.5 text-sm leading-relaxed text-[#6b6560]">
+          <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">
             {description}
           </p>
         </div>

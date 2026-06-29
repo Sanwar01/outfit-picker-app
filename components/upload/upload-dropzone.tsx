@@ -21,12 +21,12 @@ export function UploadDropzone({ onFilesSelected, disabled }: UploadDropzoneProp
   }
 
   return (
-    <div className="rounded-2xl border-2 border-dashed border-stone-200 bg-stone-50 p-8 text-center">
+    <div className="rounded-2xl border-2 border-dashed border-border bg-background p-8 text-center">
       <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-sm">
-        <ImagePlus className="h-6 w-6 text-stone-400" />
+        <ImagePlus className="h-6 w-6 text-ink-faint" />
       </div>
-      <h3 className="font-medium text-stone-900">Add to your closet</h3>
-      <p className="mt-1 text-sm text-stone-500">
+      <h3 className="font-medium text-foreground">Add to your closet</h3>
+      <p className="mt-1 text-sm text-muted-foreground">
         Upload photos of individual clothing items
       </p>
       <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">

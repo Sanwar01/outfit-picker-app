@@ -55,7 +55,7 @@ export function LocationStep({ onLocation, onSkip }: LocationStepProps) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-stone-500">
+      <p className="text-sm text-muted-foreground">
         We use your location for weather-based outfit suggestions in Phase 2.
       </p>
 

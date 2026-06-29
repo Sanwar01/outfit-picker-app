@@ -171,9 +171,9 @@ export function OutfitSuggestion({
 
   if (view === 'error' && error) {
     return (
-      <div className="rounded-3xl border border-neutral-200 bg-white px-6 py-10 text-center shadow-sm">
-        <p className="text-lg font-semibold text-neutral-950">{error.title}</p>
-        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-neutral-500">
+      <div className="rounded-3xl border border-border bg-white px-6 py-10 text-center shadow-sm">
+        <p className="text-lg font-semibold text-foreground">{error.title}</p>
+        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
           {error.body}
         </p>
         <div className="mt-6 flex flex-col gap-2">
@@ -187,7 +187,7 @@ export function OutfitSuggestion({
           </Button>
           <Button
             variant="ghost"
-            className="rounded-xl text-stone-600"
+            className="rounded-xl text-muted-foreground"
             render={<Link href="/wardrobe/add" />}
           >
             Add to wardrobe
@@ -226,7 +226,7 @@ export function OutfitSuggestion({
       <div className="grid grid-cols-2 gap-3">
         <Button
           size="lg"
-          className="h-12 rounded-2xl bg-neutral-950 text-base text-white hover:bg-neutral-800"
+          className="h-12 rounded-2xl bg-primary text-base text-white hover:bg-primary/90"
           onClick={handleWear}
           disabled={actionLoading || wornToday}
         >
@@ -236,7 +236,7 @@ export function OutfitSuggestion({
         <Button
           size="lg"
           variant="outline"
-          className="h-12 rounded-2xl border-neutral-300 bg-white text-base text-neutral-950 hover:bg-neutral-50"
+          className="h-12 rounded-2xl border-border bg-white text-base text-foreground hover:bg-background"
           onClick={() => setSaveDialogOpen(true)}
         >
           <Bookmark className="mr-2 h-4 w-4" />

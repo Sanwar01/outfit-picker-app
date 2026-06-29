@@ -43,17 +43,17 @@ export function ClothingFilters({
   return (
     <div className="mb-5 space-y-3">
       <div className="relative">
-        <Search className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+        <Search className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-ink-faint" />
         <input
           type="search"
           placeholder="Search your wardrobe"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="h-11 w-full rounded-2xl border border-neutral-200 bg-white pr-12 pl-10 text-sm text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-400"
+          className="h-11 w-full rounded-2xl border border-border bg-white pr-12 pl-10 text-sm text-foreground outline-none transition-colors placeholder:text-ink-faint focus:border-brand"
         />
         <Link
           href="/wardrobe/add"
-          className="absolute top-1/2 right-2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-xl text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+          className="absolute top-1/2 right-2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           aria-label="Add item"
         >
           <ScanLine className="h-4 w-4" strokeWidth={1.75} />
@@ -72,8 +72,8 @@ export function ClothingFilters({
               className={cn(
                 'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-medium transition-colors',
                 isActive
-                  ? 'border-neutral-950 bg-neutral-950 text-white'
-                  : 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50',
+                  ? 'border-primary bg-primary text-white'
+                  : 'border-border bg-white text-foreground hover:bg-background',
               )}
             >
               <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />

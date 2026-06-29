@@ -46,7 +46,7 @@ function CategoryPreview({
   const { scale, translateY } = WARDROBE_CATEGORY_FRAMING[categoryId];
 
   return (
-    <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-[#f4efe6]">
+    <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-cream">
       {!imageError ? (
         <div className="absolute inset-x-1.5 top-2 bottom-3 flex items-end justify-center">
           <div
@@ -68,7 +68,7 @@ function CategoryPreview({
           </div>
         </div>
       ) : (
-        <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-[#8b7355]">
+        <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-brand">
           {label.slice(0, 1)}
         </span>
       )}
@@ -177,18 +177,18 @@ export function WardrobeStep({ userId }: WardrobeStepProps) {
         <button
           type="button"
           onClick={() => router.push('/onboarding/location')}
-          className="h-12 w-full rounded-2xl bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333]"
+          className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90"
         >
           Continue
         </button>
       }
     >
-      <div className="rounded-2xl bg-[#f4efe6] p-4">
+      <div className="rounded-2xl bg-cream p-4">
         <div className="flex items-center gap-2">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#EFE1D5]">
-            <Sparkles className="size-4 text-[#8b7355]" strokeWidth={1.5} />
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-cream-deep">
+            <Sparkles className="size-4 text-brand" strokeWidth={1.5} />
           </div>
-          <p className="text-sm font-semibold text-[#1a1a1a]">
+          <p className="text-sm font-semibold text-foreground">
             Tips for best results
           </p>
         </div>
@@ -196,27 +196,27 @@ export function WardrobeStep({ userId }: WardrobeStepProps) {
           {WARDROBE_TIPS.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
-              className="flex flex-col items-center gap-2 border-r border-[#ebe4d8] pr-3 last:border-r-0 last:pr-0 p-2"
+              className="flex flex-col items-center gap-2 border-r border-border pr-3 last:border-r-0 last:pr-0 p-2"
             >
               <Icon
-                className="size-5 shrink-0 text-[#8b7355]"
+                className="size-5 shrink-0 text-brand"
                 strokeWidth={1.5}
               />
-              <p className="text-xs font-semibold text-[#1a1a1a]">{title}</p>
-              <p className="text-[11px] leading-snug text-[#6b6560]">{body}</p>
+              <p className="text-xs font-semibold text-foreground">{title}</p>
+              <p className="text-[11px] leading-snug text-muted-foreground">{body}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl border-2 border-dashed border-[#d8d0c4]  px-4 py-8 text-center">
-        <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-[#f4efe6]">
-          <Camera className="size-6 text-[#8b7355]" strokeWidth={2} />
+      <div className="mt-6 rounded-2xl border-2 border-dashed border-border-strong  px-4 py-8 text-center">
+        <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-cream">
+          <Camera className="size-6 text-brand" strokeWidth={2} />
         </div>
-        <p className="mt-4 font-(family-name:--font-auth-serif) text-xl text-[#1a1a1a] font-semibold tracking-wide">
+        <p className="mt-4 font-serif text-xl text-foreground font-semibold tracking-wide">
           Add photos of your clothes
         </p>
-        <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-[#6b6560]">
+        <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
           Tap to take photos or choose from your gallery. We&apos;ll
           automatically categorize your items.
         </p>
@@ -224,21 +224,21 @@ export function WardrobeStep({ userId }: WardrobeStepProps) {
           type="button"
           disabled={processing}
           onClick={() => openPicker(true)}
-          className="mt-6 inline-flex h-11 px-10 w-fit items-center justify-center gap-2 rounded-sm bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333] disabled:opacity-50"
+          className="mt-6 inline-flex h-11 px-10 w-fit items-center justify-center gap-2 rounded-sm bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
         >
           <Camera className="size-5" strokeWidth={1.5} />
           Take Photos
         </button>
         <div className="my-5 flex items-center justify-center gap-3">
           <span className="h-px w-36 bg-[#ebe4d8]" />
-          <p className="shrink-0 text-sm text-[#a39e97]">OR</p>
+          <p className="shrink-0 text-sm text-ink-faint">OR</p>
           <span className="h-px w-36 bg-[#ebe4d8]" />
         </div>
         <button
           type="button"
           disabled={processing}
           onClick={() => openPicker(false)}
-          className="inline-flex h-11 px-3 w-fit items-center justify-center gap-2 rounded-sm border border-[#e8e2d9] text-sm font-medium text-[#1a1a1a] transition-colors hover:bg-[#faf8f5] disabled:opacity-50"
+          className="inline-flex h-11 px-3 w-fit items-center justify-center gap-2 rounded-sm border border-input text-sm font-medium text-foreground transition-colors hover:bg-surface-hover disabled:opacity-50"
         >
           <ImageIcon className="size-5" strokeWidth={1.5} />
           Choose from Gallery
@@ -260,7 +260,7 @@ export function WardrobeStep({ userId }: WardrobeStepProps) {
 
       {queue.length > 0 && (
         <div className="mt-6 space-y-3">
-          <p className="text-sm font-medium text-[#1a1a1a]">
+          <p className="text-sm font-medium text-foreground">
             {queue.filter((item) => item.status === 'done').length} of{' '}
             {queue.length} items ready
           </p>
@@ -268,9 +268,9 @@ export function WardrobeStep({ userId }: WardrobeStepProps) {
             {queue.map((item) => (
               <div
                 key={item.id}
-                className="overflow-hidden rounded-xl border border-[#ebe4d8] bg-white"
+                className="overflow-hidden rounded-xl border border-border bg-white"
               >
-                <div className="relative aspect-square bg-[#f4efe6]">
+                <div className="relative aspect-square bg-cream">
                   <Image
                     src={item.preview}
                     alt="Upload preview"
@@ -296,7 +296,7 @@ export function WardrobeStep({ userId }: WardrobeStepProps) {
       )}
 
       <div className="mt-8">
-        <p className="font-(family-name:--font-auth-serif) text-base text-[#1a1a1a] font-semibold tracking-wide">
+        <p className="font-serif text-base text-foreground font-semibold tracking-wide">
           What you can add
         </p>
         <div className="mt-3 grid grid-cols-5 justify-items-center gap-3">
@@ -316,13 +316,13 @@ export function WardrobeStep({ userId }: WardrobeStepProps) {
         </div>
       </div>
 
-      <div className="mt-6 flex gap-3 rounded-2xl bg-[#f4efe6] p-4">
+      <div className="mt-6 flex gap-3 rounded-2xl bg-cream p-4">
         <div className="flex flex-row items-center gap-3">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#efe1d5]">
-            <Lock className="size-4 text-[#8b7355]" strokeWidth={1.5} />
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-cream-deep">
+            <Lock className="size-4 text-brand" strokeWidth={1.5} />
           </div>
-          <div className="space-y-1 text-xs leading-relaxed text-[#6b6560]">
-            <p className="font-semibold text-[#1a1a1a]">Your privacy matters</p>
+          <div className="space-y-1 text-xs leading-relaxed text-muted-foreground">
+            <p className="font-semibold text-foreground">Your privacy matters</p>
             <p>
               Your photos are private and only used to personalize your
               experience. We never share your data.

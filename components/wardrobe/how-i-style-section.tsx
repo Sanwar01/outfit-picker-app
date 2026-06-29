@@ -21,20 +21,20 @@ export function HowIStyleSection({
   }
 
   return (
-    <section className="mb-5 rounded-2xl border border-neutral-200 bg-white p-4">
+    <section className="mb-5 rounded-2xl border border-border bg-white p-4">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold text-neutral-950">
+          <h2 className="text-sm font-semibold text-foreground">
             How I style this
           </h2>
-          <p className="mt-0.5 text-xs text-neutral-500">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             This item goes well with
           </p>
         </div>
         {outfitCount > 0 && (
           <Link
             href={`/outfits?itemId=${itemId}`}
-            className="inline-flex items-center gap-0.5 text-xs font-medium text-neutral-600 hover:text-neutral-900"
+            className="inline-flex items-center gap-0.5 text-xs font-medium text-muted-foreground hover:text-foreground"
           >
             See outfits
             <ChevronRight className="h-3.5 w-3.5" />
@@ -50,7 +50,7 @@ export function HowIStyleSection({
               href={`/wardrobe/${companion.id}`}
               className="w-24 shrink-0 text-left"
             >
-              <div className="relative aspect-square overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100">
+              <div className="relative aspect-square overflow-hidden rounded-2xl border border-border bg-muted">
                 {companion.imageUrl && (
                   <Image
                     src={companion.imageUrl}
@@ -62,14 +62,14 @@ export function HowIStyleSection({
                   />
                 )}
               </div>
-              <p className="mt-2 line-clamp-2 text-xs font-medium text-neutral-900">
+              <p className="mt-2 line-clamp-2 text-xs font-medium text-foreground">
                 {companion.name}
               </p>
             </Link>
           ))}
         </div>
       ) : (
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted-foreground">
           Save outfits with this piece to see styling ideas here.
         </p>
       )}

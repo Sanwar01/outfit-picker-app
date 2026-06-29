@@ -43,7 +43,7 @@ export function OutfitListCard({
   }
 
   return (
-    <article className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+    <article className="rounded-2xl border border-border bg-white p-4 shadow-sm">
       <div className="mb-3 flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           {editing ? (
@@ -74,7 +74,7 @@ export function OutfitListCard({
           ) : (
             <Link href={`/outfits/${outfit.id}`} className="block">
               <div className="flex items-center gap-1.5">
-                <p className="truncate font-medium text-neutral-950">
+                <p className="truncate font-medium text-foreground">
                   {outfit.name ?? "Saved outfit"}
                 </p>
                 <button
@@ -85,17 +85,17 @@ export function OutfitListCard({
                     setEditName(outfit.name ?? "Saved outfit");
                     setEditing(true);
                   }}
-                  className="shrink-0 rounded-full p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
+                  className="shrink-0 rounded-full p-1 text-ink-faint hover:bg-muted hover:text-muted-foreground"
                   aria-label="Rename outfit"
                 >
                   <Pencil className="h-3.5 w-3.5" />
                 </button>
               </div>
-              <p className="mt-0.5 line-clamp-2 text-sm text-neutral-500">
+              <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">
                 {outfitSubtitle(outfit)}
               </p>
               {weather && (
-                <p className="mt-1 text-xs text-neutral-400">
+                <p className="mt-1 text-xs text-ink-faint">
                   {weather.temp_c}°C · {weatherConditionLabel(weather.condition)}
                 </p>
               )}
@@ -105,13 +105,13 @@ export function OutfitListCard({
         <button
           type="button"
           onClick={onToggleFavorite}
-          className="shrink-0 rounded-full p-1.5 text-neutral-400 hover:bg-neutral-100"
+          className="shrink-0 rounded-full p-1.5 text-ink-faint hover:bg-muted"
           aria-label={outfit.is_favorite ? "Remove favorite" : "Add favorite"}
         >
           <Heart
             className={cn(
               "h-4 w-4",
-              outfit.is_favorite && "fill-neutral-950 text-neutral-950",
+              outfit.is_favorite && "fill-primary text-foreground",
             )}
           />
         </button>
@@ -123,7 +123,7 @@ export function OutfitListCard({
             key={item.id}
             type="button"
             onClick={() => onItemClick(item)}
-            className="relative h-20 w-16 shrink-0 overflow-hidden rounded-xl bg-neutral-100"
+            className="relative h-20 w-16 shrink-0 overflow-hidden rounded-xl bg-muted"
             aria-label={`Quick edit ${item.name}`}
           >
             <Image
@@ -153,9 +153,9 @@ export function OutfitGridCard({
   const heroUrl = outfit.imageUrls[heroItem?.image_url ?? ""] ?? "";
 
   return (
-    <article className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+    <article className="relative overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
       <Link href={`/outfits/${outfit.id}`} className="block">
-        <div className="relative aspect-3/4 bg-neutral-100">
+        <div className="relative aspect-3/4 bg-muted">
           {heroUrl ? (
             <Image
               src={heroUrl}
@@ -167,10 +167,10 @@ export function OutfitGridCard({
           ) : null}
         </div>
         <div className="space-y-1 p-3">
-          <p className="truncate text-sm font-semibold text-neutral-950">
+          <p className="truncate text-sm font-semibold text-foreground">
             {outfit.name ?? "Saved outfit"}
           </p>
-          <p className="line-clamp-2 text-xs text-neutral-500">
+          <p className="line-clamp-2 text-xs text-muted-foreground">
             {outfitSubtitle(outfit)}
           </p>
         </div>
@@ -185,8 +185,8 @@ export function OutfitGridCard({
           className={cn(
             "h-4 w-4",
             outfit.is_favorite
-              ? "fill-neutral-950 text-neutral-950"
-              : "text-neutral-500",
+              ? "fill-primary text-foreground"
+              : "text-muted-foreground",
           )}
         />
       </button>

@@ -17,11 +17,11 @@ interface ForgotPasswordFormProps {
 function SecurityNotice() {
   return (
     <div className="mt-8 flex gap-3 rounded-2xl bg-[#ebe4d8]/80 p-4">
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f4efe6]">
-        <Lock className="size-4 text-[#8b7355]" strokeWidth={1.5} />
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-cream">
+        <Lock className="size-4 text-brand" strokeWidth={1.5} />
       </div>
-      <div className="space-y-1 text-xs leading-relaxed text-[#6b6560]">
-        <p className="font-semibold text-[#1a1a1a]">Your security matters</p>
+      <div className="space-y-1 text-xs leading-relaxed text-muted-foreground">
+        <p className="font-semibold text-foreground">Your security matters</p>
         <p>We&apos;ll never share your email with anyone.</p>
         <p>Check your spam folder if you don&apos;t see the email.</p>
       </div>
@@ -34,7 +34,7 @@ function ForgotPasswordShell({ children }: { children: React.ReactNode }) {
     <section className="flex min-h-dvh flex-col px-6 pb-10 pt-6">
       <Link
         href="/login"
-        className="mb-8 inline-flex size-10 items-center justify-center rounded-full bg-white/90 text-[#1a1a1a] shadow-sm transition-colors hover:bg-white"
+        className="mb-8 inline-flex size-10 items-center justify-center rounded-full bg-white/90 text-foreground shadow-sm transition-colors hover:bg-white"
         aria-label="Back to log in"
       >
         <ArrowLeft className="size-5" strokeWidth={1.5} />
@@ -68,17 +68,17 @@ export function ForgotPasswordForm({ error, sent }: ForgotPasswordFormProps) {
   if (sent) {
     return (
       <ForgotPasswordShell>
-        <h1 className="mt-8 text-center font-(family-name:--font-auth-serif) text-[1.75rem] leading-tight tracking-tight text-[#1a1a1a]">
+        <h1 className="mt-8 text-center font-serif text-[1.75rem] leading-tight tracking-tight text-foreground">
           Check your email
         </h1>
-        <p className="mx-auto mt-3 max-w-xs text-center text-sm leading-relaxed text-[#6b6560]">
+        <p className="mx-auto mt-3 max-w-xs text-center text-sm leading-relaxed text-muted-foreground">
           If an account exists for that address, we sent a link to reset your
           password.
         </p>
 
         <Link
           href="/login"
-          className="mt-8 inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333]"
+          className="mt-8 inline-flex h-12 w-full items-center justify-center rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90"
         >
           Back to log in
         </Link>
@@ -90,10 +90,10 @@ export function ForgotPasswordForm({ error, sent }: ForgotPasswordFormProps) {
 
   return (
     <ForgotPasswordShell>
-      <h1 className="mt-8 text-center font-(family-name:--font-auth-serif) text-[1.75rem] leading-tight tracking-tight text-[#1a1a1a]">
+      <h1 className="mt-8 text-center font-serif text-[1.75rem] leading-tight tracking-tight text-foreground">
         Forgot your password?
       </h1>
-      <p className="mx-auto mt-3 max-w-xs text-center text-sm leading-relaxed text-[#6b6560]">
+      <p className="mx-auto mt-3 max-w-xs text-center text-sm leading-relaxed text-muted-foreground">
         No worries! Enter your email address and we&apos;ll send you a link to
         reset your password.
       </p>
@@ -120,7 +120,7 @@ export function ForgotPasswordForm({ error, sent }: ForgotPasswordFormProps) {
         />
         <button
           type="submit"
-          className="h-12 w-full rounded-2xl bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333]"
+          className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90"
         >
           Send reset link
         </button>
@@ -130,7 +130,7 @@ export function ForgotPasswordForm({ error, sent }: ForgotPasswordFormProps) {
         Remember your password?{' '}
         <Link
           href="/login"
-          className="font-(family-name:--font-auth-serif) text-[#8b7355] hover:underline"
+          className="font-serif text-brand hover:underline"
         >
           Log in
         </Link>

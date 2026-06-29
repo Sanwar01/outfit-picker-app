@@ -102,7 +102,7 @@ function SaveOutfitForm({
 
         {suggestions.length > 0 && (
           <div className="space-y-2">
-            <p className="text-xs font-medium text-stone-500">Suggestions</p>
+            <p className="text-xs font-medium text-muted-foreground">Suggestions</p>
             <div className="flex flex-wrap gap-2">
               {suggestions.map((suggestion) => (
                 <button
@@ -112,8 +112,8 @@ function SaveOutfitForm({
                   className={cn(
                     'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
                     name === suggestion
-                      ? 'border-stone-900 bg-stone-900 text-white'
-                      : 'border-stone-200 bg-white text-stone-600 hover:border-stone-300',
+                      ? 'border-primary bg-primary text-white'
+                      : 'border-border bg-white text-muted-foreground hover:border-border',
                   )}
                 >
                   {suggestion}

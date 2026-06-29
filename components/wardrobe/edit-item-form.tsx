@@ -257,7 +257,7 @@ export function EditItemForm({
       <div className="mb-5 flex items-center justify-between">
         <Link
           href={`/wardrobe/${item.id}`}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-800"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
           aria-label="Back to item"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -278,17 +278,17 @@ export function EditItemForm({
       </div>
 
       <div className="mb-6">
-        <h1 className="font-(family-name:--font-auth-serif) text-[1.75rem] leading-tight text-neutral-950">
+        <h1 className="font-serif text-[1.75rem] leading-tight text-foreground">
           Edit item
         </h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm text-muted-foreground">
           Make changes to your item details
         </p>
       </div>
 
       <div className="mb-6 flex gap-4">
         <div className="relative w-[42%] shrink-0">
-          <div className="relative aspect-3/4 overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100">
+          <div className="relative aspect-3/4 overflow-hidden rounded-2xl border border-border bg-muted">
             {previewUrl && (
               <Image
                 src={previewUrl}
@@ -300,7 +300,7 @@ export function EditItemForm({
             )}
             {photoLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-white/70">
-                <Loader2 className="h-6 w-6 animate-spin text-neutral-600" />
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             )}
           </div>
@@ -319,7 +319,7 @@ export function EditItemForm({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={photoLoading || saving}
-            className="absolute inset-x-2 bottom-2 flex items-center justify-center gap-1.5 rounded-full border border-neutral-200 bg-white/95 py-2 text-xs font-medium text-neutral-900 shadow-sm backdrop-blur-sm"
+            className="absolute inset-x-2 bottom-2 flex items-center justify-center gap-1.5 rounded-full border border-border bg-white/95 py-2 text-xs font-medium text-foreground shadow-sm backdrop-blur-sm"
           >
             <Camera className="h-3.5 w-3.5" />
             Change photo
@@ -340,7 +340,7 @@ export function EditItemForm({
               {extraImages.map((image) => (
                 <div
                   key={image.id}
-                  className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-neutral-200"
+                  className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-border"
                 >
                   <Image
                     src={image.imageUrl}
@@ -366,7 +366,7 @@ export function EditItemForm({
             type="button"
             onClick={() => extraPhotoInputRef.current?.click()}
             disabled={extraPhotoLoading || saving || photoLoading}
-            className="mt-2 w-full rounded-xl border border-dashed border-neutral-300 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-50 disabled:opacity-50"
+            className="mt-2 w-full rounded-xl border border-dashed border-border py-2 text-xs font-medium text-muted-foreground hover:bg-background disabled:opacity-50"
           >
             {extraPhotoLoading ? 'Adding photo…' : 'Add another photo'}
           </button>
@@ -405,15 +405,15 @@ export function EditItemForm({
               </select>
               <CategoryIcon
                 category={category}
-                className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-neutral-400"
+                className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-ink-faint"
               />
             </div>
           </Field>
         </div>
       </div>
 
-      <section className="mb-6 rounded-2xl border border-neutral-200 bg-white p-4">
-        <h2 className="mb-4 text-sm font-semibold text-neutral-950">Details</h2>
+      <section className="mb-6 rounded-2xl border border-border bg-white p-4">
+        <h2 className="mb-4 text-sm font-semibold text-foreground">Details</h2>
         <div className="space-y-4">
           <Field label="Description">
             <textarea
@@ -439,8 +439,8 @@ export function EditItemForm({
                     className={cn(
                       'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
                       isActive
-                        ? 'border-neutral-950 bg-neutral-950 text-white'
-                        : 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50',
+                        ? 'border-primary bg-primary text-white'
+                        : 'border-border bg-white text-foreground hover:bg-background',
                     )}
                   >
                     {season.label}
@@ -460,7 +460,7 @@ export function EditItemForm({
               placeholder="Anything helpful about this piece"
               className={cn(inputClass, 'resize-none py-2.5')}
             />
-            <p className="mt-1 text-right text-xs text-neutral-400">
+            <p className="mt-1 text-right text-xs text-ink-faint">
               {notes.length}/{NOTES_MAX_LENGTH}
             </p>
           </Field>
@@ -469,7 +469,7 @@ export function EditItemForm({
 
       <Button
         size="lg"
-        className="h-12 w-full rounded-2xl bg-neutral-950 text-base text-white hover:bg-neutral-800"
+        className="h-12 w-full rounded-2xl bg-primary text-base text-white hover:bg-primary/90"
         onClick={handleSave}
         disabled={saving || deleting || photoLoading || extraPhotoLoading}
       >
@@ -487,7 +487,7 @@ export function EditItemForm({
 }
 
 const inputClass =
-  'h-10 w-full rounded-xl border border-neutral-200 bg-white px-3 text-sm text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-400';
+  'h-10 w-full rounded-xl border border-border bg-white px-3 text-sm text-foreground outline-none transition-colors placeholder:text-ink-faint focus:border-brand';
 
 function Field({
   label,
@@ -498,7 +498,7 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-medium text-neutral-600">{label}</label>
+      <label className="text-xs font-medium text-muted-foreground">{label}</label>
       {children}
     </div>
   );

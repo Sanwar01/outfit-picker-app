@@ -24,7 +24,7 @@ export function RecentlyAddedStrip({
           href={`/wardrobe/${item.id}`}
           className="w-28 shrink-0 text-left"
         >
-          <div className="relative aspect-square overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100">
+          <div className="relative aspect-square overflow-hidden rounded-2xl border border-border bg-muted">
             <Image
               src={imageUrls[item.image_url] ?? ''}
               alt={item.name}
@@ -34,10 +34,10 @@ export function RecentlyAddedStrip({
               unoptimized
             />
           </div>
-          <p className="mt-2 truncate text-xs font-medium text-neutral-950">
+          <p className="mt-2 truncate text-xs font-medium text-foreground">
             {item.name}
           </p>
-          <p className="text-[11px] text-neutral-400">
+          <p className="text-[11px] text-ink-faint">
             {formatRelativeAdded(item.created_at)}
           </p>
         </Link>

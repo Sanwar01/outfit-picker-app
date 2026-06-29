@@ -44,13 +44,13 @@ export function ItemImageGallery({ imageUrls, alt }: ItemImageGalleryProps) {
 
   if (!activeUrl) {
     return (
-      <div className="aspect-3/4 rounded-2xl border border-neutral-200 bg-neutral-100" />
+      <div className="aspect-3/4 rounded-2xl border border-border bg-muted" />
     );
   }
 
   return (
     <div
-      className="relative aspect-3/4 overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100"
+      className="relative aspect-3/4 overflow-hidden rounded-2xl border border-border bg-muted"
       onTouchStart={(e) => handleTouchStart(e.touches[0]?.clientX ?? 0)}
       onTouchEnd={(e) => handleTouchEnd(e.changedTouches[0]?.clientX ?? 0)}
     >
@@ -69,7 +69,7 @@ export function ItemImageGallery({ imageUrls, alt }: ItemImageGalleryProps) {
           <button
             type="button"
             onClick={goPrev}
-            className="absolute top-1/2 left-1 z-10 -translate-y-1/2 rounded-full p-1.5 text-neutral-400 transition-colors hover:text-neutral-950 active:text-neutral-950"
+            className="absolute top-1/2 left-1 z-10 -translate-y-1/2 rounded-full p-1.5 text-ink-faint transition-colors hover:text-foreground active:text-foreground"
             aria-label="Previous image"
           >
             <ChevronLeft className="h-5 w-5" strokeWidth={1.75} />
@@ -77,7 +77,7 @@ export function ItemImageGallery({ imageUrls, alt }: ItemImageGalleryProps) {
           <button
             type="button"
             onClick={goNext}
-            className="absolute top-1/2 right-1 z-10 -translate-y-1/2 rounded-full p-1.5 text-neutral-400 transition-colors hover:text-neutral-950 active:text-neutral-950"
+            className="absolute top-1/2 right-1 z-10 -translate-y-1/2 rounded-full p-1.5 text-ink-faint transition-colors hover:text-foreground active:text-foreground"
             aria-label="Next image"
           >
             <ChevronRight className="h-5 w-5" strokeWidth={1.75} />

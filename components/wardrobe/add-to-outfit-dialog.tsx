@@ -87,10 +87,10 @@ export function AddToOutfitDialog({
         <div className="max-h-[50vh] space-y-2 overflow-y-auto pr-1">
           {loading ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-neutral-500" />
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : outfits.length === 0 ? (
-            <p className="py-6 text-center text-sm text-neutral-500">
+            <p className="py-6 text-center text-sm text-muted-foreground">
               No saved outfits yet. Save one from Today first.
             </p>
           ) : (
@@ -104,13 +104,13 @@ export function AddToOutfitDialog({
                   type="button"
                   onClick={() => addToOutfit(outfit.id)}
                   disabled={!!addingId}
-                  className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 bg-white p-3 text-left transition-colors hover:bg-neutral-50 disabled:opacity-60"
+                  className="flex w-full items-center gap-3 rounded-xl border border-border bg-white p-3 text-left transition-colors hover:bg-background disabled:opacity-60"
                 >
                   <div className="flex -space-x-2">
                     {previewItems.map((item) => (
                       <div
                         key={item.id}
-                        className="relative h-10 w-10 overflow-hidden rounded-lg border-2 border-white bg-neutral-100"
+                        className="relative h-10 w-10 overflow-hidden rounded-lg border-2 border-white bg-muted"
                       >
                         {outfit.imageUrls[item.image_url] && (
                           <Image
@@ -125,15 +125,15 @@ export function AddToOutfitDialog({
                     ))}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-neutral-950">
+                    <p className="truncate text-sm font-medium text-foreground">
                       {outfit.name ?? 'Saved outfit'}
                     </p>
-                    <p className="text-xs text-neutral-500">
+                    <p className="text-xs text-muted-foreground">
                       {outfit.items.length} items
                     </p>
                   </div>
                   {isAdding && (
-                    <Loader2 className="h-4 w-4 shrink-0 animate-spin text-neutral-500" />
+                    <Loader2 className="h-4 w-4 shrink-0 animate-spin text-muted-foreground" />
                   )}
                 </button>
               );

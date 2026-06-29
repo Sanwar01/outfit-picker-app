@@ -14,7 +14,7 @@ export function SignupHero() {
       <div className="relative mx-auto max-w-md">
         <Link
           href="/login"
-          className="mb-6 inline-flex size-10 items-center justify-center rounded-full bg-white/90 text-[#1a1a1a] shadow-sm transition-colors hover:bg-white"
+          className="mb-6 inline-flex size-10 items-center justify-center rounded-full bg-white/90 text-foreground shadow-sm transition-colors hover:bg-white"
           aria-label="Back to log in"
         >
           <ArrowLeft className="size-5" strokeWidth={1.5} />
@@ -22,10 +22,10 @@ export function SignupHero() {
 
         <AuthBrand />
 
-        <h1 className="mt-8 font-(family-name:--font-auth-serif) text-[2rem] leading-[1.15] tracking-tight text-[#1a1a1a]">
+        <h1 className="mt-8 font-serif text-[2rem] leading-[1.15] tracking-tight text-foreground">
           Create your account
         </h1>
-        <p className="mt-3 max-w-xs text-sm leading-relaxed text-[#6b6560]">
+        <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
           Start building a smarter wardrobe that works for you.
         </p>
 

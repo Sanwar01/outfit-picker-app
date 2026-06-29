@@ -64,7 +64,7 @@ export function WeatherIconAnimated({
   return (
     <div
       className={cn(
-        'flex items-center justify-center text-neutral-800',
+        'flex items-center justify-center text-foreground',
         animation,
         className,
       )}

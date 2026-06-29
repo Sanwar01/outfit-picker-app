@@ -40,7 +40,7 @@ function GoogleIcon() {
 }
 
 const socialButtonClass =
-  "flex h-12 w-full items-center justify-center gap-3 rounded-2xl border border-[#e8e2d9] bg-white text-sm font-medium text-[#1a1a1a] transition-colors hover:bg-[#faf8f5]";
+  "flex h-12 w-full items-center justify-center gap-3 rounded-2xl border border-input bg-white text-sm font-medium text-foreground transition-colors hover:bg-surface-hover";
 
 interface SocialAuthButtonsProps {
   mode?: "login" | "signup";

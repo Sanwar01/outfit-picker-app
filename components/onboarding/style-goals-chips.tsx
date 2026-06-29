@@ -33,12 +33,12 @@ export function StyleGoalsChips({ selected, onChange }: StyleGoalsChipsProps) {
             className={cn(
               'inline-flex items-center gap-2 rounded-xl border p-2.5 text-left text-xs font-medium transition-colors',
               isSelected
-                ? 'border-[#8b7355] bg-[#f4efe6] text-[#1a1a1a]'
-                : 'border-[#ebe4d8] bg-white text-[#1a1a1a]',
+                ? 'border-brand bg-cream text-foreground'
+                : 'border-border bg-white text-foreground',
             )}
           >
             <Icon
-              className="size-3.5 shrink-0 text-[#8b7355]"
+              className="size-3.5 shrink-0 text-brand"
               strokeWidth={1.5}
             />
             <span>{label}</span>
@@ -47,8 +47,8 @@ export function StyleGoalsChips({ selected, onChange }: StyleGoalsChipsProps) {
                 className={cn(
                   'flex size-4 shrink-0 items-center justify-center rounded-full border',
                   isSelected
-                    ? 'border-[#8b7355] bg-[#8b7355] text-white'
-                    : 'border-[#d8d0c4] bg-white',
+                    ? 'border-brand bg-brand text-white'
+                    : 'border-border-strong bg-white',
                 )}
               >
                 {isSelected && <Check className="size-3" strokeWidth={2.5} />}

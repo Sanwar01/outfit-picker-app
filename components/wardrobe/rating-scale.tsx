@@ -13,8 +13,8 @@ export function RatingScale({ label, hint, value, onChange }: RatingScaleProps) 
   return (
     <div className="space-y-2">
       <div>
-        <p className="text-sm font-medium text-neutral-900">{label}</p>
-        <p className="text-xs text-neutral-500">{hint}</p>
+        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className="text-xs text-muted-foreground">{hint}</p>
       </div>
       <div className="flex gap-2">
         {[1, 2, 3, 4, 5].map((level) => (
@@ -25,8 +25,8 @@ export function RatingScale({ label, hint, value, onChange }: RatingScaleProps) 
             className={cn(
               'flex h-9 w-9 items-center justify-center rounded-full border text-sm font-medium transition-colors',
               value === level
-                ? 'border-neutral-950 bg-neutral-950 text-white'
-                : 'border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50',
+                ? 'border-primary bg-primary text-white'
+                : 'border-border bg-white text-muted-foreground hover:bg-background',
             )}
           >
             {level}

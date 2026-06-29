@@ -57,7 +57,7 @@ export function OccasionPicker({
   return (
     <div className="space-y-6">
       {contextLine && (
-        <p className="text-center text-sm text-stone-500">{contextLine}</p>
+        <p className="text-center text-sm text-muted-foreground">{contextLine}</p>
       )}
 
       <div className="grid grid-cols-2 gap-3">
@@ -70,16 +70,16 @@ export function OccasionPicker({
               disabled={disabled}
               onClick={() => onSelect(occasion.id)}
               className={cn(
-                'flex flex-col items-start gap-2 rounded-2xl bg-white px-4 py-4 text-left shadow-sm ring-1 ring-stone-200/60 transition-colors',
-                'hover:bg-stone-50 hover:ring-stone-300/80',
+                'flex flex-col items-start gap-2 rounded-2xl bg-white px-4 py-4 text-left shadow-sm ring-1 ring-border/60 transition-colors',
+                'hover:bg-background hover:ring-border',
                 'disabled:pointer-events-none disabled:opacity-60',
               )}
             >
-              <Icon className="h-5 w-5 text-stone-700" />
-              <span className="text-sm font-semibold text-stone-900">
+              <Icon className="h-5 w-5 text-foreground" />
+              <span className="text-sm font-semibold text-foreground">
                 {occasion.label}
               </span>
-              <span className="text-xs leading-snug text-stone-500">
+              <span className="text-xs leading-snug text-muted-foreground">
                 {occasion.description}
               </span>
             </button>
@@ -90,14 +90,14 @@ export function OccasionPicker({
       <Button
         size="lg"
         variant="outline"
-        className="h-12 w-full rounded-2xl border-stone-200 bg-white text-base text-stone-800"
+        className="h-12 w-full rounded-2xl border-border bg-white text-base text-foreground"
         disabled={disabled}
         onClick={() => onSelect(CHOOSE_FOR_ME.id)}
       >
         <Wand2 className="mr-2 h-4 w-4" />
         {CHOOSE_FOR_ME.label}
       </Button>
-      <p className="text-center text-xs text-stone-400">
+      <p className="text-center text-xs text-ink-faint">
         {CHOOSE_FOR_ME.description}
       </p>
     </div>

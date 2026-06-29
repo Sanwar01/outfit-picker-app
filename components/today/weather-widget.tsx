@@ -37,11 +37,11 @@ function UnitToggle({
   onChange: (unit: 'c' | 'f') => void;
 }) {
   return (
-    <div className="flex items-center gap-1 text-[10px] font-medium tracking-wide text-neutral-400 uppercase">
+    <div className="flex items-center gap-1 text-[10px] font-medium tracking-wide text-ink-faint uppercase">
       <button
         type="button"
         onClick={() => onChange('c')}
-        className={cn(unit === 'c' && 'text-neutral-900')}
+        className={cn(unit === 'c' && 'text-foreground')}
       >
         °C
       </button>
@@ -49,7 +49,7 @@ function UnitToggle({
       <button
         type="button"
         onClick={() => onChange('f')}
-        className={cn(unit === 'f' && 'text-neutral-900')}
+        className={cn(unit === 'f' && 'text-foreground')}
       >
         °F
       </button>
@@ -69,13 +69,13 @@ export function WeatherWidget({ bundle, hasLocation }: WeatherWidgetProps) {
 
   if (!hasLocation) {
     return (
-      <div className="mb-5 rounded-3xl border border-neutral-200 bg-white px-4 py-4 shadow-sm">
-        <div className="flex items-center gap-2 text-neutral-500">
+      <div className="mb-5 rounded-3xl border border-border bg-white px-4 py-4 shadow-sm">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <MapPin className="h-4 w-4 shrink-0" />
           <p className="text-sm">
             <Link
               href="/profile"
-              className="font-medium text-neutral-900 underline underline-offset-2"
+              className="font-medium text-foreground underline underline-offset-2"
             >
               Add your city
             </Link>{' '}
@@ -96,29 +96,29 @@ export function WeatherWidget({ bundle, hasLocation }: WeatherWidgetProps) {
         unit={unit}
       />
 
-      <article className="mb-5 overflow-hidden rounded-3xl border border-neutral-200 bg-white px-4 py-4 shadow-sm">
+      <article className="mb-5 overflow-hidden rounded-3xl border border-border bg-white px-4 py-4 shadow-sm">
         <div className="flex items-center gap-2">
-          <MapPin className="h-3.5 w-3.5 shrink-0 text-neutral-500" />
-          <span className="truncate text-xs font-semibold tracking-[0.12em] text-neutral-800 uppercase">
+          <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          <span className="truncate text-xs font-semibold tracking-[0.12em] text-foreground uppercase">
             {cityLabel}
           </span>
         </div>
 
         <div className="mt-3 flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-2xl leading-tight font-semibold text-neutral-950">
+            <p className="text-2xl leading-tight font-semibold text-foreground">
               {formatTemp(current.temp_c, unit)}
               {rainHint ? (
-                <span className="font-normal text-neutral-600">
+                <span className="font-normal text-muted-foreground">
                   , {rainHint.toLowerCase()}
                 </span>
               ) : (
-                <span className="font-normal text-neutral-600">
+                <span className="font-normal text-muted-foreground">
                   , {description.toLowerCase()}
                 </span>
               )}
             </p>
-            <p className="mt-2 text-sm text-neutral-500">
+            <p className="mt-2 text-sm text-muted-foreground">
               H {formatTempShort(current.high_c, unit)} · L{' '}
               {formatTempShort(current.low_c, unit)}
             </p>
@@ -135,7 +135,7 @@ export function WeatherWidget({ bundle, hasLocation }: WeatherWidgetProps) {
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
           {showRainBadge && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-neutral-100 px-3 py-1.5 text-[11px] font-medium text-neutral-700">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1.5 text-[11px] font-medium text-foreground">
               <Umbrella className="h-3.5 w-3.5" strokeWidth={1.75} />
               {rainBadgeLabel(current)}
             </span>
@@ -143,7 +143,7 @@ export function WeatherWidget({ bundle, hasLocation }: WeatherWidgetProps) {
           <button
             type="button"
             onClick={() => setForecastOpen(true)}
-            className="rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-[10px] font-semibold tracking-[0.15em] text-neutral-700 uppercase transition-colors hover:bg-neutral-50"
+            className="rounded-full border border-border bg-white px-3 py-1.5 text-[10px] font-semibold tracking-[0.15em] text-foreground uppercase transition-colors hover:bg-background"
           >
             Details ›
           </button>

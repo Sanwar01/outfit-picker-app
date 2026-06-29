@@ -101,7 +101,7 @@ export function OnboardingLocationStep({ userId }: LocationStepProps) {
             type="button"
             onClick={handleContinue}
             disabled={saving}
-            className="h-12 w-full rounded-2xl bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333] disabled:opacity-50"
+            className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
           >
             {saving ? "Saving..." : "Continue"}
           </button>
@@ -112,15 +112,15 @@ export function OnboardingLocationStep({ userId }: LocationStepProps) {
               void handleContinue();
             }}
             disabled={saving}
-            className="h-11 w-full text-sm font-medium text-[#8b7355] hover:underline disabled:opacity-50"
+            className="h-11 w-full text-sm font-medium text-brand hover:underline disabled:opacity-50"
           >
             Skip for now
           </button>
         </div>
       }
     >
-      <div className="rounded-2xl border border-[#ebe4d8] bg-white p-6">
-        <p className="text-sm leading-relaxed text-[#6b6560]">
+      <div className="rounded-2xl border border-border bg-white p-6">
+        <p className="text-sm leading-relaxed text-muted-foreground">
           Enable location so we can factor in today&apos;s weather when picking
           outfits from your closet.
         </p>
@@ -132,7 +132,7 @@ export function OnboardingLocationStep({ userId }: LocationStepProps) {
         )}
 
         {location?.city && (
-          <p className="mt-4 text-sm font-medium text-[#1a1a1a]">
+          <p className="mt-4 text-sm font-medium text-foreground">
             Location set: {location.city}
           </p>
         )}
@@ -141,7 +141,7 @@ export function OnboardingLocationStep({ userId }: LocationStepProps) {
           type="button"
           onClick={handleUseLocation}
           disabled={loading}
-          className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333] disabled:opacity-50"
+          className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
         >
           {loading ? (
             <Loader2 className="size-4 animate-spin" />

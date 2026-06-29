@@ -33,14 +33,14 @@ function WeatherIcon({ condition }: { condition: string }) {
 
 export function WeatherHeader({ weather }: { weather: WeatherSnapshot }) {
   return (
-    <div className="flex items-center gap-2 text-sm text-stone-500">
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
       <WeatherIcon condition={weather.condition} />
       <span>
         {weather.city ? `${weather.city} · ` : ""}
         {weather.temp_c}°C · {weatherConditionLabel(weather.condition)}
       </span>
       {weather.precip_chance >= 30 && (
-        <span className="text-stone-400">· {weather.precip_chance}% rain</span>
+        <span className="text-ink-faint">· {weather.precip_chance}% rain</span>
       )}
     </div>
   );

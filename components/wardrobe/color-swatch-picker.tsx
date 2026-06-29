@@ -37,8 +37,8 @@ export function ColorSwatchPicker({
             className={cn(
               'h-8 w-8 rounded-full border-2 transition-transform',
               isSelected
-                ? 'border-neutral-950 ring-2 ring-neutral-200 ring-offset-1'
-                : 'border-neutral-200 hover:scale-105',
+                ? 'border-primary ring-2 ring-border ring-offset-1'
+                : 'border-border hover:scale-105',
             )}
             style={{ backgroundColor: swatch.hex }}
             aria-label={swatch.name}

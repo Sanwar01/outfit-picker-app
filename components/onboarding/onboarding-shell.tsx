@@ -25,7 +25,7 @@ export function OnboardingShell({
         {backHref ? (
           <Link
             href={backHref}
-            className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-[#1a1a1a] shadow-sm transition-colors hover:bg-[#f4efe6]"
+            className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-foreground shadow-sm transition-colors hover:bg-cream"
             aria-label="Go back"
           >
             <ArrowLeft className="size-5" strokeWidth={1.5} />
@@ -38,10 +38,10 @@ export function OnboardingShell({
       </div>
 
       <div className="text-center">
-        <h1 className="font-(family-name:--font-auth-serif) text-4xl leading-tight tracking-wide text-[#1a1a1a] font-semibold">
+        <h1 className="font-serif text-4xl leading-tight tracking-wide text-foreground font-semibold">
           {title}
         </h1>
-        <p className="mx-auto mt-2 max-w-xs text-base leading-relaxed text-[#6b6560]">
+        <p className="mx-auto mt-2 max-w-xs text-base leading-relaxed text-muted-foreground">
           {subtitle}
         </p>
       </div>

@@ -35,7 +35,7 @@ export function AlternateOccasionsRow({
 }: AlternateOccasionsRowProps) {
   return (
     <div className="space-y-3">
-      <p className="text-[10px] font-semibold tracking-[0.15em] text-neutral-400 uppercase">
+      <p className="text-[10px] font-semibold tracking-[0.15em] text-ink-faint uppercase">
         Dressing for something else?
       </p>
       <div className="flex justify-between gap-2">
@@ -50,13 +50,13 @@ export function AlternateOccasionsRow({
               className={cn(
                 'flex min-w-0 flex-1 flex-col items-center gap-2 rounded-2xl border bg-white px-1 py-3 shadow-sm transition-colors',
                 isActive
-                  ? 'border-neutral-950'
-                  : 'border-neutral-200 hover:bg-neutral-50',
+                  ? 'border-primary'
+                  : 'border-border hover:bg-background',
                 'disabled:pointer-events-none disabled:opacity-60',
               )}
             >
-              <Icon className="h-5 w-5 text-neutral-800" strokeWidth={1.5} />
-              <span className="w-full truncate text-center text-[10px] font-medium text-neutral-600">
+              <Icon className="h-5 w-5 text-foreground" strokeWidth={1.5} />
+              <span className="w-full truncate text-center text-[10px] font-medium text-muted-foreground">
                 {label}
               </span>
             </button>

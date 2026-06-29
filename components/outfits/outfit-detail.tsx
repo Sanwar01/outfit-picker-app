@@ -158,13 +158,13 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
         <header className="mb-5 flex items-center justify-between gap-3">
           <Link
             href="/outfits"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-800"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
             aria-label="Back to outfits"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
 
-          <h1 className="font-(family-name:--font-auth-serif) text-lg text-neutral-950">
+          <h1 className="font-serif text-lg text-foreground">
             Outfit detail
           </h1>
 
@@ -173,13 +173,13 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
               type="button"
               onClick={toggleFavorite}
               disabled={loading}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-700"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
               aria-label={isFavorite ? "Remove favorite" : "Add favorite"}
             >
               <Heart
                 className={cn(
                   "h-4 w-4",
-                  isFavorite && "fill-neutral-950 text-neutral-950",
+                  isFavorite && "fill-primary text-foreground",
                 )}
               />
             </button>
@@ -188,7 +188,7 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
               <button
                 type="button"
                 onClick={() => setMenuOpen((open) => !open)}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-800"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
                 aria-label="More actions"
                 aria-expanded={menuOpen}
               >
@@ -196,14 +196,14 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
               </button>
 
               {menuOpen && (
-                <div className="absolute right-0 z-20 mt-2 w-44 overflow-hidden rounded-xl border border-neutral-200 bg-white py-1 shadow-lg">
+                <div className="absolute right-0 z-20 mt-2 w-44 overflow-hidden rounded-xl border border-border bg-white py-1 shadow-lg">
                   <button
                     type="button"
                     onClick={renameOutfit}
                     disabled={loading}
-                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-neutral-800 hover:bg-neutral-50 disabled:opacity-50"
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-foreground hover:bg-background disabled:opacity-50"
                   >
-                    <Pencil className="h-4 w-4 text-neutral-500" />
+                    <Pencil className="h-4 w-4 text-muted-foreground" />
                     Rename
                   </button>
                   <button
@@ -230,14 +230,14 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
           </div>
 
           <div className="min-w-0 flex-1 space-y-3 pt-1">
-            <h2 className="font-(family-name:--font-auth-serif) text-2xl leading-tight text-neutral-950">
+            <h2 className="font-serif text-2xl leading-tight text-foreground">
               {outfit.name ?? "Saved outfit"}
             </h2>
           </div>
         </div>
 
         <section className="mb-5">
-          <h3 className="mb-3 text-sm font-semibold text-neutral-950">
+          <h3 className="mb-3 text-sm font-semibold text-foreground">
             Items in this outfit
           </h3>
           <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
@@ -251,7 +251,7 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
                   href={`/wardrobe/${item.id}`}
                   className="w-28 shrink-0 text-left"
                 >
-                  <div className="relative aspect-square overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100">
+                  <div className="relative aspect-square overflow-hidden rounded-2xl border border-border bg-muted">
                     {imageUrl && (
                       <Image
                         src={imageUrl}
@@ -262,10 +262,10 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
                       />
                     )}
                   </div>
-                  <p className="mt-2 truncate text-xs font-medium text-neutral-950">
+                  <p className="mt-2 truncate text-xs font-medium text-foreground">
                     {item.name}
                   </p>
-                  <p className="text-[11px] text-neutral-400">
+                  <p className="text-[11px] text-ink-faint">
                     {primaryColor ?? item.brand ?? "—"}
                   </p>
                 </Link>
@@ -275,10 +275,10 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
         </section>
 
         {whyBullets.length > 0 && (
-          <section className="rounded-2xl border border-neutral-200 bg-white p-4">
+          <section className="rounded-2xl border border-border bg-white p-4">
             <div className="mb-3 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-neutral-500" />
-              <h3 className="text-sm font-semibold text-neutral-950">
+              <Sparkles className="h-4 w-4 text-muted-foreground" />
+              <h3 className="text-sm font-semibold text-foreground">
                 Why this works
               </h3>
             </div>
@@ -286,10 +286,10 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
               {whyBullets.map((reason) => (
                 <li
                   key={reason}
-                  className="flex items-start gap-2 text-sm text-neutral-700"
+                  className="flex items-start gap-2 text-sm text-foreground"
                 >
                   <Check
-                    className="mt-0.5 h-4 w-4 shrink-0 text-neutral-950"
+                    className="mt-0.5 h-4 w-4 shrink-0 text-foreground"
                     strokeWidth={2}
                   />
                   <span>{reason}</span>
@@ -301,18 +301,18 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
       </div>
 
       <div className="fixed inset-x-0 bottom-20 z-40 mx-auto max-w-lg px-4">
-        <div className="flex gap-3 rounded-2xl border border-neutral-200 bg-white/95 p-2 shadow-lg backdrop-blur-sm">
+        <div className="flex gap-3 rounded-2xl border border-border bg-white/95 p-2 shadow-lg backdrop-blur-sm">
           <Button
             type="button"
             variant="outline"
             onClick={toggleFavorite}
             disabled={loading}
-            className="h-11 flex-1 rounded-xl border-neutral-200 bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
+            className="h-11 flex-1 rounded-xl border-border bg-muted text-foreground hover:bg-cream-deep"
           >
             <Heart
               className={cn(
                 "mr-2 h-4 w-4",
-                isFavorite && "fill-neutral-950 text-neutral-950",
+                isFavorite && "fill-primary text-foreground",
               )}
             />
             {isFavorite ? "Favorited" : "Favorite"}
@@ -321,7 +321,7 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
             type="button"
             onClick={handleWear}
             disabled={loading || wearing || wornToday}
-            className="h-11 flex-1 rounded-xl bg-neutral-950 text-white hover:bg-neutral-800"
+            className="h-11 flex-1 rounded-xl bg-primary text-white hover:bg-primary/90"
           >
             {wearing ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -22,9 +22,9 @@ export function CategoryBrowseGrid({
           key={category.category}
           type="button"
           onClick={() => onSelectCategory(category.category)}
-          className="overflow-hidden rounded-2xl border border-neutral-200 bg-white text-left shadow-sm transition-colors hover:bg-neutral-50"
+          className="overflow-hidden rounded-2xl border border-border bg-white text-left shadow-sm transition-colors hover:bg-background"
         >
-          <div className="relative aspect-4/3 bg-neutral-100">
+          <div className="relative aspect-4/3 bg-muted">
             {category.coverItem ? (
               <Image
                 src={imageUrls[category.coverItem.image_url] ?? ''}
@@ -35,16 +35,16 @@ export function CategoryBrowseGrid({
                 unoptimized
               />
             ) : (
-              <div className="flex h-full items-center justify-center text-xs text-neutral-400">
+              <div className="flex h-full items-center justify-center text-xs text-ink-faint">
                 No items yet
               </div>
             )}
           </div>
           <div className="px-3 py-2.5">
-            <p className="text-sm font-semibold text-neutral-950">
+            <p className="text-sm font-semibold text-foreground">
               {category.label}
             </p>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-muted-foreground">
               {category.count}{' '}
               {category.count === 1 ? 'item' : 'items'}
             </p>

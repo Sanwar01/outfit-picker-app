@@ -159,8 +159,8 @@ export function ClothingGrid({ items, imageUrls }: ClothingGridProps) {
           )}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-neutral-200 bg-white px-6 py-12 text-center">
-          <p className="text-sm text-neutral-500">
+        <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-12 text-center">
+          <p className="text-sm text-muted-foreground">
             {items.length === 0
               ? "Your closet is empty. Add your first items to get started."
               : "No items match your search."}

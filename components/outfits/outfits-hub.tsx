@@ -119,7 +119,7 @@ export function OutfitsHub({ userId, itemId, initialTab = "all" }: OutfitsHubPro
   if (loading) {
     return (
       <div className="flex justify-center py-16">
-        <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-ink-faint" />
       </div>
     );
   }
@@ -139,13 +139,13 @@ export function OutfitsHub({ userId, itemId, initialTab = "all" }: OutfitsHubPro
       />
 
       {itemId && (
-        <p className="mb-4 rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-600">
+        <p className="mb-4 rounded-xl border border-border bg-white px-3 py-2 text-sm text-muted-foreground">
           Showing outfits that include this item.
         </p>
       )}
 
       <div className="mb-5 flex items-center justify-between gap-3">
-        <div className="flex gap-4 overflow-x-auto border-b border-neutral-200">
+        <div className="flex gap-4 overflow-x-auto border-b border-border">
           {OUTFIT_TAB_OPTIONS.map((option) => {
             const isActive = tab === option.value;
             return (
@@ -156,8 +156,8 @@ export function OutfitsHub({ userId, itemId, initialTab = "all" }: OutfitsHubPro
                 className={cn(
                   "shrink-0 border-b-2 pb-2.5 text-sm font-medium transition-colors",
                   isActive
-                    ? "border-neutral-950 text-neutral-950"
-                    : "border-transparent text-neutral-400 hover:text-neutral-600",
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-ink-faint hover:text-muted-foreground",
                 )}
               >
                 {option.label}
@@ -166,15 +166,15 @@ export function OutfitsHub({ userId, itemId, initialTab = "all" }: OutfitsHubPro
           })}
         </div>
 
-        <div className="flex shrink-0 rounded-xl border border-neutral-200 bg-white p-0.5">
+        <div className="flex shrink-0 rounded-xl border border-border bg-white p-0.5">
           <button
             type="button"
             onClick={() => setView("grid")}
             className={cn(
               "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
               view === "grid"
-                ? "bg-neutral-950 text-white"
-                : "text-neutral-500 hover:text-neutral-800",
+                ? "bg-primary text-white"
+                : "text-muted-foreground hover:text-foreground",
             )}
             aria-label="Grid view"
           >
@@ -186,8 +186,8 @@ export function OutfitsHub({ userId, itemId, initialTab = "all" }: OutfitsHubPro
             className={cn(
               "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
               view === "list"
-                ? "bg-neutral-950 text-white"
-                : "text-neutral-500 hover:text-neutral-800",
+                ? "bg-primary text-white"
+                : "text-muted-foreground hover:text-foreground",
             )}
             aria-label="List view"
           >
@@ -197,8 +197,8 @@ export function OutfitsHub({ userId, itemId, initialTab = "all" }: OutfitsHubPro
       </div>
 
       {visible.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-neutral-200 bg-white px-6 py-12 text-center">
-          <p className="text-sm text-neutral-500">
+        <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-12 text-center">
+          <p className="text-sm text-muted-foreground">
             {tab === "favorites"
               ? "No favorite outfits yet."
               : "Save outfits from the Today tab to see them here."}

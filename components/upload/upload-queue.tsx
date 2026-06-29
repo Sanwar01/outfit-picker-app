@@ -114,16 +114,16 @@ export function UploadQueue({ userId }: UploadQueueProps) {
 
       {queue.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-sm font-medium text-stone-700">
+          <h3 className="text-sm font-medium text-foreground">
             {doneCount} of {queue.length} items ready
           </h3>
           <div className="grid grid-cols-2 gap-3">
             {queue.map((item) => (
               <div
                 key={item.id}
-                className="overflow-hidden rounded-2xl border border-stone-200 bg-white"
+                className="overflow-hidden rounded-2xl border border-border bg-white"
               >
-                <div className="relative aspect-3/4 bg-stone-100">
+                <div className="relative aspect-3/4 bg-muted">
                   <Image
                     src={item.preview}
                     alt="Upload preview"
@@ -143,7 +143,7 @@ export function UploadQueue({ userId }: UploadQueueProps) {
                   </div>
                 </div>
                 <div className="p-2">
-                  <p className="truncate text-xs text-stone-600">
+                  <p className="truncate text-xs text-muted-foreground">
                     {item.name ??
                       (item.status === 'tagging'
                         ? 'AI tagging...'

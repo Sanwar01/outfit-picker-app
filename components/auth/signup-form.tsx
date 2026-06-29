@@ -18,14 +18,14 @@ export function SignupForm({ error }: SignupFormProps) {
     <section className="relative z-10 -mt-6 rounded-t-[2rem] bg-white px-6 pt-8 pb-10 shadow-[0_-8px_30px_rgba(0,0,0,0.06)]">
       <div className="mx-auto max-w-md">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-(family-name:--font-auth-serif) text-3xl tracking-tight text-[#1a1a1a]">
+          <h2 className="font-serif text-3xl tracking-tight text-foreground">
             Sign up
           </h2>
           <p className="text-sm text-[#8b8178]">
             Already have an account?{' '}
             <Link
               href="/login"
-              className="font-(family-name:--font-auth-serif) text-[#8b7355] hover:underline"
+              className="font-serif text-brand hover:underline"
             >
               Log in
             </Link>
@@ -38,9 +38,9 @@ export function SignupForm({ error }: SignupFormProps) {
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-[#ebe4d8]" />
+            <span className="w-full border-t border-border" />
           </div>
-          <p className="relative mx-auto w-fit bg-white px-3 text-xs text-[#a39e97]">
+          <p className="relative mx-auto w-fit bg-white px-3 text-xs text-ink-faint">
             or sign up with email
           </p>
         </div>
@@ -84,26 +84,26 @@ export function SignupForm({ error }: SignupFormProps) {
             minLength={8}
           />
 
-          <label className="flex cursor-pointer items-start gap-2.5 text-sm leading-snug text-[#6b6560]">
+          <label className="flex cursor-pointer items-start gap-2.5 text-sm leading-snug text-muted-foreground">
             <input
               type="checkbox"
               name="terms"
               checked={termsAccepted}
               onChange={(event) => setTermsAccepted(event.target.checked)}
-              className="mt-0.5 size-4 shrink-0 rounded border-[#c9bfb0] accent-[#1a1a1a]"
+              className="mt-0.5 size-4 shrink-0 rounded border-border-strong accent-primary"
             />
             <span>
               I agree to the{' '}
               <Link
                 href="/terms"
-                className="font-(family-name:--font-auth-serif) text-[#8b7355] hover:underline"
+                className="font-serif text-brand hover:underline"
               >
                 Terms of Service
               </Link>{' '}
               and{' '}
               <Link
                 href="/privacy"
-                className="font-(family-name:--font-auth-serif) text-[#8b7355] hover:underline"
+                className="font-serif text-brand hover:underline"
               >
                 Privacy Policy
               </Link>
@@ -113,13 +113,13 @@ export function SignupForm({ error }: SignupFormProps) {
           <button
             type="submit"
             disabled={!termsAccepted}
-            className="h-12 w-full rounded-2xl bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333] disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Create account
           </button>
         </form>
 
-        <p className="mt-6 flex items-center justify-center gap-2 text-center text-xs text-[#a39e97]">
+        <p className="mt-6 flex items-center justify-center gap-2 text-center text-xs text-ink-faint">
           <Shield className="size-3.5 shrink-0" strokeWidth={1.5} />
           Your data is secure and private.
         </p>

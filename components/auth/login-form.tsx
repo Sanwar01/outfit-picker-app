@@ -32,7 +32,7 @@ export function LoginForm({ error }: LoginFormProps) {
   return (
     <section className="relative z-10 -mt-6 rounded-t-[2rem] bg-white px-6 pt-8 pb-10 shadow-[0_-8px_30px_rgba(0,0,0,0.06)]">
       <div className="mx-auto max-w-md">
-        <h2 className="font-(family-name:--font-auth-serif) text-3xl tracking-tight text-[#1a1a1a]">
+        <h2 className="font-serif text-3xl tracking-tight text-foreground">
           Welcome back
         </h2>
         <p className="mt-1 text-sm text-[#8b8178]">Log in to continue</p>
@@ -43,9 +43,9 @@ export function LoginForm({ error }: LoginFormProps) {
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-[#ebe4d8]" />
+            <span className="w-full border-t border-border" />
           </div>
-          <p className="relative mx-auto w-fit bg-white px-3 text-xs text-[#a39e97]">
+          <p className="relative mx-auto w-fit bg-white px-3 text-xs text-ink-faint">
             or continue with email
           </p>
         </div>
@@ -75,19 +75,19 @@ export function LoginForm({ error }: LoginFormProps) {
           />
 
           <div className="flex items-center justify-between gap-4">
-            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-[#6b6560]">
+            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-muted-foreground">
               <input
                 type="checkbox"
                 name="remember"
                 checked={rememberMe}
                 onChange={(event) => setRememberMe(event.target.checked)}
-                className="size-4 rounded border-[#c9bfb0] accent-[#1a1a1a]"
+                className="size-4 rounded border-border-strong accent-primary"
               />
               Remember me
             </label>
             <Link
               href="/forgot-password"
-              className="font-(family-name:--font-auth-serif) text-sm text-[#8b7355] hover:underline"
+              className="font-serif text-sm text-brand hover:underline"
             >
               Forgot password?
             </Link>
@@ -95,7 +95,7 @@ export function LoginForm({ error }: LoginFormProps) {
 
           <button
             type="submit"
-            className="h-12 w-full rounded-2xl bg-[#1a1a1a] text-sm font-medium text-white transition-colors hover:bg-[#333]"
+            className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90"
           >
             Log in
           </button>
@@ -105,7 +105,7 @@ export function LoginForm({ error }: LoginFormProps) {
           Don&apos;t have an account?{' '}
           <Link
             href="/signup"
-            className="font-(family-name:--font-auth-serif) text-[#8b7355] hover:underline"
+            className="font-serif text-brand hover:underline"
           >
             Sign up
           </Link>

@@ -63,7 +63,7 @@ export function StyleStep({
           type="button"
           onClick={handleContinue}
           disabled={saving}
-          className="h-12 w-full rounded-2xl bg-[#1a1a1a] text-base font-medium text-white transition-colors hover:bg-[#333] disabled:opacity-50"
+          className="h-12 w-full rounded-2xl bg-primary text-base font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Continue'}
         </button>

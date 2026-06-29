@@ -33,22 +33,22 @@ export function StyleVibeGrid({ selected, onChange }: StyleVibeGridProps) {
             className={cn(
               'relative rounded-2xl border-2 p-2.5 text-left transition-colors',
               isSelected
-                ? 'border-[#8b7355] bg-[#f4efe6]'
-                : 'border-[#ebe4d8] bg-white',
+                ? 'border-brand bg-cream'
+                : 'border-border bg-white',
             )}
           >
             <div
               className={cn(
                 'absolute top-2 right-2 z-10 flex size-5 items-center justify-center rounded-full border',
                 isSelected
-                  ? 'border-[#8b7355] bg-[#8b7355] text-white'
-                  : 'border-[#d8d0c4] bg-white',
+                  ? 'border-brand bg-brand text-white'
+                  : 'border-border-strong bg-white',
               )}
             >
               {isSelected && <Check className="size-3" strokeWidth={2.5} />}
             </div>
 
-            <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-[#f4efe6]">
+            <div className="relative aspect-4/5 overflow-hidden rounded-xl bg-cream">
               <Image
                 src={imageUrl}
                 alt={label}
@@ -57,7 +57,7 @@ export function StyleVibeGrid({ selected, onChange }: StyleVibeGridProps) {
               />
             </div>
 
-            <p className="mt-2 text-center text-xs font-semibold text-[#1a1a1a]">
+            <p className="mt-2 text-center text-xs font-semibold text-foreground">
               {label}
             </p>
           </button>

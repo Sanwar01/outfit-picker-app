@@ -234,12 +234,12 @@ function ClothingDetailContent({
           value={name}
           onChange={(e) => setName(e.target.value)}
           onBlur={handleNameBlur}
-          className="min-w-0 flex-1 bg-transparent text-lg font-semibold text-neutral-950 outline-none"
+          className="min-w-0 flex-1 bg-transparent text-lg font-semibold text-foreground outline-none"
         />
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900"
+          className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
           aria-label="Close"
         >
           <X className="h-4 w-4" />
@@ -314,7 +314,7 @@ function ClothingDetailContent({
         </div>
       </div>
 
-      <div className="relative aspect-3/4 w-full overflow-hidden rounded-2xl bg-neutral-100">
+      <div className="relative aspect-3/4 w-full overflow-hidden rounded-2xl bg-muted">
         {previewUrl && (
           <Image
             src={previewUrl}
@@ -326,7 +326,7 @@ function ClothingDetailContent({
         )}
         {photoLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white/70">
-            <Loader2 className="h-6 w-6 animate-spin text-neutral-600" />
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
         )}
         <button
@@ -340,8 +340,8 @@ function ClothingDetailContent({
             className={cn(
               'h-4 w-4',
               isFavorite
-                ? 'fill-neutral-950 text-neutral-950'
-                : 'text-neutral-600',
+                ? 'fill-primary text-foreground'
+                : 'text-muted-foreground',
             )}
           />
         </button>
@@ -418,7 +418,7 @@ function ClothingDetailContent({
 }
 
 const fieldClass =
-  'h-10 w-full rounded-xl border border-neutral-200 bg-white px-3 text-sm text-neutral-900 outline-none focus:border-neutral-400 disabled:opacity-50';
+  'h-10 w-full rounded-xl border border-border bg-white px-3 text-sm text-foreground outline-none focus:border-brand disabled:opacity-50';
 
 function Field({
   label,
@@ -429,7 +429,7 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-medium text-neutral-600">{label}</label>
+      <label className="text-xs font-medium text-muted-foreground">{label}</label>
       {children}
     </div>
   );
