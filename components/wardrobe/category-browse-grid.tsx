@@ -22,7 +22,7 @@ export function CategoryBrowseGrid({
           key={category.category}
           type="button"
           onClick={() => onSelectCategory(category.category)}
-          className="overflow-hidden rounded-2xl border border-border bg-white text-left shadow-sm transition-colors hover:bg-background"
+          className="overflow-hidden rounded-2xl border border-border bg-surface text-left shadow-sm transition-colors hover:bg-background"
         >
           <div className="relative aspect-4/3 bg-muted">
             {category.coverItem ? (

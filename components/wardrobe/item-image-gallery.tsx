@@ -82,7 +82,7 @@ export function ItemImageGallery({ imageUrls, alt }: ItemImageGalleryProps) {
           >
             <ChevronRight className="h-5 w-5" strokeWidth={1.75} />
           </button>
-          <span className="absolute right-2 bottom-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-medium text-white">
+          <span className="absolute right-2 bottom-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-medium text-primary-foreground">
             {activeIndex + 1} / {validUrls.length}
           </span>
         </>

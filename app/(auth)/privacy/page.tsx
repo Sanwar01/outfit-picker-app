@@ -6,7 +6,7 @@ export default function PrivacyPage() {
     <main className="mx-auto min-h-dvh w-full max-w-lg px-6 py-12">
       <Link
         href="/signup"
-        className="mb-8 inline-flex size-10 items-center justify-center rounded-full bg-white/90 text-foreground shadow-sm"
+        className="mb-8 inline-flex size-10 items-center justify-center rounded-full bg-surface/90 text-foreground shadow-sm"
         aria-label="Back"
       >
         <ArrowLeft className="size-5" strokeWidth={1.5} />

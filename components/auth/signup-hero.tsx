@@ -14,7 +14,7 @@ export function SignupHero() {
       <div className="relative mx-auto max-w-md">
         <Link
           href="/login"
-          className="mb-6 inline-flex size-10 items-center justify-center rounded-full bg-white/90 text-foreground shadow-sm transition-colors hover:bg-white"
+          className="mb-6 inline-flex size-10 items-center justify-center rounded-full bg-surface/90 text-foreground shadow-sm transition-colors hover:bg-surface"
           aria-label="Back to log in"
         >
           <ArrowLeft className="size-5" strokeWidth={1.5} />
@@ -30,7 +30,7 @@ export function SignupHero() {
         </p>
 
         <AuthFeatureGrid
-          tileClassName="bg-white/90 shadow-sm"
+          tileClassName="bg-surface/90 shadow-sm"
           variant="signup"
         />
       </div>

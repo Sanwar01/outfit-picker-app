@@ -18,14 +18,14 @@ export function OnboardingProgress({ currentStep }: OnboardingProgressProps) {
             <div
               className={cn(
                 "size-2.5 rounded-full transition-colors",
-                isComplete || isCurrent ? "bg-brand" : "bg-[#e0d8ce]"
+                isComplete || isCurrent ? "bg-brand" : "bg-cream-deep"
               )}
             />
             {step < ONBOARDING_STEPS && (
               <div
                 className={cn(
                   "h-px w-8 transition-colors sm:w-10",
-                  step < currentStep ? "bg-brand" : "bg-[#e0d8ce]"
+                  step < currentStep ? "bg-brand" : "bg-cream-deep"
                 )}
               />
             )}

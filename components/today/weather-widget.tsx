@@ -69,7 +69,7 @@ export function WeatherWidget({ bundle, hasLocation }: WeatherWidgetProps) {
 
   if (!hasLocation) {
     return (
-      <div className="mb-5 rounded-3xl border border-border bg-white px-4 py-4 shadow-sm">
+      <div className="mb-5 rounded-3xl border border-border bg-surface px-4 py-4 shadow-sm">
         <div className="flex items-center gap-2 text-muted-foreground">
           <MapPin className="h-4 w-4 shrink-0" />
           <p className="text-sm">
@@ -96,7 +96,7 @@ export function WeatherWidget({ bundle, hasLocation }: WeatherWidgetProps) {
         unit={unit}
       />
 
-      <article className="mb-5 overflow-hidden rounded-3xl border border-border bg-white px-4 py-4 shadow-sm">
+      <article className="mb-5 overflow-hidden rounded-3xl border border-border bg-surface px-4 py-4 shadow-sm">
         <div className="flex items-center gap-2">
           <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
           <span className="truncate text-xs font-semibold tracking-[0.12em] text-foreground uppercase">
@@ -143,7 +143,7 @@ export function WeatherWidget({ bundle, hasLocation }: WeatherWidgetProps) {
           <button
             type="button"
             onClick={() => setForecastOpen(true)}
-            className="rounded-full border border-border bg-white px-3 py-1.5 text-[10px] font-semibold tracking-[0.15em] text-foreground uppercase transition-colors hover:bg-background"
+            className="rounded-full border border-border bg-surface px-3 py-1.5 text-[10px] font-semibold tracking-[0.15em] text-foreground uppercase transition-colors hover:bg-background"
           >
             Details ›
           </button>

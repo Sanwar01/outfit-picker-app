@@ -102,7 +102,7 @@ export function ProfileForm({
       <header className="flex items-center gap-3">
         <Link
           href="/profile"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground"
           aria-label="Back to profile"
         >
           <ArrowLeft className="h-4 w-4" />

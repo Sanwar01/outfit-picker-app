@@ -104,7 +104,7 @@ export function AddToOutfitDialog({
                   type="button"
                   onClick={() => addToOutfit(outfit.id)}
                   disabled={!!addingId}
-                  className="flex w-full items-center gap-3 rounded-xl border border-border bg-white p-3 text-left transition-colors hover:bg-background disabled:opacity-60"
+                  className="flex w-full items-center gap-3 rounded-xl border border-border bg-surface p-3 text-left transition-colors hover:bg-background disabled:opacity-60"
                 >
                   <div className="flex -space-x-2">
                     {previewItems.map((item) => (

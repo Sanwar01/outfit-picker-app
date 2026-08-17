@@ -257,7 +257,7 @@ export function EditItemForm({
       <div className="mb-5 flex items-center justify-between">
         <Link
           href={`/wardrobe/${item.id}`}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground"
           aria-label="Back to item"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -266,7 +266,7 @@ export function EditItemForm({
           type="button"
           onClick={handleDelete}
           disabled={deleting || saving}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-red-200 bg-white text-red-600 disabled:opacity-50"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-red-200 bg-surface text-red-600 disabled:opacity-50"
           aria-label="Delete item"
         >
           {deleting ? (
@@ -299,7 +299,7 @@ export function EditItemForm({
               />
             )}
             {photoLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+              <div className="absolute inset-0 flex items-center justify-center bg-surface/70">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             )}
@@ -319,7 +319,7 @@ export function EditItemForm({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={photoLoading || saving}
-            className="absolute inset-x-2 bottom-2 flex items-center justify-center gap-1.5 rounded-full border border-border bg-white/95 py-2 text-xs font-medium text-foreground shadow-sm backdrop-blur-sm"
+            className="absolute inset-x-2 bottom-2 flex items-center justify-center gap-1.5 rounded-full border border-border bg-surface/95 py-2 text-xs font-medium text-foreground shadow-sm backdrop-blur-sm"
           >
             <Camera className="h-3.5 w-3.5" />
             Change photo
@@ -353,7 +353,7 @@ export function EditItemForm({
                     type="button"
                     onClick={() => void removeExtraPhoto(image)}
                     disabled={extraPhotoLoading || saving}
-                    className="absolute inset-0 flex items-center justify-center bg-black/40 text-white opacity-0 transition-opacity hover:opacity-100"
+                    className="absolute inset-0 flex items-center justify-center bg-black/40 text-primary-foreground opacity-0 transition-opacity hover:opacity-100"
                     aria-label="Remove photo"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -412,7 +412,7 @@ export function EditItemForm({
         </div>
       </div>
 
-      <section className="mb-6 rounded-2xl border border-border bg-white p-4">
+      <section className="mb-6 rounded-2xl border border-border bg-surface p-4">
         <h2 className="mb-4 text-sm font-semibold text-foreground">Details</h2>
         <div className="space-y-4">
           <Field label="Description">
@@ -439,8 +439,8 @@ export function EditItemForm({
                     className={cn(
                       'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
                       isActive
-                        ? 'border-primary bg-primary text-white'
-                        : 'border-border bg-white text-foreground hover:bg-background',
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-surface text-foreground hover:bg-background',
                     )}
                   >
                     {season.label}
@@ -469,7 +469,7 @@ export function EditItemForm({
 
       <Button
         size="lg"
-        className="h-12 w-full rounded-2xl bg-primary text-base text-white hover:bg-primary/90"
+        className="h-12 w-full rounded-2xl bg-primary text-base text-primary-foreground hover:bg-primary/90"
         onClick={handleSave}
         disabled={saving || deleting || photoLoading || extraPhotoLoading}
       >
@@ -487,7 +487,7 @@ export function EditItemForm({
 }
 
 const inputClass =
-  'h-10 w-full rounded-xl border border-border bg-white px-3 text-sm text-foreground outline-none transition-colors placeholder:text-ink-faint focus:border-brand';
+  'h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm text-foreground outline-none transition-colors placeholder:text-ink-faint focus:border-brand';
 
 function Field({
   label,

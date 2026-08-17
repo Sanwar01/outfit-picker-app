@@ -112,8 +112,8 @@ function SaveOutfitForm({
                   className={cn(
                     'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
                     name === suggestion
-                      ? 'border-primary bg-primary text-white'
-                      : 'border-border bg-white text-muted-foreground hover:border-border',
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border bg-surface text-muted-foreground hover:border-border',
                   )}
                 >
                   {suggestion}

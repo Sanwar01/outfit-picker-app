@@ -15,7 +15,7 @@ export function ClothingCard({ item, imageUrl }: ClothingCardProps) {
   return (
     <Link
       href={`/wardrobe/${item.id}`}
-      className="group overflow-hidden rounded-2xl border border-border bg-white text-left shadow-sm transition-shadow hover:shadow-md"
+      className="group overflow-hidden rounded-2xl border border-border bg-surface text-left shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="relative aspect-3/4 bg-muted">
         <Image

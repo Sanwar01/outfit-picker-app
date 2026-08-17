@@ -99,7 +99,7 @@ export function OutfitGeneratingLoader({
 
   return (
     <div
-      className="overflow-hidden rounded-3xl border border-border bg-white shadow-sm"
+      className="overflow-hidden rounded-3xl border border-border bg-surface shadow-sm"
       aria-busy="true"
       aria-label="Styling your outfit"
     >
@@ -110,7 +110,7 @@ export function OutfitGeneratingLoader({
               ? 'Finding another option'
               : "Styling today's outfit"}
           </h2>
-          <Sparkles className="h-4 w-4 animate-pulse text-ink-faint" />
+          <Sparkles className="h-4 w-4 animate-pulse text-brand/70" />
         </div>
         <p className="mt-0.5 text-xs text-muted-foreground">
           {variant === 'shuffle'
@@ -125,7 +125,7 @@ export function OutfitGeneratingLoader({
             <div className="absolute inset-0 animate-pulse bg-linear-to-br from-muted via-background to-cream-deep/70" />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="flex flex-col items-center gap-2 text-center">
-                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/90 shadow-sm">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-surface/90 shadow-sm">
                   <Sparkles
                     className="h-5 w-5 text-muted-foreground"
                     strokeWidth={1.5}
@@ -152,7 +152,7 @@ export function OutfitGeneratingLoader({
                   className={cn(
                     'flex items-center gap-2.5 rounded-xl border px-2 py-1.5 transition-all duration-700',
                     isRevealed
-                      ? 'border-border bg-white'
+                      ? 'border-border bg-surface'
                       : 'border-transparent bg-background/80',
                     isBuilding && 'border-border bg-background',
                   )}
@@ -205,10 +205,10 @@ export function OutfitGeneratingLoader({
       </div>
 
       <div
-        className="border-t border-border bg-background/60 px-4 py-4"
+        className="flex gap-3 rounded-2xl border border-border bg-cream/60 px-4 py-4"
         aria-live="polite"
       >
-        <p className="text-[10px] font-semibold tracking-[0.15em] text-ink-faint uppercase">
+        <p className="text-[10px] font-semibold tracking-[0.15em] text-brand uppercase">
           Stylist note
         </p>
         <p className="mt-2 font-serif text-base leading-snug text-foreground">

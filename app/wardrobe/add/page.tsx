@@ -16,7 +16,7 @@ export default async function AddClothingPage() {
   return (
     <AppShell>
       <div className="px-4 py-6">
-        <h1 className="text-xl font-semibold text-foreground">Add clothes</h1>
+        <h1 className="font-serif text-xl font-semibold text-foreground">Add clothes</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Snap or upload photos — AI will tag each item for you.
         </p>

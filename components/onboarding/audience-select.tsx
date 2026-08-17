@@ -26,15 +26,15 @@ export function AudienceSelect({ selected, onChange }: AudienceSelectProps) {
               "relative rounded-2xl border-2 p-4 text-left transition-colors",
               isSelected
                 ? "border-brand bg-cream"
-                : "border-border bg-white"
+                : "border-border bg-surface"
             )}
           >
             <div
               className={cn(
                 "absolute top-3 right-3 flex size-5 items-center justify-center rounded-full border",
                 isSelected
-                  ? "border-brand bg-brand text-white"
-                  : "border-border-strong bg-white"
+                  ? "border-brand bg-brand text-primary-foreground"
+                  : "border-border-strong bg-surface"
               )}
             >
               {isSelected && <Check className="size-3" strokeWidth={2.5} />}

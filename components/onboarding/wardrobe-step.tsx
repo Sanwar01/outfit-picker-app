@@ -177,7 +177,7 @@ export function WardrobeStep({ userId }: WardrobeStepProps) {
         <button
           type="button"
           onClick={() => router.push('/onboarding/location')}
-          className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90"
+          className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
         >
           Continue
         </button>
@@ -224,15 +224,15 @@ export function WardrobeStep({ userId }: WardrobeStepProps) {
           type="button"
           disabled={processing}
           onClick={() => openPicker(true)}
-          className="mt-6 inline-flex h-11 px-10 w-fit items-center justify-center gap-2 rounded-sm bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
+          className="mt-6 inline-flex h-11 px-10 w-fit items-center justify-center gap-2 rounded-sm bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
         >
           <Camera className="size-5" strokeWidth={1.5} />
           Take Photos
         </button>
         <div className="my-5 flex items-center justify-center gap-3">
-          <span className="h-px w-36 bg-[#ebe4d8]" />
+          <span className="h-px w-36 bg-border" />
           <p className="shrink-0 text-sm text-ink-faint">OR</p>
-          <span className="h-px w-36 bg-[#ebe4d8]" />
+          <span className="h-px w-36 bg-border" />
         </div>
         <button
           type="button"
@@ -268,7 +268,7 @@ export function WardrobeStep({ userId }: WardrobeStepProps) {
             {queue.map((item) => (
               <div
                 key={item.id}
-                className="overflow-hidden rounded-xl border border-border bg-white"
+                className="overflow-hidden rounded-xl border border-border bg-surface"
               >
                 <div className="relative aspect-square bg-cream">
                   <Image
@@ -281,9 +281,9 @@ export function WardrobeStep({ userId }: WardrobeStepProps) {
                   <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                     {item.status === 'uploading' ||
                     item.status === 'tagging' ? (
-                      <Loader2 className="size-5 animate-spin text-white" />
+                      <Loader2 className="size-5 animate-spin text-primary-foreground" />
                     ) : item.status === 'done' ? (
-                      <CheckCircle2 className="size-5 text-white" />
+                      <CheckCircle2 className="size-5 text-primary-foreground" />
                     ) : item.status === 'error' ? (
                       <AlertCircle className="size-5 text-red-200" />
                     ) : null}

@@ -158,7 +158,7 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
         <header className="mb-5 flex items-center justify-between gap-3">
           <Link
             href="/outfits"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground"
             aria-label="Back to outfits"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -173,7 +173,7 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
               type="button"
               onClick={toggleFavorite}
               disabled={loading}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground"
               aria-label={isFavorite ? "Remove favorite" : "Add favorite"}
             >
               <Heart
@@ -188,7 +188,7 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
               <button
                 type="button"
                 onClick={() => setMenuOpen((open) => !open)}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground"
                 aria-label="More actions"
                 aria-expanded={menuOpen}
               >
@@ -196,7 +196,7 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
               </button>
 
               {menuOpen && (
-                <div className="absolute right-0 z-20 mt-2 w-44 overflow-hidden rounded-xl border border-border bg-white py-1 shadow-lg">
+                <div className="absolute right-0 z-20 mt-2 w-44 overflow-hidden rounded-xl border border-border bg-surface py-1 shadow-lg">
                   <button
                     type="button"
                     onClick={renameOutfit}
@@ -275,10 +275,10 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
         </section>
 
         {whyBullets.length > 0 && (
-          <section className="rounded-2xl border border-border bg-white p-4">
+          <section className="rounded-2xl border border-border bg-surface p-4">
             <div className="mb-3 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-muted-foreground" />
-              <h3 className="text-sm font-semibold text-foreground">
+              <Sparkles className="h-4 w-4 text-brand" />
+              <h3 className="font-serif text-sm font-semibold text-foreground">
                 Why this works
               </h3>
             </div>
@@ -301,7 +301,7 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
       </div>
 
       <div className="fixed inset-x-0 bottom-20 z-40 mx-auto max-w-lg px-4">
-        <div className="flex gap-3 rounded-2xl border border-border bg-white/95 p-2 shadow-lg backdrop-blur-sm">
+        <div className="flex gap-3 rounded-2xl border border-border bg-surface/95 p-2 shadow-lg backdrop-blur-sm">
           <Button
             type="button"
             variant="outline"
@@ -321,7 +321,7 @@ export function OutfitDetail({ outfit: initialOutfit }: OutfitDetailProps) {
             type="button"
             onClick={handleWear}
             disabled={loading || wearing || wornToday}
-            className="h-11 flex-1 rounded-xl bg-primary text-white hover:bg-primary/90"
+            className="h-11 flex-1 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {wearing ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

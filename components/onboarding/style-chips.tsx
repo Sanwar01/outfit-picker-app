@@ -31,8 +31,8 @@ export function StyleChips({ selected, onChange }: StyleChipsProps) {
             className={cn(
               "rounded-full border px-4 py-2 text-sm transition-colors",
               isSelected
-                ? "border-primary bg-primary text-white"
-                : "border-border bg-white text-foreground hover:border-border"
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-surface text-foreground hover:border-border"
             )}
           >
             {vibe}

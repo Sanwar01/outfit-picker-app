@@ -43,7 +43,7 @@ export function ProfileHub({
         </p>
       </header>
 
-      <section className="rounded-2xl border border-border bg-white p-4 shadow-sm">
+      <section className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
         <div className="flex gap-4">
           <div
             className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-muted text-lg font-semibold text-foreground"
@@ -95,7 +95,7 @@ export function ProfileHub({
           </Link>
         </div>
 
-        <div className="rounded-2xl border border-border bg-white p-3.5">
+        <div className="rounded-2xl border border-border bg-surface p-3.5">
           <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground">
             <Shirt className="h-4 w-4" strokeWidth={1.75} />
           </div>

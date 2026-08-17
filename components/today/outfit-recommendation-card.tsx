@@ -47,9 +47,9 @@ export function OutfitRecommendationCard({
   );
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-border bg-white shadow-sm">
+    <div className="overflow-hidden rounded-3xl border border-border bg-surface shadow-sm">
       <div className="border-b border-border px-4 py-3.5">
-        <h2 className="text-xs font-semibold tracking-[0.12em] text-foreground uppercase">
+        <h2 className="font-serif text-xs font-semibold tracking-[0.12em] text-foreground uppercase">
           Today&apos;s outfit ✨
         </h2>
         <p className="mt-0.5 text-xs text-muted-foreground">
@@ -73,7 +73,7 @@ export function OutfitRecommendationCard({
             type="button"
             onClick={onShuffle}
             disabled={shuffleDisabled}
-            className="absolute inset-x-3 bottom-3 flex items-center justify-center gap-1.5 rounded-full border border-border bg-white/95 px-3 py-2 text-xs font-medium text-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-white disabled:opacity-60"
+            className="absolute inset-x-3 bottom-3 flex items-center justify-center gap-1.5 rounded-full border border-border bg-surface/95 px-3 py-2 text-xs font-medium text-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-surface disabled:opacity-60"
           >
             <RefreshCw className="h-3 w-3" />
             Another option
@@ -114,7 +114,7 @@ export function OutfitRecommendationCard({
       </div>
 
       <div className="border-t border-border px-4 py-3.5">
-        <p className="text-[10px] font-semibold tracking-[0.15em] text-ink-faint uppercase">
+        <p className="text-[10px] font-semibold tracking-[0.15em] text-brand uppercase">
           Why this works
         </p>
         <ul className="mt-2.5 space-y-2">

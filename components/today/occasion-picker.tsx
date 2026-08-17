@@ -70,7 +70,7 @@ export function OccasionPicker({
               disabled={disabled}
               onClick={() => onSelect(occasion.id)}
               className={cn(
-                'flex flex-col items-start gap-2 rounded-2xl bg-white px-4 py-4 text-left shadow-sm ring-1 ring-border/60 transition-colors',
+                'flex flex-col items-start gap-2 rounded-2xl bg-surface px-4 py-4 text-left shadow-sm ring-1 ring-border/60 transition-colors',
                 'hover:bg-background hover:ring-border',
                 'disabled:pointer-events-none disabled:opacity-60',
               )}
@@ -90,7 +90,7 @@ export function OccasionPicker({
       <Button
         size="lg"
         variant="outline"
-        className="h-12 w-full rounded-2xl border-border bg-white text-base text-foreground"
+        className="h-12 w-full rounded-2xl border-border bg-surface text-base text-foreground"
         disabled={disabled}
         onClick={() => onSelect(CHOOSE_FOR_ME.id)}
       >

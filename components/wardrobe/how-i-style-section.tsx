@@ -21,7 +21,7 @@ export function HowIStyleSection({
   }
 
   return (
-    <section className="mb-5 rounded-2xl border border-border bg-white p-4">
+    <section className="mb-5 rounded-2xl border border-border bg-surface p-4">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold text-foreground">

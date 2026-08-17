@@ -12,7 +12,7 @@ export function WardrobeInsightBanner({ insight }: WardrobeInsightBannerProps) {
       href="/wardrobe"
       className="flex items-center gap-3 rounded-2xl border border-border bg-muted/80 px-4 py-3.5 transition-colors hover:bg-muted"
     >
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-foreground shadow-sm">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface text-foreground shadow-sm">
         <Shirt className="h-4 w-4" strokeWidth={1.75} />
       </div>
       <div className="min-w-0 flex-1">

@@ -30,7 +30,7 @@ export function LoginForm({ error }: LoginFormProps) {
   }
 
   return (
-    <section className="relative z-10 -mt-6 rounded-t-[2rem] bg-white px-6 pt-8 pb-10 shadow-[0_-8px_30px_rgba(0,0,0,0.06)]">
+    <section className="relative z-10 -mt-6 rounded-t-[2rem] bg-surface px-6 pt-8 pb-10 shadow-[0_-8px_30px_rgba(0,0,0,0.06)]">
       <div className="mx-auto max-w-md">
         <h2 className="font-serif text-3xl tracking-tight text-foreground">
           Welcome back
@@ -45,7 +45,7 @@ export function LoginForm({ error }: LoginFormProps) {
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t border-border" />
           </div>
-          <p className="relative mx-auto w-fit bg-white px-3 text-xs text-ink-faint">
+          <p className="relative mx-auto w-fit bg-surface px-3 text-xs text-ink-faint">
             or continue with email
           </p>
         </div>
@@ -95,7 +95,7 @@ export function LoginForm({ error }: LoginFormProps) {
 
           <button
             type="submit"
-            className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90"
+            className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Log in
           </button>

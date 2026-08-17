@@ -49,7 +49,7 @@ interface AuthBrandProps {
 
 function HangerLogo() {
   return (
-    <div className="flex size-11 items-center justify-center rounded-2xl bg-[#ebe4d8] shadow-sm">
+    <div className="flex size-11 items-center justify-center rounded-2xl bg-border shadow-sm">
       <svg
         viewBox="0 0 24 24"
         fill="none"
@@ -102,7 +102,7 @@ interface AuthFeatureGridProps {
 }
 
 export function AuthFeatureGrid({
-  tileClassName = "bg-[#ebe4d8]/90",
+  tileClassName = "bg-border/90",
   variant = "login",
 }: AuthFeatureGridProps) {
   return (

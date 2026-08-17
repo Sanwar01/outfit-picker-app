@@ -11,7 +11,7 @@ interface ResetPasswordFormProps {
 export function ResetPasswordForm({ error }: ResetPasswordFormProps) {
   return (
     <section className="flex min-h-dvh flex-col justify-center px-6 py-12">
-      <div className="mx-auto w-full max-w-md rounded-t-[2rem] bg-white px-6 py-10 shadow-sm">
+      <div className="mx-auto w-full max-w-md rounded-t-[2rem] bg-surface px-6 py-10 shadow-sm">
         <h1 className="font-serif text-3xl tracking-tight text-foreground">
           New password
         </h1>
@@ -44,7 +44,7 @@ export function ResetPasswordForm({ error }: ResetPasswordFormProps) {
           />
           <button
             type="submit"
-            className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90"
+            className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Update password
           </button>

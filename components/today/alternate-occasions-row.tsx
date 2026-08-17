@@ -35,7 +35,7 @@ export function AlternateOccasionsRow({
 }: AlternateOccasionsRowProps) {
   return (
     <div className="space-y-3">
-      <p className="text-[10px] font-semibold tracking-[0.15em] text-ink-faint uppercase">
+      <p className="text-[10px] font-semibold tracking-[0.15em] text-brand uppercase">
         Dressing for something else?
       </p>
       <div className="flex justify-between gap-2">
@@ -48,7 +48,7 @@ export function AlternateOccasionsRow({
               disabled={disabled}
               onClick={() => onSelect(id)}
               className={cn(
-                'flex min-w-0 flex-1 flex-col items-center gap-2 rounded-2xl border bg-white px-1 py-3 shadow-sm transition-colors',
+                'flex min-w-0 flex-1 flex-col items-center gap-2 rounded-2xl border bg-surface px-1 py-3 shadow-sm transition-colors',
                 isActive
                   ? 'border-primary'
                   : 'border-border hover:bg-background',

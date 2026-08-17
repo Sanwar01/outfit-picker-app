@@ -36,7 +36,7 @@ function OptionGroup<T extends string>({
 }) {
   return (
     <div>
-      <p className="mb-2.5 text-[10px] font-semibold tracking-[0.15em] text-ink-faint uppercase">
+      <p className="mb-2.5 text-[10px] font-semibold tracking-[0.15em] text-brand uppercase">
         {label}
       </p>
       <div className="flex flex-col gap-2">
@@ -50,8 +50,8 @@ function OptionGroup<T extends string>({
               className={cn(
                 "rounded-xl border px-4 py-3 text-left text-sm font-medium transition-colors",
                 isActive
-                  ? "border-primary bg-primary text-white"
-                  : "border-border bg-white text-foreground hover:bg-background",
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-surface text-foreground hover:bg-background",
               )}
             >
               {option.label}

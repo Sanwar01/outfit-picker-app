@@ -39,7 +39,7 @@ export function ProfileMenuRow({
     return (
       <Link
         href={href}
-        className="flex items-center gap-3 rounded-2xl border border-border bg-white px-4 py-3.5 transition-colors hover:bg-background"
+        className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3.5 transition-colors hover:bg-background"
       >
         {content}
       </Link>
@@ -50,7 +50,7 @@ export function ProfileMenuRow({
     <button
       type="button"
       onClick={() => toast.message("Coming soon")}
-      className="flex w-full items-center gap-3 rounded-2xl border border-border bg-white px-4 py-3.5 text-left transition-colors hover:bg-background"
+      className="flex w-full items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3.5 text-left transition-colors hover:bg-background"
     >
       {content}
     </button>

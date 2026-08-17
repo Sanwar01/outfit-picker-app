@@ -121,7 +121,7 @@ export function UploadQueue({ userId }: UploadQueueProps) {
             {queue.map((item) => (
               <div
                 key={item.id}
-                className="overflow-hidden rounded-2xl border border-border bg-white"
+                className="overflow-hidden rounded-2xl border border-border bg-surface"
               >
                 <div className="relative aspect-3/4 bg-muted">
                   <Image
@@ -134,9 +134,9 @@ export function UploadQueue({ userId }: UploadQueueProps) {
                   <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                     {item.status === 'uploading' ||
                     item.status === 'tagging' ? (
-                      <Loader2 className="h-6 w-6 animate-spin text-white" />
+                      <Loader2 className="h-6 w-6 animate-spin text-primary-foreground" />
                     ) : item.status === 'done' ? (
-                      <CheckCircle2 className="h-6 w-6 text-white" />
+                      <CheckCircle2 className="h-6 w-6 text-primary-foreground" />
                     ) : item.status === 'error' ? (
                       <AlertCircle className="h-6 w-6 text-red-200" />
                     ) : null}

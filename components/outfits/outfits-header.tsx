@@ -24,14 +24,14 @@ export function OutfitsHeader({
         type="button"
         onClick={onOpenFilters}
         className={cn(
-          "relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-white text-foreground transition-colors hover:bg-background",
+          "relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-foreground transition-colors hover:bg-background",
           activeFilterCount > 0 && "border-primary",
         )}
         aria-label="Filter and sort"
       >
         <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} />
         {activeFilterCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-white">
+          <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
             {activeFilterCount}
           </span>
         )}

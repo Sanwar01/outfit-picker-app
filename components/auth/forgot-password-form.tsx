@@ -16,7 +16,7 @@ interface ForgotPasswordFormProps {
 
 function SecurityNotice() {
   return (
-    <div className="mt-8 flex gap-3 rounded-2xl bg-[#ebe4d8]/80 p-4">
+    <div className="mt-8 flex gap-3 rounded-2xl bg-border/80 p-4">
       <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-cream">
         <Lock className="size-4 text-brand" strokeWidth={1.5} />
       </div>
@@ -34,7 +34,7 @@ function ForgotPasswordShell({ children }: { children: React.ReactNode }) {
     <section className="flex min-h-dvh flex-col px-6 pb-10 pt-6">
       <Link
         href="/login"
-        className="mb-8 inline-flex size-10 items-center justify-center rounded-full bg-white/90 text-foreground shadow-sm transition-colors hover:bg-white"
+        className="mb-8 inline-flex size-10 items-center justify-center rounded-full bg-surface/90 text-foreground shadow-sm transition-colors hover:bg-surface"
         aria-label="Back to log in"
       >
         <ArrowLeft className="size-5" strokeWidth={1.5} />
@@ -78,7 +78,7 @@ export function ForgotPasswordForm({ error, sent }: ForgotPasswordFormProps) {
 
         <Link
           href="/login"
-          className="mt-8 inline-flex h-12 w-full items-center justify-center rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90"
+          className="mt-8 inline-flex h-12 w-full items-center justify-center rounded-2xl bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
         >
           Back to log in
         </Link>
@@ -120,7 +120,7 @@ export function ForgotPasswordForm({ error, sent }: ForgotPasswordFormProps) {
         />
         <button
           type="submit"
-          className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90"
+          className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
         >
           Send reset link
         </button>

@@ -171,7 +171,7 @@ export function OutfitSuggestion({
 
   if (view === 'error' && error) {
     return (
-      <div className="rounded-3xl border border-border bg-white px-6 py-10 text-center shadow-sm">
+      <div className="rounded-3xl border border-border bg-surface px-6 py-10 text-center shadow-sm">
         <p className="text-lg font-semibold text-foreground">{error.title}</p>
         <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
           {error.body}
@@ -226,7 +226,7 @@ export function OutfitSuggestion({
       <div className="grid grid-cols-2 gap-3">
         <Button
           size="lg"
-          className="h-12 rounded-2xl bg-primary text-base text-white hover:bg-primary/90"
+          className="h-12 rounded-2xl bg-primary text-base text-primary-foreground hover:bg-primary/90"
           onClick={handleWear}
           disabled={actionLoading || wornToday}
         >
@@ -236,7 +236,7 @@ export function OutfitSuggestion({
         <Button
           size="lg"
           variant="outline"
-          className="h-12 rounded-2xl border-border bg-white text-base text-foreground hover:bg-background"
+          className="h-12 rounded-2xl border-border bg-surface text-base text-foreground hover:bg-background"
           onClick={() => setSaveDialogOpen(true)}
         >
           <Bookmark className="mr-2 h-4 w-4" />

@@ -43,7 +43,7 @@ export function OutfitListCard({
   }
 
   return (
-    <article className="rounded-2xl border border-border bg-white p-4 shadow-sm">
+    <article className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
       <div className="mb-3 flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           {editing ? (
@@ -153,7 +153,7 @@ export function OutfitGridCard({
   const heroUrl = outfit.imageUrls[heroItem?.image_url ?? ""] ?? "";
 
   return (
-    <article className="relative overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+    <article className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
       <Link href={`/outfits/${outfit.id}`} className="block">
         <div className="relative aspect-3/4 bg-muted">
           {heroUrl ? (
@@ -178,7 +178,7 @@ export function OutfitGridCard({
       <button
         type="button"
         onClick={onToggleFavorite}
-        className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm"
+        className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-surface/90 shadow-sm"
         aria-label={outfit.is_favorite ? "Remove favorite" : "Add favorite"}
       >
         <Heart

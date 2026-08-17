@@ -34,7 +34,7 @@ export function StyleGoalsChips({ selected, onChange }: StyleGoalsChipsProps) {
               'inline-flex items-center gap-2 rounded-xl border p-2.5 text-left text-xs font-medium transition-colors',
               isSelected
                 ? 'border-brand bg-cream text-foreground'
-                : 'border-border bg-white text-foreground',
+                : 'border-border bg-surface text-foreground',
             )}
           >
             <Icon
@@ -47,8 +47,8 @@ export function StyleGoalsChips({ selected, onChange }: StyleGoalsChipsProps) {
                 className={cn(
                   'flex size-4 shrink-0 items-center justify-center rounded-full border',
                   isSelected
-                    ? 'border-brand bg-brand text-white'
-                    : 'border-border-strong bg-white',
+                    ? 'border-brand bg-brand text-primary-foreground'
+                    : 'border-border-strong bg-surface',
                 )}
               >
                 {isSelected && <Check className="size-3" strokeWidth={2.5} />}

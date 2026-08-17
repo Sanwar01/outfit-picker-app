@@ -25,7 +25,7 @@ export function OnboardingShell({
         {backHref ? (
           <Link
             href={backHref}
-            className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-foreground shadow-sm transition-colors hover:bg-cream"
+            className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-surface text-foreground shadow-sm transition-colors hover:bg-cream"
             aria-label="Go back"
           >
             <ArrowLeft className="size-5" strokeWidth={1.5} />

@@ -101,7 +101,7 @@ export function OnboardingLocationStep({ userId }: LocationStepProps) {
             type="button"
             onClick={handleContinue}
             disabled={saving}
-            className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
+            className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
           >
             {saving ? "Saving..." : "Continue"}
           </button>
@@ -119,7 +119,7 @@ export function OnboardingLocationStep({ userId }: LocationStepProps) {
         </div>
       }
     >
-      <div className="rounded-2xl border border-border bg-white p-6">
+      <div className="rounded-2xl border border-border bg-surface p-6">
         <p className="text-sm leading-relaxed text-muted-foreground">
           Enable location so we can factor in today&apos;s weather when picking
           outfits from your closet.
@@ -141,7 +141,7 @@ export function OnboardingLocationStep({ userId }: LocationStepProps) {
           type="button"
           onClick={handleUseLocation}
           disabled={loading}
-          className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
+          className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
         >
           {loading ? (
             <Loader2 className="size-4 animate-spin" />

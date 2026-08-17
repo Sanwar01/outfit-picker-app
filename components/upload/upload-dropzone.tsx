@@ -22,7 +22,7 @@ export function UploadDropzone({ onFilesSelected, disabled }: UploadDropzoneProp
 
   return (
     <div className="rounded-2xl border-2 border-dashed border-border bg-background p-8 text-center">
-      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-sm">
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-surface shadow-sm">
         <ImagePlus className="h-6 w-6 text-ink-faint" />
       </div>
       <h3 className="font-medium text-foreground">Add to your closet</h3>

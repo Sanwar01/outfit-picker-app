@@ -139,7 +139,7 @@ export function OutfitsHub({ userId, itemId, initialTab = "all" }: OutfitsHubPro
       />
 
       {itemId && (
-        <p className="mb-4 rounded-xl border border-border bg-white px-3 py-2 text-sm text-muted-foreground">
+        <p className="mb-4 rounded-xl border border-border bg-surface px-3 py-2 text-sm text-muted-foreground">
           Showing outfits that include this item.
         </p>
       )}
@@ -166,14 +166,14 @@ export function OutfitsHub({ userId, itemId, initialTab = "all" }: OutfitsHubPro
           })}
         </div>
 
-        <div className="flex shrink-0 rounded-xl border border-border bg-white p-0.5">
+        <div className="flex shrink-0 rounded-xl border border-border bg-surface p-0.5">
           <button
             type="button"
             onClick={() => setView("grid")}
             className={cn(
               "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
               view === "grid"
-                ? "bg-primary text-white"
+                ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground",
             )}
             aria-label="Grid view"
@@ -186,7 +186,7 @@ export function OutfitsHub({ userId, itemId, initialTab = "all" }: OutfitsHubPro
             className={cn(
               "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
               view === "list"
-                ? "bg-primary text-white"
+                ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground",
             )}
             aria-label="List view"
@@ -197,7 +197,7 @@ export function OutfitsHub({ userId, itemId, initialTab = "all" }: OutfitsHubPro
       </div>
 
       {visible.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-12 text-center">
+        <div className="rounded-2xl border border-dashed border-border bg-surface px-6 py-12 text-center">
           <p className="text-sm text-muted-foreground">
             {tab === "favorites"
               ? "No favorite outfits yet."

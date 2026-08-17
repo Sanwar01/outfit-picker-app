@@ -51,14 +51,14 @@ export function FinishStep({ userId }: FinishStepProps) {
           type="button"
           onClick={handleGetStarted}
           disabled={saving}
-          className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
+          className="h-12 w-full rounded-2xl bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
         >
           {saving ? "Starting..." : "Get started"}
         </button>
       }
     >
       <div className="flex flex-col items-center rounded-2xl bg-cream px-6 py-10 text-center">
-        <div className="flex size-16 items-center justify-center rounded-full bg-white shadow-sm">
+        <div className="flex size-16 items-center justify-center rounded-full bg-surface shadow-sm">
           <Sparkles className="size-7 text-brand" strokeWidth={1.5} />
         </div>
         <p className="mt-6 font-serif text-xl text-foreground">

@@ -25,8 +25,8 @@ export function RatingScale({ label, hint, value, onChange }: RatingScaleProps) 
             className={cn(
               'flex h-9 w-9 items-center justify-center rounded-full border text-sm font-medium transition-colors',
               value === level
-                ? 'border-primary bg-primary text-white'
-                : 'border-border bg-white text-muted-foreground hover:bg-background',
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border bg-surface text-muted-foreground hover:bg-background',
             )}
           >
             {level}

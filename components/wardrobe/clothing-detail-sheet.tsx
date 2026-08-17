@@ -325,7 +325,7 @@ function ClothingDetailContent({
           />
         )}
         {photoLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+          <div className="absolute inset-0 flex items-center justify-center bg-surface/70">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
         )}
@@ -333,7 +333,7 @@ function ClothingDetailContent({
           type="button"
           onClick={toggleFavorite}
           disabled={busy}
-          className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm"
+          className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-surface/90 shadow-sm backdrop-blur-sm"
           aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
         >
           <Heart
@@ -418,7 +418,7 @@ function ClothingDetailContent({
 }
 
 const fieldClass =
-  'h-10 w-full rounded-xl border border-border bg-white px-3 text-sm text-foreground outline-none focus:border-brand disabled:opacity-50';
+  'h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm text-foreground outline-none focus:border-brand disabled:opacity-50';
 
 function Field({
   label,

@@ -74,7 +74,7 @@ export function AuthField({
         minLength={minLength}
         {...inputProps}
         className={cn(
-          "h-12 w-full rounded-2xl border border-input bg-white pr-12 pl-11 text-sm text-foreground outline-none transition-colors placeholder:text-ink-faint",
+          "h-12 w-full rounded-2xl border border-input bg-surface pr-12 pl-11 text-sm text-foreground outline-none transition-colors placeholder:text-ink-faint",
           "focus-visible:border-border-strong focus-visible:ring-2 focus-visible:ring-[#c9bfb0]/30"
         )}
       />

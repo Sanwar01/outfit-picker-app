@@ -49,7 +49,7 @@ export function ClothingFilters({
           placeholder="Search your wardrobe"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="h-11 w-full rounded-2xl border border-border bg-white pr-12 pl-10 text-sm text-foreground outline-none transition-colors placeholder:text-ink-faint focus:border-brand"
+          className="h-11 w-full rounded-2xl border border-border bg-surface pr-12 pl-10 text-sm text-foreground outline-none transition-colors placeholder:text-ink-faint focus:border-brand"
         />
         <Link
           href="/wardrobe/add"
@@ -72,8 +72,8 @@ export function ClothingFilters({
               className={cn(
                 'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-medium transition-colors',
                 isActive
-                  ? 'border-primary bg-primary text-white'
-                  : 'border-border bg-white text-foreground hover:bg-background',
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-surface text-foreground hover:bg-background',
               )}
             >
               <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />

@@ -201,7 +201,7 @@ export function ClothingItemDetail({
         <header className="mb-5 flex items-center justify-between">
           <Link
             href="/wardrobe"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground"
             aria-label="Back to wardrobe"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -210,7 +210,7 @@ export function ClothingItemDetail({
           <div className="flex items-center gap-2">
             <Link
               href={`/wardrobe/${item.id}/edit`}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground"
               aria-label="Edit item"
             >
               <Pencil className="h-4 w-4" />
@@ -220,7 +220,7 @@ export function ClothingItemDetail({
               <button
                 type="button"
                 onClick={() => setMenuOpen((open) => !open)}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground"
                 aria-label="More actions"
                 aria-expanded={menuOpen}
               >
@@ -228,7 +228,7 @@ export function ClothingItemDetail({
               </button>
 
               {menuOpen && (
-                <div className="absolute right-0 z-20 mt-2 w-48 overflow-hidden rounded-xl border border-border bg-white py-1 shadow-lg">
+                <div className="absolute right-0 z-20 mt-2 w-48 overflow-hidden rounded-xl border border-border bg-surface py-1 shadow-lg">
                   <button
                     type="button"
                     onClick={retryTagging}
@@ -296,7 +296,7 @@ export function ClothingItemDetail({
           </div>
         </div>
 
-        <section className="mb-5 rounded-2xl border border-border bg-white">
+        <section className="mb-5 rounded-2xl border border-border bg-surface">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -325,7 +325,7 @@ export function ClothingItemDetail({
           outfitCount={outfitCount}
         />
 
-        <section className="mb-4 rounded-2xl border border-border bg-white p-4">
+        <section className="mb-4 rounded-2xl border border-border bg-surface p-4">
           <div className="mb-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <NotebookPen className="h-4 w-4 text-muted-foreground" />
@@ -347,7 +347,7 @@ export function ClothingItemDetail({
       </div>
 
       <div className="fixed inset-x-0 bottom-20 z-40 mx-auto max-w-lg px-4">
-        <div className="flex gap-3 rounded-2xl border border-border bg-white/95 p-2 shadow-lg backdrop-blur-sm">
+        <div className="flex gap-3 rounded-2xl border border-border bg-surface/95 p-2 shadow-lg backdrop-blur-sm">
           <Button
             type="button"
             variant="outline"
@@ -368,7 +368,7 @@ export function ClothingItemDetail({
             type="button"
             onClick={() => setAddDialogOpen(true)}
             disabled={loading}
-            className="h-11 flex-1 rounded-xl bg-primary text-white hover:bg-primary/90"
+            className="h-11 flex-1 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
             Add to outfit

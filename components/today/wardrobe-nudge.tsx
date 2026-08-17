@@ -15,11 +15,11 @@ interface WardrobeNudgeProps {
 export function WardrobeNudge({ readiness }: WardrobeNudgeProps) {
   if (readiness.status === "empty") {
     return (
-      <div className="rounded-3xl bg-white px-6 py-10 text-center shadow-sm ring-1 ring-border/60">
+      <div className="rounded-3xl bg-surface px-6 py-10 text-center shadow-sm ring-1 ring-border/60">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
           <Shirt className="h-6 w-6 text-muted-foreground" />
         </div>
-        <h2 className="text-lg font-semibold text-foreground">
+        <h2 className="font-serif text-lg font-semibold text-foreground">
           Let&apos;s build your closet
         </h2>
         <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
@@ -35,11 +35,11 @@ export function WardrobeNudge({ readiness }: WardrobeNudgeProps) {
   }
 
   return (
-    <div className="rounded-3xl bg-white px-6 py-8 shadow-sm ring-1 ring-border/60">
+    <div className="rounded-3xl bg-surface px-6 py-8 shadow-sm ring-1 ring-border/60">
       <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">
         {readiness.itemCount} item{readiness.itemCount === 1 ? "" : "s"} so far
       </p>
-      <h2 className="mt-1 text-lg font-semibold text-foreground">
+      <h2 className="mt-1 font-serif text-lg font-semibold text-foreground">
         {missingSlotsHeadline(readiness.missing)}
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
