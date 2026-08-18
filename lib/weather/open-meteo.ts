@@ -1,9 +1,5 @@
-export interface WeatherSnapshot {
-  temp_c: number;
-  condition: string;
-  precip_chance: number;
-  city: string | null;
-}
+export type { WeatherSnapshot } from "@/lib/types/weather";
+import type { WeatherSnapshot } from "@/lib/types/weather";
 
 export interface WeatherDetail extends WeatherSnapshot {
   weather_code: number;

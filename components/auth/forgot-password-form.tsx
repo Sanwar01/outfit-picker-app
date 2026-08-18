@@ -43,7 +43,7 @@ function ForgotPasswordShell({ children }: { children: React.ReactNode }) {
       <div className="mx-auto w-full max-w-md">
         <AuthBrand variant="centered" />
 
-        <div className="relative mx-auto mt-8 h-40 w-full max-w-[220px]">
+        <div className="relative mx-auto mt-8 h-40 w-full max-w-55">
           <Image
             src="/auth/forgot-password-hero.png"
             alt=""
@@ -128,10 +128,7 @@ export function ForgotPasswordForm({ error, sent }: ForgotPasswordFormProps) {
 
       <p className="mt-6 text-center text-sm text-[#8b8178]">
         Remember your password?{' '}
-        <Link
-          href="/login"
-          className="font-serif text-brand hover:underline"
-        >
+        <Link href="/login" className="font-serif text-brand hover:underline">
           Log in
         </Link>
       </p>

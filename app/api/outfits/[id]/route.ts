@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createRouteClient } from "@/lib/supabase/route-client";
 import { getSavedOutfitById } from "@/lib/outfits/get-outfit";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
+    const supabase = await createRouteClient(request);
     const { data: claimsData } = await supabase.auth.getClaims();
 
     if (!claimsData?.claims?.sub) {
@@ -37,7 +37,7 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
+    const supabase = await createRouteClient(request);
     const { data: claimsData } = await supabase.auth.getClaims();
 
     if (!claimsData?.claims?.sub) {
@@ -75,12 +75,12 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
+    const supabase = await createRouteClient(request);
     const { data: claimsData } = await supabase.auth.getClaims();
 
     if (!claimsData?.claims?.sub) {

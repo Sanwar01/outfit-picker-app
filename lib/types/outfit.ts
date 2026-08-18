@@ -1,5 +1,5 @@
-import type { ClothingItem } from "@/lib/types/database";
-import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
+import type { ClothingItem } from "./database";
+import type { WeatherSnapshot } from "./weather";
 
 export interface GeneratedOutfit {
   item_ids: string[];

@@ -3,6 +3,23 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password", "/terms", "/privacy", "/auth"];
 
+function corsHeaders(request: NextRequest) {
+  const origin = request.headers.get("origin") ?? "*";
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Max-Age": "86400",
+  };
+}
+
+function withCors(response: NextResponse, request: NextRequest) {
+  for (const [key, value] of Object.entries(corsHeaders(request))) {
+    response.headers.set(key, value);
+  }
+  return response;
+}
+
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some(
     (path) => pathname === path || pathname.startsWith(`${path}/`)
@@ -14,6 +31,19 @@ function isOnboardingPath(pathname: string) {
 }
 
 export async function updateSession(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // API routes: CORS for mobile, auth handled in route handlers (Bearer or cookies)
+  if (pathname.startsWith("/api/")) {
+    if (request.method === "OPTIONS") {
+      return new NextResponse(null, {
+        status: 204,
+        headers: corsHeaders(request),
+      });
+    }
+    return withCors(NextResponse.next({ request }), request);
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -42,7 +72,6 @@ export async function updateSession(request: NextRequest) {
 
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
-  const pathname = request.nextUrl.pathname;
 
   if (!user && !isPublicPath(pathname)) {
     const url = request.nextUrl.clone();

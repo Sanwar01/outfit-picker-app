@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createRouteClient } from "@/lib/supabase/route-client";
 import type { ClothingCategory } from "@/lib/types/database";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +10,7 @@ export async function POST(
 ) {
   try {
     const { id: outfitId } = await params;
-    const supabase = await createClient();
+    const supabase = await createRouteClient(request);
     const { data: claimsData } = await supabase.auth.getClaims();
 
     if (!claimsData?.claims?.sub) {

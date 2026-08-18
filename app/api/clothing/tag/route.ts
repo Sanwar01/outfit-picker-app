@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createRouteClient } from "@/lib/supabase/route-client";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isGeminiUnavailableError } from "@/lib/ai/gemini";
 import { tagClothingFromImage } from "@/lib/ai/tag-clothing";
@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = await createRouteClient(request);
     const { data: claimsData } = await supabase.auth.getClaims();
 
     if (!claimsData?.claims?.sub) {

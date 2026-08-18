@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createRouteClient } from "@/lib/supabase/route-client";
 import { getSignedImageUrls } from "@/lib/storage";
 import type { ClothingCategory, ClothingItem, Outfit } from "@/lib/types/database";
 import type { Json } from "@/lib/types/database";
@@ -15,7 +15,7 @@ type OutfitItemRow = {
 
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
+    const supabase = await createRouteClient(request);
     const { data: claimsData } = await supabase.auth.getClaims();
 
     if (!claimsData?.claims?.sub) {
@@ -134,7 +134,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
+    const supabase = await createRouteClient(request);
     const { data: claimsData } = await supabase.auth.getClaims();
 
     if (!claimsData?.claims?.sub) {
