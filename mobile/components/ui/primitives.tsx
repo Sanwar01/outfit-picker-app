@@ -58,7 +58,7 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    height: 48,
+    height: 52,
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
@@ -84,6 +84,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 15,
     fontWeight: "600",
+    fontFamily: "DMSans_600SemiBold",
   },
   textPrimary: {
     color: colors.primaryForeground,

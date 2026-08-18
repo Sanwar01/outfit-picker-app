@@ -23,3 +23,18 @@ export const spacing = {
   cardRadius: 16,
   tabBarHeight: 64,
 } as const;
+
+export const radius = {
+  sheet: 32,
+  button: 16,
+  input: 16,
+  tile: 16,
+  logo: 16,
+} as const;
+
+export const fonts = {
+  serif: "InstrumentSerif_400Regular",
+  sans: "DMSans_400Regular",
+  sansMedium: "DMSans_500Medium",
+  sansSemi: "DMSans_600SemiBold",
+} as const;

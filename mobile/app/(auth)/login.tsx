@@ -1,31 +1,47 @@
-import { useState } from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { useEffect, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Link, router } from "expo-router";
 import { supabase } from "@/lib/supabase";
-import { colors } from "@/lib/theme";
-import { Button, ScreenSubtitle, ScreenTitle } from "@/components/ui/primitives";
-import { Screen } from "@/components/ui/screen";
+import { brand } from "@/lib/brand";
+import {
+  getRememberedEmail,
+  writeRememberedEmail,
+} from "@/lib/remember-email";
+import { colors, fonts } from "@/lib/theme";
+import {
+  AuthCheckbox,
+  AuthDivider,
+  AuthError,
+  AuthField,
+  AuthFooterLink,
+  AuthScreen,
+  AuthSheetHeader,
+  SocialAuthButtons,
+} from "@/components/auth";
+import { Button } from "@/components/ui/primitives";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    getRememberedEmail().then((saved) => {
+      if (saved) setEmail(saved);
+    });
+  }, []);
 
   async function handleLogin() {
     setLoading(true);
     setError(null);
 
+    const trimmed = email.trim();
+    await writeRememberedEmail(rememberMe && trimmed ? trimmed : null);
+
     const { error: authError } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
+      email: trimmed,
       password,
     });
 
@@ -40,99 +56,86 @@ export default function LoginScreen() {
   }
 
   return (
-    <Screen style={styles.screen}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.hero}>
-            <ScreenTitle>Welcome back</ScreenTitle>
-            <ScreenSubtitle>Log in to continue</ScreenSubtitle>
-          </View>
+    <AuthScreen
+      headline={brand.loginHeadline}
+      subheadline={brand.loginSubheadline}
+    >
+      <AuthSheetHeader title="Welcome back" subtitle="Log in to continue" />
 
-          <View style={styles.form}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              autoComplete="email"
-              placeholder="you@example.com"
-              placeholderTextColor={colors.inkFaint}
-              style={styles.input}
-            />
+      <SocialAuthButtons onError={setError} />
 
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoComplete="password"
-              placeholder="••••••••"
-              placeholderTextColor={colors.inkFaint}
-              style={styles.input}
-            />
+      <View style={styles.divider}>
+        <AuthDivider label="or continue with email" />
+      </View>
 
-            {error ? <Text style={styles.error}>{error}</Text> : null}
+      {error ? <AuthError message={error} /> : null}
 
-            <Button title="Log in" loading={loading} onPress={handleLogin} />
+      <View style={styles.form}>
+        <AuthField
+          type="email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          autoComplete="email"
+          placeholder="Email address"
+        />
+        <AuthField
+          type="password"
+          value={password}
+          onChangeText={setPassword}
+          autoComplete="password"
+          placeholder="Password"
+        />
 
-            <Link href="/(auth)/signup" asChild>
-              <Text style={styles.link}>
-                Don&apos;t have an account?{" "}
-                <Text style={styles.linkBold}>Sign up</Text>
-              </Text>
-            </Link>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </Screen>
+        <View style={styles.options}>
+          <AuthCheckbox
+            checked={rememberMe}
+            onChange={setRememberMe}
+            label="Remember me"
+          />
+          <Link href="/(auth)/forgot-password" asChild>
+            <Pressable hitSlop={6}>
+              <Text style={styles.forgot}>Forgot password?</Text>
+            </Pressable>
+          </Link>
+        </View>
+
+        <Button title="Log in" loading={loading} onPress={handleLogin} />
+      </View>
+
+      <View style={styles.footer}>
+        <AuthFooterLink
+          prompt="Don't have an account?"
+          actionLabel="Sign up"
+          href="/(auth)/signup"
+        />
+      </View>
+    </AuthScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { paddingTop: 48 },
-  flex: { flex: 1 },
-  scroll: { flexGrow: 1, justifyContent: "center", paddingBottom: 32 },
-  hero: { marginBottom: 32 },
-  form: { gap: 12 },
-  label: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: colors.ink,
-    fontFamily: "DMSans_600SemiBold",
+  divider: {
+    marginVertical: 20,
   },
-  input: {
-    height: 48,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.borderInput,
-    backgroundColor: colors.surface,
-    paddingHorizontal: 16,
-    fontSize: 15,
-    color: colors.ink,
-    fontFamily: "DMSans_400Regular",
-    marginBottom: 4,
+  form: {
+    gap: 12,
+    marginTop: 4,
   },
-  error: {
-    color: colors.destructive,
-    fontSize: 13,
-    fontFamily: "DMSans_400Regular",
+  options: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 4,
+    marginBottom: 8,
   },
-  link: {
-    textAlign: "center",
-    marginTop: 16,
+  forgot: {
+    fontFamily: fonts.serif,
     fontSize: 14,
-    color: colors.inkMuted,
-    fontFamily: "DMSans_400Regular",
-  },
-  linkBold: {
     color: colors.brand,
-    fontFamily: "DMSans_600SemiBold",
+  },
+  footer: {
+    marginTop: 24,
   },
 });
