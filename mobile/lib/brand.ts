@@ -8,6 +8,50 @@ export const brand = {
   signupSubheadline: "Start building a smarter wardrobe that works for you.",
 } as const;
 
+export type WelcomeFeatureIcon = "shirt" | "sparkles" | "weather";
+
+export type WelcomeSlide = {
+  id: string;
+  headline: string;
+  headlineAccent?: string; // chars at end of headline to render in brand colour
+  subheadline: string;
+  features: {
+    id: string;
+    icon: WelcomeFeatureIcon;
+    title: string;
+    body: string;
+  }[];
+};
+
+export const welcomeSlides: WelcomeSlide[] = [
+  {
+    id: "main",
+    headline: "Your style.",
+    headlineAccent: "Simplified.",
+    subheadline: "Smart outfit ideas from the clothes you already own.",
+    features: [
+      {
+        id: "organize",
+        icon: "shirt",
+        title: "Organize your wardrobe",
+        body: "Keep all your clothes in one place.",
+      },
+      {
+        id: "outfits",
+        icon: "sparkles",
+        title: "Get personalized outfits",
+        body: "AI-powered looks that match your style, the weather and the occasion.",
+      },
+      {
+        id: "everyday",
+        icon: "weather",
+        title: "Perfect for every day",
+        body: "Daily picks that help you look great without the guesswork.",
+      },
+    ],
+  },
+];
+
 export type AuthFeatureIcon = "shirt" | "sparkles" | "weather";
 
 export const authFeatures: {

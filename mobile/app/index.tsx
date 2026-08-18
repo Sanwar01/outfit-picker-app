@@ -1,12 +1,23 @@
 import { Redirect } from "expo-router";
-import { ActivityIndicator, View, StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { useAuth } from "@/lib/auth-context";
+import { getHasSeenWelcome } from "@/lib/has-seen-welcome";
 import { colors } from "@/lib/theme";
 
 export default function Index() {
   const { session, profile, loading } = useAuth();
+  const [welcomeChecked, setWelcomeChecked] = useState(false);
+  const [hasSeenWelcome, setHasSeenWelcome] = useState(false);
 
-  if (loading) {
+  useEffect(() => {
+    getHasSeenWelcome().then((seen) => {
+      setHasSeenWelcome(seen);
+      setWelcomeChecked(true);
+    });
+  }, []);
+
+  if (loading || !welcomeChecked) {
     return (
       <View style={styles.loader}>
         <ActivityIndicator color={colors.brand} />
@@ -15,7 +26,7 @@ export default function Index() {
   }
 
   if (!session) {
-    return <Redirect href="/(auth)/login" />;
+    return <Redirect href={hasSeenWelcome ? "/(auth)/login" : "/welcome"} />;
   }
 
   if (profile && !profile.onboarding_complete) {
