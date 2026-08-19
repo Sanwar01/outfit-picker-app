@@ -10,6 +10,9 @@ import {
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
+const PROFILE_COLUMNS =
+  "id, display_name, onboarding_complete, style_vibes, location_city";
+
 type Profile = {
   id: string;
   display_name: string | null;
@@ -29,6 +32,16 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+async function fetchProfile(userId: string) {
+  const { data } = await supabase
+    .from("profiles")
+    .select(PROFILE_COLUMNS)
+    .eq("id", userId)
+    .single();
+
+  return data as Profile | null;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -41,40 +54,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(null);
       return;
     }
-
-    const { data } = await supabase
-      .from("profiles")
-      .select(
-        "id, display_name, onboarding_complete, style_vibes, location_city",
-      )
-      .eq("id", userId)
-      .single();
-
-    setProfile(data as Profile | null);
+    setProfile(await fetchProfile(userId));
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
+    function applySession(nextSession: Session | null) {
+      setSession(nextSession);
+      if (!nextSession?.user) {
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
+
+      void fetchProfile(nextSession.user.id).then((row) => {
+        if (cancelled) return;
+        setProfile(row);
+        setLoading(false);
+      });
+    }
+
     supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
+      if (!cancelled) applySession(data.session);
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, nextSession) => {
-        setSession(nextSession);
+        applySession(nextSession);
       },
     );
 
-    return () => listener.subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      listener.subscription.unsubscribe();
+    };
   }, []);
-
-  useEffect(() => {
-    if (session?.user) {
-      void refreshProfile();
-    } else {
-      setProfile(null);
-    }
-  }, [session?.user?.id, refreshProfile]);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();

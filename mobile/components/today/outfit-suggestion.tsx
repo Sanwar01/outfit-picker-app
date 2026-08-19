@@ -5,6 +5,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { router } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import {
@@ -23,7 +24,7 @@ import { OccasionPicker } from "@/components/today/occasion-picker";
 const INITIAL_LOADER_MIN_MS = 700;
 
 type GenerateResult =
-  | { kind: "nudge" }
+  | { kind: "nudge"; itemCount: number }
   | { kind: "error"; error: string }
   | { kind: "result"; outfit: GeneratedOutfit };
 
@@ -32,6 +33,7 @@ export function OutfitSuggestion() {
   const userId = user?.id;
   const [wornToday, setWornToday] = useState(false);
   const [wearing, setWearing] = useState(false);
+  const [activeOccasion, setActiveOccasion] = useState<string | null>(null);
   const shuffleRef = useRef(false);
   const occasionRef = useRef<string | undefined>(undefined);
   const lastOutfitIdsRef = useRef<string[] | null>(null);
@@ -54,7 +56,10 @@ export function OutfitSuggestion() {
       const readiness = checkWardrobeReadiness(items);
 
       if (readiness.status !== "ready") {
-        return { kind: "nudge" };
+        return {
+          kind: "nudge",
+          itemCount: readiness.status === "empty" ? 0 : readiness.itemCount,
+        };
       }
 
       const excluded =
@@ -79,7 +84,10 @@ export function OutfitSuggestion() {
 
   function runGenerate(shuffle = false, occasion?: string) {
     shuffleRef.current = shuffle;
-    occasionRef.current = occasion;
+    if (occasion !== undefined) {
+      occasionRef.current = occasion;
+      setActiveOccasion(occasion);
+    }
     setWornToday(false);
     void query.refetch();
   }
@@ -101,21 +109,32 @@ export function OutfitSuggestion() {
   if (!userId || query.isPending || query.isFetching) {
     return (
       <View style={styles.stateCard}>
-        <Text style={styles.stateEyebrow}>STYLING TODAY&apos;S OUTFIT</Text>
-        <Text style={styles.stateTitle}>Putting something together</Text>
-        <Text style={styles.stateBody}>Curated for you — not just generated</Text>
+        <Text style={styles.stateTitle}>Styling today&apos;s outfit</Text>
+        <Text style={styles.stateBody}>
+          Curated for you — not just generated
+        </Text>
         <ActivityIndicator color={colors.brand} style={styles.spinner} />
       </View>
     );
   }
 
   if (query.data?.kind === "nudge") {
+    const isEmpty = query.data.itemCount === 0;
     return (
       <View style={styles.stateCard}>
-        <Text style={styles.stateTitle}>Almost there</Text>
-        <Text style={styles.stateBody}>
-          Add tops, bottoms, and shoes so we can suggest outfits.
+        <Text style={styles.stateTitle}>
+          {isEmpty ? "Let's build your closet" : "You're close"}
         </Text>
+        <Text style={styles.stateBody}>
+          {isEmpty
+            ? "Snap a few pieces you wear often — tops, bottoms, and shoes. I'll start suggesting outfits."
+            : "Add a top, bottom, and shoes so I can put a full look together."}
+        </Text>
+        <Button
+          title={isEmpty ? "Add your first items" : "Add clothes"}
+          onPress={() => router.push("/wardrobe/add")}
+          style={styles.stateBtn}
+        />
       </View>
     );
   }
@@ -124,18 +143,18 @@ export function OutfitSuggestion() {
     query.data?.kind === "error"
       ? query.data.error
       : query.isError
-        ? "Something went wrong"
+        ? "Give it another try, or add a few more pieces to your wardrobe."
         : null;
 
   if (errorMessage) {
     return (
       <View style={styles.stateCard}>
-        <Text style={styles.stateTitle}>Couldn&apos;t generate</Text>
+        <Text style={styles.stateTitle}>Couldn&apos;t put a look together</Text>
         <Text style={styles.stateBody}>{errorMessage}</Text>
         <Button
           title="Try again"
           onPress={() => runGenerate(false)}
-          style={styles.retryBtn}
+          style={styles.stateBtn}
         />
       </View>
     );
@@ -147,12 +166,8 @@ export function OutfitSuggestion() {
 
   return (
     <View style={styles.content}>
-      {/* Weather card */}
-      {outfit.weather && (
-        <WeatherCard weather={outfit.weather} />
-      )}
+      {outfit.weather && <WeatherCard weather={outfit.weather} />}
 
-      {/* Outfit card */}
       <OutfitCard
         outfit={outfit}
         wornToday={wornToday}
@@ -162,8 +177,8 @@ export function OutfitSuggestion() {
         onShuffle={() => runGenerate(true)}
       />
 
-      {/* Occasion picker */}
       <OccasionPicker
+        activeOccasion={activeOccasion}
         onSelect={(occasionId) => runGenerate(false, occasionId)}
       />
     </View>
@@ -176,34 +191,34 @@ const styles = StyleSheet.create({
   },
   stateCard: {
     backgroundColor: colors.surface,
-    borderRadius: 20,
+    borderRadius: 24,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 20,
-  },
-  stateEyebrow: {
-    fontFamily: fonts.sansSemi,
-    fontSize: 11,
-    letterSpacing: 1.4,
-    color: colors.brand,
-    marginBottom: 6,
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+    alignItems: "center",
   },
   stateTitle: {
     fontFamily: fonts.serif,
-    fontSize: 22,
+    fontSize: 20,
+    lineHeight: 26,
     color: colors.ink,
-    marginBottom: 6,
+    textAlign: "center",
   },
   stateBody: {
     fontFamily: fonts.sans,
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 21,
     color: colors.inkMuted,
+    textAlign: "center",
+    marginTop: 8,
+    maxWidth: 320,
   },
   spinner: {
-    marginTop: 20,
+    marginTop: 24,
   },
-  retryBtn: {
-    marginTop: 16,
+  stateBtn: {
+    marginTop: 20,
+    alignSelf: "stretch",
   },
 });
