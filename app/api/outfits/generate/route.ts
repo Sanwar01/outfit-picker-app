@@ -10,13 +10,15 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createRouteClient(request);
-    const { data: claimsData } = await supabase.auth.getClaims();
+    const [{ data: claimsData }, { data: userData }] = await Promise.all([
+      supabase.auth.getClaims(),
+      supabase.auth.getUser(),
+    ]);
+    const userId = userData.user?.id ?? claimsData?.claims?.sub ?? null;
 
-    if (!claimsData?.claims?.sub) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const userId = claimsData.claims.sub as string;
     const body = await request.json().catch(() => ({}));
     const excludeCombinations =
       (body.excludeCombinations as string[][]) ?? [];

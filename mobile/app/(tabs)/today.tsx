@@ -1,8 +1,8 @@
-import { StyleSheet, View } from "react-native";
-import { Screen } from "@/components/ui/screen";
-import { ScreenSubtitle, ScreenTitle } from "@/components/ui/primitives";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { OutfitSuggestion } from "@/components/today/outfit-suggestion";
 import { useAuth } from "@/lib/auth-context";
+import { colors, fonts, spacing } from "@/lib/theme";
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -13,23 +13,72 @@ function getGreeting() {
 
 export default function TodayScreen() {
   const { profile } = useAuth();
-  const name = profile?.display_name?.split(" ")[0] ?? "there";
+  const insets = useSafeAreaInsets();
+  const firstName = profile?.display_name?.split(" ")[0] ?? "there";
 
   return (
-    <Screen>
+    <ScrollView
+      style={styles.root}
+      contentContainerStyle={[
+        styles.content,
+        {
+          paddingTop: insets.top + 16,
+          paddingBottom: insets.bottom + spacing.tabBarHeight + 24,
+        },
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Page header */}
       <View style={styles.header}>
-        <ScreenTitle>{`${getGreeting()}, ${name} 👋`}</ScreenTitle>
-        <ScreenSubtitle>
-          Here&apos;s what I recommend for you today
-        </ScreenSubtitle>
+        <View style={styles.headerText}>
+          <Text style={styles.greeting}>
+            {getGreeting()}, {firstName} 👋
+          </Text>
+          <Text style={styles.sub}>Here&apos;s what I recommend for you today.</Text>
+        </View>
+        {/* Notification bell placeholder — wired up in a future sprint */}
+        <View style={styles.bellPlaceholder} />
       </View>
+
+      {/* Main content */}
       <OutfitSuggestion />
-    </Screen>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: colors.page,
+  },
+  content: {
+    paddingHorizontal: spacing.screen,
+    gap: 20,
+  },
   header: {
-    marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+  },
+  headerText: {
+    flex: 1,
+    paddingRight: 8,
+  },
+  greeting: {
+    fontFamily: fonts.serif,
+    fontSize: 28,
+    lineHeight: 34,
+    color: colors.ink,
+    letterSpacing: -0.3,
+  },
+  sub: {
+    fontFamily: fonts.sans,
+    fontSize: 13,
+    color: colors.inkMuted,
+    marginTop: 4,
+  },
+  bellPlaceholder: {
+    width: 40,
+    height: 40,
   },
 });

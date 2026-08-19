@@ -32,9 +32,10 @@ export async function fetchWardrobe(userId: string) {
 
 export async function generateOutfit(
   excludeCombinations: string[][] = [],
+  occasion = "auto",
 ): Promise<{ ok: true; outfit: GeneratedOutfit } | { ok: false; error: string }> {
   const result = await apiPost<GeneratedOutfit>("/api/outfits/generate", {
-    occasion: "auto",
+    occasion,
     excludeCombinations,
   });
   if (!result.ok) return result;

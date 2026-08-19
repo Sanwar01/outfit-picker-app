@@ -23,3 +23,6 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
     detectSessionInUrl: false,
   },
 });
+
+/** Shared storage adapter for app-level persistence (welcome flag, remembered email, etc.) */
+export const appStorage = ssrSafeStorage;

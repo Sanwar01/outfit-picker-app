@@ -1,11 +1,11 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { appStorage } from "@/lib/supabase";
 
 const KEY = "wardrobe_has_seen_welcome";
 
 export async function getHasSeenWelcome(): Promise<boolean> {
-  return (await AsyncStorage.getItem(KEY)) === "1";
+  return (await appStorage.getItem(KEY)) === "1";
 }
 
 export async function setHasSeenWelcome(): Promise<void> {
-  await AsyncStorage.setItem(KEY, "1");
+  await appStorage.setItem(KEY, "1");
 }
