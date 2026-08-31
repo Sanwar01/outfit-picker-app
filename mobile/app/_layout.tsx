@@ -49,6 +49,7 @@ export default function RootLayout() {
           <Stack.Screen name="onboarding" />
           <Stack.Screen name="wardrobe" />
           <Stack.Screen name="outfits" />
+          <Stack.Screen name="profile" />
           <Stack.Screen name="+not-found" />
         </Stack>
       </AuthProvider>

@@ -8,9 +8,11 @@
     "scheme": "outfitpicker",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.outfitpicker.app"
     },
     "android": {
+      "package": "com.outfitpicker.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

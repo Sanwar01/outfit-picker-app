@@ -11,7 +11,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
 const PROFILE_COLUMNS =
-  "id, display_name, onboarding_complete, style_vibes, location_city";
+  "id, display_name, onboarding_complete, style_vibes, location_city, location_lat, location_lng";
 
 type Profile = {
   id: string;
@@ -19,6 +19,8 @@ type Profile = {
   onboarding_complete: boolean;
   style_vibes: string[];
   location_city: string | null;
+  location_lat: number | null;
+  location_lng: number | null;
 };
 
 type AuthContextValue = {

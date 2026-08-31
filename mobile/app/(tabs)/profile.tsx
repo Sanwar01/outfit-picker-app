@@ -169,10 +169,9 @@ export default function ProfileScreen() {
 
         <Pressable
           style={styles.editBtn}
-          onPress={() => comingSoon("Edit profile")}
+          onPress={() => router.push("/profile/edit")}
         >
           <Text style={styles.editBtnText}>Edit profile</Text>
-          <ComingSoonBadge compact />
         </Pressable>
       </View>
 
@@ -181,7 +180,7 @@ export default function ProfileScreen() {
           <Text style={styles.sectionTitle}>My style preferences</Text>
           <Pressable
             style={styles.sectionLink}
-            onPress={() => comingSoon("Editing style preferences")}
+            onPress={() => router.push("/profile/edit")}
           >
             <Text style={styles.sectionLinkText}>Edit</Text>
             <Ionicons name="chevron-forward" size={12} color={colors.inkFaint} />
@@ -193,7 +192,9 @@ export default function ProfileScreen() {
             <View style={styles.prefIcon}>
               <Ionicons name="shirt-outline" size={14} color={colors.inkMuted} />
             </View>
-            <Text style={styles.prefLabel}>Style vibe</Text>
+            <Text style={styles.prefLabel} numberOfLines={2}>
+              Style vibe
+            </Text>
             <Text style={styles.prefValue} numberOfLines={2}>
               {formatStyleVibesLabel(vibes)}
             </Text>
@@ -203,17 +204,16 @@ export default function ProfileScreen() {
             style={styles.prefCard}
             onPress={() => comingSoon("Favourite colours")}
           >
-            <View style={styles.prefTop}>
-              <View style={styles.prefIcon}>
-                <Ionicons
-                  name="color-palette-outline"
-                  size={14}
-                  color={colors.inkMuted}
-                />
-              </View>
-              <ComingSoonBadge compact />
+            <View style={styles.prefIcon}>
+              <Ionicons
+                name="color-palette-outline"
+                size={14}
+                color={colors.inkMuted}
+              />
             </View>
-            <Text style={styles.prefLabel}>Favourite colours</Text>
+            <Text style={styles.prefLabel} numberOfLines={2}>
+              Favourite colours
+            </Text>
             <View style={styles.swatches}>
               {["#1a1a1a", "#1f3a5f", "#cbb79a", "#c8c4be"].map((hex) => (
                 <View
@@ -222,35 +222,39 @@ export default function ProfileScreen() {
                 />
               ))}
             </View>
+            <ComingSoonBadge compact />
           </Pressable>
-        </View>
-        <View style={[styles.prefGrid, styles.prefGridFollow]}>
+
           <Pressable
             style={styles.prefCard}
             onPress={() => comingSoon("Favourite brands")}
           >
-            <View style={styles.prefTop}>
-              <View style={styles.prefIcon}>
-                <Ionicons name="heart-outline" size={14} color={colors.inkMuted} />
-              </View>
-              <ComingSoonBadge compact />
+            <View style={styles.prefIcon}>
+              <Ionicons name="heart-outline" size={14} color={colors.inkMuted} />
             </View>
-            <Text style={styles.prefLabel}>Favourite brands</Text>
-            <Text style={styles.prefValue}>Not set</Text>
+            <Text style={styles.prefLabel} numberOfLines={2}>
+              Favourite brands
+            </Text>
+            <Text style={styles.prefValue} numberOfLines={1}>
+              Not set
+            </Text>
+            <ComingSoonBadge compact />
           </Pressable>
 
           <Pressable
             style={styles.prefCard}
             onPress={() => comingSoon("Fit preference")}
           >
-            <View style={styles.prefTop}>
-              <View style={styles.prefIcon}>
-                <Ionicons name="resize-outline" size={14} color={colors.inkMuted} />
-              </View>
-              <ComingSoonBadge compact />
+            <View style={styles.prefIcon}>
+              <Ionicons name="resize-outline" size={14} color={colors.inkMuted} />
             </View>
-            <Text style={styles.prefLabel}>Fit preference</Text>
-            <Text style={styles.prefValue}>Not set</Text>
+            <Text style={styles.prefLabel} numberOfLines={2}>
+              Fit preference
+            </Text>
+            <Text style={styles.prefValue} numberOfLines={1}>
+              Not set
+            </Text>
+            <ComingSoonBadge compact />
           </Pressable>
         </View>
       </View>
@@ -531,7 +535,7 @@ const styles = StyleSheet.create({
   },
   prefGrid: {
     flexDirection: "row",
-    gap: 8,
+    gap: 6,
   },
   prefGridFollow: {
     marginTop: 8,
@@ -543,42 +547,40 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 10,
-    gap: 6,
-  },
-  prefTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    padding: 8,
+    gap: 4,
+    alignItems: "flex-start",
   },
   prefIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 7,
     backgroundColor: colors.cream,
     alignItems: "center",
     justifyContent: "center",
   },
   prefLabel: {
     fontFamily: fonts.sans,
-    fontSize: 11,
+    fontSize: 10,
+    lineHeight: 13,
     color: colors.inkFaint,
   },
   prefValue: {
     fontFamily: fonts.sansSemi,
-    fontSize: 13,
-    lineHeight: 17,
+    fontSize: 11,
+    lineHeight: 14,
     color: colors.ink,
   },
   swatches: {
     flexDirection: "row",
-    gap: 5,
+    flexWrap: "wrap",
+    gap: 3,
     marginTop: 2,
   },
   swatch: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     borderWidth: 1,
     borderColor: colors.border,
   },
