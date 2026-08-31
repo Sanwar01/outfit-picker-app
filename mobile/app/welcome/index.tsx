@@ -6,7 +6,6 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BrandMark } from '@/components/brand/brand-mark';
 import { WelcomeFeatureRow } from '@/components/welcome/welcome-feature-row';
-import { PaginationDots } from '@/components/welcome/pagination-dots';
 import { Button } from '@/components/ui/primitives';
 import { AuthFooterLink } from '@/components/auth/auth-footer-link';
 import { welcomeSlides } from '@/lib/brand';
@@ -16,7 +15,6 @@ import { colors, fonts, radius } from '@/lib/theme';
 import heroImage from '../../assets/images/welcome-hero.jpg';
 
 const slide = welcomeSlides[0];
-const TOTAL_SLIDES = welcomeSlides.length;
 
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
@@ -89,15 +87,6 @@ export default function WelcomeScreen() {
             href="/(auth)/login"
           />
         </View>
-
-        {TOTAL_SLIDES > 1 ? (
-          <PaginationDots total={TOTAL_SLIDES} active={0} />
-        ) : (
-          /* Single-slide: still show dots as design detail */
-          <View style={styles.dotsWrap}>
-            <PaginationDots total={3} active={0} />
-          </View>
-        )}
       </View>
     </View>
   );
@@ -148,16 +137,13 @@ const styles = StyleSheet.create({
   },
   features: {
     gap: 20,
-    marginBottom: 32,
+    marginBottom: 22,
   },
   cta: {
     marginBottom: 16,
   },
   footer: {
-    marginBottom: 20,
+    marginBottom: 10,
     alignItems: 'center',
-  },
-  dotsWrap: {
-    marginTop: 4,
   },
 });

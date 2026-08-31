@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   StyleSheet,
   Text,
   View,
@@ -13,6 +14,7 @@ import {
   fetchWardrobe,
   generateOutfit,
   wearOutfit,
+  saveOutfit,
 } from "@/lib/today";
 import type { GeneratedOutfit } from "@shared/types/outfit";
 import { colors, fonts } from "@/lib/theme";
@@ -33,6 +35,8 @@ export function OutfitSuggestion() {
   const userId = user?.id;
   const [wornToday, setWornToday] = useState(false);
   const [wearing, setWearing] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [activeOccasion, setActiveOccasion] = useState<string | null>(null);
   const shuffleRef = useRef(false);
   const occasionRef = useRef<string | undefined>(undefined);
@@ -89,6 +93,7 @@ export function OutfitSuggestion() {
       setActiveOccasion(occasion);
     }
     setWornToday(false);
+    setSaved(false);
     void query.refetch();
   }
 
@@ -102,8 +107,18 @@ export function OutfitSuggestion() {
     if (result.ok) setWornToday(true);
   }
 
-  function handleSave() {
-    // Save outfit — to be wired to saved outfits API
+  async function handleSave() {
+    const outfit =
+      query.data?.kind === "result" ? query.data.outfit : null;
+    if (!outfit || saved) return;
+    setSaving(true);
+    const result = await saveOutfit(outfit);
+    setSaving(false);
+    if (result.ok) {
+      setSaved(true);
+      return;
+    }
+    Alert.alert("Couldn't save that outfit", result.error);
   }
 
   if (!userId || query.isPending || query.isFetching) {
@@ -172,8 +187,10 @@ export function OutfitSuggestion() {
         outfit={outfit}
         wornToday={wornToday}
         wearing={wearing}
+        saved={saved}
+        saving={saving}
         onWear={handleWear}
-        onSave={handleSave}
+        onSave={() => void handleSave()}
         onShuffle={() => runGenerate(true)}
       />
 

@@ -10,13 +10,11 @@ import {
 import { colors, fonts } from "@/lib/theme";
 import {
   AuthCheckbox,
-  AuthDivider,
   AuthError,
   AuthField,
   AuthFooterLink,
   AuthScreen,
   AuthSheetHeader,
-  SocialAuthButtons,
 } from "@/components/auth";
 import { Button } from "@/components/ui/primitives";
 
@@ -61,12 +59,6 @@ export default function LoginScreen() {
       subheadline={brand.loginSubheadline}
     >
       <AuthSheetHeader title="Welcome back" subtitle="Log in to continue" />
-
-      <SocialAuthButtons onError={setError} />
-
-      <View style={styles.divider}>
-        <AuthDivider label="or continue with email" />
-      </View>
 
       {error ? <AuthError message={error} /> : null}
 
@@ -116,9 +108,6 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  divider: {
-    marginVertical: 20,
-  },
   form: {
     gap: 12,
     marginTop: 4,

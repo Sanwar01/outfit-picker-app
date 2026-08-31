@@ -28,6 +28,8 @@ type OutfitCardProps = {
   outfit: GeneratedOutfit;
   wornToday: boolean;
   wearing: boolean;
+  saved: boolean;
+  saving: boolean;
   onWear: () => void;
   onSave: () => void;
   onShuffle: () => void;
@@ -37,6 +39,8 @@ export function OutfitCard({
   outfit,
   wornToday,
   wearing,
+  saved,
+  saving,
   onWear,
   onSave,
   onShuffle,
@@ -139,9 +143,11 @@ export function OutfitCard({
           style={styles.actionBtn}
         />
         <Button
-          title="Save outfit"
+          title={saved ? "Saved" : "Save outfit"}
           variant="outline"
           onPress={onSave}
+          loading={saving}
+          disabled={saved}
           style={styles.actionBtn}
         />
       </View>

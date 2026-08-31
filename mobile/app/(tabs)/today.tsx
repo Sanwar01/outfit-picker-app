@@ -14,7 +14,6 @@ function getGreeting() {
 export default function TodayScreen() {
   const { profile } = useAuth();
   const insets = useSafeAreaInsets();
-  console.log(profile);
   const firstName = profile?.display_name;
 
   return (

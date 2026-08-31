@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   FlatList,
   Image,
@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { Screen } from "@/components/ui/screen";
 import { ScreenSubtitle, ScreenTitle } from "@/components/ui/primitives";
 import { apiGet } from "@/lib/api";
@@ -22,9 +22,11 @@ export default function OutfitsScreen() {
     if (result.ok) setOutfits(result.data);
   }, []);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  useFocusEffect(
+    useCallback(() => {
+      void load();
+    }, [load]),
+  );
 
   return (
     <Screen>

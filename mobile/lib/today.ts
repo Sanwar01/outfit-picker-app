@@ -45,3 +45,12 @@ export async function generateOutfit(
 export async function wearOutfit(itemIds: string[]) {
   return apiPost("/api/outfits/wear", { itemIds });
 }
+
+export async function saveOutfit(outfit: GeneratedOutfit, name?: string) {
+  return apiPost("/api/outfits", {
+    slots: outfit.slots,
+    rationale: outfit.description || outfit.rationale,
+    weather: outfit.weather,
+    name: name ?? "Saved outfit",
+  });
+}

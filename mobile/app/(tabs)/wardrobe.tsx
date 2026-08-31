@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   FlatList,
   Image,
   Pressable,
   StyleSheet,
   Text,
-  View,
 } from "react-native";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { Screen } from "@/components/ui/screen";
 import { ScreenSubtitle, ScreenTitle } from "@/components/ui/primitives";
 import { useAuth } from "@/lib/auth-context";
@@ -40,9 +39,11 @@ export default function WardrobeScreen() {
     setUrls(map);
   }, [user]);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  useFocusEffect(
+    useCallback(() => {
+      void load();
+    }, [load]),
+  );
 
   return (
     <Screen>

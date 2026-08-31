@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import { router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { Screen } from "@/components/ui/screen";
@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/primitives";
 import { useAuth } from "@/lib/auth-context";
 import { apiPost } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
-import { colors } from "@/lib/theme";
 
 export default function AddClothingScreen() {
   const { user } = useAuth();
@@ -40,6 +39,8 @@ export default function AddClothingScreen() {
     if (result.canceled) return;
 
     setUploading(true);
+    let uploaded = 0;
+    let lastError = "Couldn't upload that photo.";
 
     for (const asset of result.assets) {
       const itemId =
@@ -53,9 +54,12 @@ export default function AddClothingScreen() {
         .from("wardrobe-images")
         .upload(path, blob, { contentType: "image/jpeg", upsert: false });
 
-      if (uploadError) continue;
+      if (uploadError) {
+        lastError = uploadError.message;
+        continue;
+      }
 
-      await supabase.from("clothing_items").insert({
+      const { error: insertError } = await supabase.from("clothing_items").insert({
         id: itemId,
         user_id: user.id,
         image_url: path,
@@ -63,10 +67,22 @@ export default function AddClothingScreen() {
         category: "top",
       });
 
+      if (insertError) {
+        lastError = insertError.message;
+        continue;
+      }
+
       await apiPost("/api/clothing/tag", { itemId });
+      uploaded += 1;
     }
 
     setUploading(false);
+
+    if (uploaded === 0) {
+      Alert.alert("Couldn't add that", lastError);
+      return;
+    }
+
     router.back();
   }
 
