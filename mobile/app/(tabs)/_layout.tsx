@@ -54,11 +54,11 @@ function TabBar({ state, navigation }: any) {
               }}
               style={styles.tab}
             >
-              <View style={[styles.iconPill, isFocused && styles.iconPillActive]}>
+              <View style={styles.iconPill}>
                 <Ionicons
                   name={isFocused ? item.active! : item.icon!}
                   size={20}
-                  color={isFocused ? colors.primaryForeground : colors.inkFaint}
+                  color={isFocused ? colors.ink : colors.inkFaint}
                 />
               </View>
               <Text style={[styles.label, isFocused && styles.labelActive]}>
@@ -113,12 +113,8 @@ const styles = StyleSheet.create({
   iconPill: {
     width: 56,
     height: 36,
-    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
-  },
-  iconPillActive: {
-    backgroundColor: colors.ink,
   },
   label: {
     fontSize: 10,
