@@ -1,7 +1,14 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password", "/terms", "/privacy", "/auth"];
+const PUBLIC_PATHS = [
+  "/",
+  "/forgot-password",
+  "/reset-password",
+  "/terms",
+  "/privacy",
+  "/auth",
+];
 
 function corsHeaders(request: NextRequest) {
   const origin = request.headers.get("origin") ?? "*";
@@ -21,19 +28,15 @@ function withCors(response: NextResponse, request: NextRequest) {
 }
 
 function isPublicPath(pathname: string) {
-  return PUBLIC_PATHS.some(
-    (path) => pathname === path || pathname.startsWith(`${path}/`)
-  );
-}
-
-function isOnboardingPath(pathname: string) {
-  return pathname === "/onboarding" || pathname.startsWith("/onboarding/");
+  return PUBLIC_PATHS.some((path) => {
+    if (path === "/") return pathname === "/";
+    return pathname === path || pathname.startsWith(`${path}/`);
+  });
 }
 
 export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // API routes: CORS for mobile, auth handled in route handlers (Bearer or cookies)
   if (pathname.startsWith("/api/")) {
     if (request.method === "OPTIONS") {
       return new NextResponse(null, {
@@ -56,61 +59,26 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet, headers) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
+            request.cookies.set(name, value),
           );
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, options),
           );
           Object.entries(headers).forEach(([key, value]) =>
-            supabaseResponse.headers.set(key, value)
+            supabaseResponse.headers.set(key, value),
           );
         },
       },
-    }
+    },
   );
 
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  await supabase.auth.getClaims();
 
-  if (!user && !isPublicPath(pathname)) {
+  if (!isPublicPath(pathname)) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = "/";
     return NextResponse.redirect(url);
-  }
-
-  if (user && (pathname === "/login" || pathname === "/signup" || pathname === "/forgot-password")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/today";
-    return NextResponse.redirect(url);
-  }
-
-  if (user && !isOnboardingPath(pathname) && !isPublicPath(pathname) && !pathname.startsWith("/api")) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("onboarding_complete")
-      .eq("id", user.sub as string)
-      .single();
-
-    if (profile && !profile.onboarding_complete) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/onboarding";
-      return NextResponse.redirect(url);
-    }
-  }
-
-  if (user && isOnboardingPath(pathname)) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("onboarding_complete")
-      .eq("id", user.sub as string)
-      .single();
-
-    if (profile?.onboarding_complete) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/today";
-      return NextResponse.redirect(url);
-    }
   }
 
   return supabaseResponse;

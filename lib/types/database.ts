@@ -237,6 +237,27 @@ export interface Database {
         };
         Relationships: [];
       };
+      install_requests: {
+        Row: {
+          id: string;
+          email: string;
+          platform: "ios" | "android" | "both";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          platform: "ios" | "android" | "both";
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          platform?: "ios" | "android" | "both";
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -256,3 +277,5 @@ export type ClothingItemImage =
 export type Outfit = Database["public"]["Tables"]["outfits"]["Row"];
 export type OutfitItem = Database["public"]["Tables"]["outfit_items"]["Row"];
 export type WearLog = Database["public"]["Tables"]["wear_log"]["Row"];
+export type InstallRequest =
+  Database["public"]["Tables"]["install_requests"]["Row"];

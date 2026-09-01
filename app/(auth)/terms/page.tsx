@@ -5,7 +5,7 @@ export default function TermsPage() {
   return (
     <main className="mx-auto min-h-dvh w-full max-w-lg px-6 py-12">
       <Link
-        href="/signup"
+        href="/"
         className="mb-8 inline-flex size-10 items-center justify-center rounded-full bg-white/90 text-foreground shadow-sm"
         aria-label="Back"
       >

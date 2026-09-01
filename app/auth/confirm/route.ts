@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
-  const next = searchParams.get("next") ?? "/onboarding";
+  const next = searchParams.get("next") ?? "/";
 
   const redirectTo = request.nextUrl.clone();
   redirectTo.pathname = next;
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  redirectTo.pathname = "/login";
+  redirectTo.pathname = "/";
   redirectTo.searchParams.set("error", "auth");
   return NextResponse.redirect(redirectTo);
 }

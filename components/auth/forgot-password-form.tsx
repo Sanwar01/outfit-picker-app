@@ -33,9 +33,9 @@ function ForgotPasswordShell({ children }: { children: React.ReactNode }) {
   return (
     <section className="flex min-h-dvh flex-col px-6 pb-10 pt-6">
       <Link
-        href="/login"
+        href="/"
         className="mb-8 inline-flex size-10 items-center justify-center rounded-full bg-white/90 text-foreground shadow-sm transition-colors hover:bg-white"
-        aria-label="Back to log in"
+        aria-label="Back"
       >
         <ArrowLeft className="size-5" strokeWidth={1.5} />
       </Link>
@@ -77,10 +77,10 @@ export function ForgotPasswordForm({ error, sent }: ForgotPasswordFormProps) {
         </p>
 
         <Link
-          href="/login"
+          href="/"
           className="mt-8 inline-flex h-12 w-full items-center justify-center rounded-2xl bg-primary text-sm font-medium text-white transition-colors hover:bg-primary/90"
         >
-          Back to log in
+          Back to Wardrobe
         </Link>
 
         <SecurityNotice />
@@ -127,9 +127,8 @@ export function ForgotPasswordForm({ error, sent }: ForgotPasswordFormProps) {
       </form>
 
       <p className="mt-6 text-center text-sm text-[#8b8178]">
-        Remember your password?{' '}
-        <Link href="/login" className="font-serif text-brand hover:underline">
-          Log in
+        <Link href="/" className="font-serif text-brand hover:underline">
+          Back to Wardrobe
         </Link>
       </p>
 

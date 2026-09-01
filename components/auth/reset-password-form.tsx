@@ -52,10 +52,10 @@ export function ResetPasswordForm({ error }: ResetPasswordFormProps) {
 
         <p className="mt-6 text-center text-sm text-[#8b8178]">
           <Link
-            href="/login"
+            href="/"
             className="font-serif text-brand hover:underline"
           >
-            Back to log in
+            Back to Wardrobe
           </Link>
         </p>
       </div>

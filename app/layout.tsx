@@ -28,8 +28,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Outfit Picker",
-  description: "AI-powered digital wardrobe and personal stylist",
+  title: "Wardrobe",
+  description:
+    "Smart outfit ideas from the clothes you already own. Available on iOS and Android.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
