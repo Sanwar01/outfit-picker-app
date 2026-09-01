@@ -34,10 +34,16 @@ const CATEGORIES: ClothingCategory[] = [
 type DraftEditFormProps = {
   draft: ClothingDraftResponse;
   saving?: boolean;
+  saveButtonTitle?: string;
   onSave: (patch: ClothingDraftPatch) => Promise<void>;
 };
 
-export function DraftEditForm({ draft, saving, onSave }: DraftEditFormProps) {
+export function DraftEditForm({
+  draft,
+  saving,
+  saveButtonTitle = "Save item",
+  onSave,
+}: DraftEditFormProps) {
   const [name, setName] = useState(draft.name);
   const [category, setCategory] = useState<ClothingCategory>(draft.category);
   const [subCategory, setSubCategory] = useState(draft.sub_category ?? "");
@@ -220,7 +226,11 @@ export function DraftEditForm({ draft, saving, onSave }: DraftEditFormProps) {
         />
       </View>
 
-      <Button title="Save item" loading={saving} onPress={() => void handleSave()} />
+      <Button
+        title={saveButtonTitle}
+        loading={saving}
+        onPress={() => void handleSave()}
+      />
     </ScrollView>
   );
 }

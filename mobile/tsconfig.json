@@ -17,6 +17,7 @@
       "@/lib/theme": ["./lib/theme"],
       "@/lib/today": ["./lib/today"],
       "@/lib/wardrobe-drafts": ["./lib/wardrobe-drafts"],
+      "@/lib/wardrobe-items": ["./lib/wardrobe-items"],
       "@/lib/*": ["../lib/*"],
       "@/*": ["./*"],
       "@shared/*": ["../lib/*"]
