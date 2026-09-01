@@ -5,7 +5,8 @@ import {
   DMSans_600SemiBold,
 } from "@expo-google-fonts/dm-sans";
 import { InstrumentSerif_400Regular } from "@expo-google-fonts/instrument-serif";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/lib/query-client";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
@@ -16,8 +17,6 @@ import { colors } from "@/lib/theme";
 export { ErrorBoundary } from "expo-router";
 
 SplashScreen.preventAutoHideAsync();
-
-const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({

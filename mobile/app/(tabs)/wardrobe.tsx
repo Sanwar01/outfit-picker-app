@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -8,7 +8,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 import { Screen } from "@/components/ui/screen";
 import { ScreenSubtitle, ScreenTitle } from "@/components/ui/primitives";
 import { CategoryFilterChips } from "@/components/wardrobe/category-filter-chips";
@@ -18,11 +18,8 @@ import { WardrobeGridCard } from "@/components/wardrobe/wardrobe-grid-card";
 import { WardrobeSearchBar } from "@/components/wardrobe/wardrobe-search-bar";
 import { WardrobeSortChips } from "@/components/wardrobe/wardrobe-sort-chips";
 import { useAuth } from "@/lib/auth-context";
-import {
-  loadWardrobeScreenData,
-  type FilterValue,
-} from "@/lib/wardrobe-items";
-import type { ClothingItem } from "@shared/types/database";
+import { useWardrobeScreenQuery } from "@/lib/queries/wardrobe";
+import type { FilterValue } from "@/lib/wardrobe-items";
 import {
   prepareWardrobeList,
   wardrobeSummaryLine,
@@ -36,48 +33,19 @@ export default function WardrobeScreen() {
   const { user } = useAuth();
   const { width: windowWidth } = useWindowDimensions();
   const cardWidth = (windowWidth - spacing.screen * 2 - GRID_GAP) / 2;
-  const [items, setItems] = useState<ClothingItem[]>([]);
-  const [urls, setUrls] = useState<Record<string, string>>({});
-  const [draftCount, setDraftCount] = useState(0);
+
   const [filter, setFilter] = useState<FilterValue>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sort, setSort] = useState<WardrobeSortValue>("recent");
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(
-    async (mode: "initial" | "refresh" = "initial") => {
-      if (!user) return;
-
-      if (mode === "initial") setLoading(true);
-      if (mode === "refresh") setRefreshing(true);
-
-      try {
-        const result = await loadWardrobeScreenData(user.id);
-        setItems(result.items);
-        setUrls(result.urls);
-        setDraftCount(result.draftCount);
-        setError(null);
-      } catch (loadError) {
-        setError(
-          loadError instanceof Error
-            ? loadError.message
-            : "Couldn't load your wardrobe",
-        );
-      } finally {
-        setLoading(false);
-        setRefreshing(false);
-      }
-    },
-    [user],
+  const { data, error, isLoading, isFetching, refetch } = useWardrobeScreenQuery(
+    user?.id,
   );
 
-  useFocusEffect(
-    useCallback(() => {
-      void load("initial");
-    }, [load]),
-  );
+  const items = data?.items ?? [];
+  const urls = data?.urls ?? {};
+  const draftCount = data?.draftCount ?? 0;
+  const loadError = error instanceof Error ? error.message : null;
 
   const activeCount = useMemo(
     () => items.filter((item) => item.status === "active").length,
@@ -91,7 +59,7 @@ export default function WardrobeScreen() {
 
   const hasWardrobeItems = items.length > 0;
   const showEmptyState =
-    !loading && !error && activeCount === 0 && filter === "all" && !searchQuery;
+    !isLoading && !loadError && activeCount === 0 && filter === "all" && !searchQuery;
 
   function emptyMessage(): string {
     if (searchQuery.trim()) {
@@ -117,8 +85,8 @@ export default function WardrobeScreen() {
         contentContainerStyle={styles.list}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => void load("refresh")}
+            refreshing={isFetching && !isLoading}
+            onRefresh={() => void refetch()}
             tintColor={colors.brand}
           />
         }
@@ -127,7 +95,7 @@ export default function WardrobeScreen() {
             <ScreenTitle>My Wardrobe</ScreenTitle>
             <ScreenSubtitle>Everything you own, perfectly organised</ScreenSubtitle>
             <Text style={styles.summary}>{wardrobeSummaryLine(activeCount)}</Text>
-            {error ? <Text style={styles.error}>{error}</Text> : null}
+            {loadError ? <Text style={styles.error}>{loadError}</Text> : null}
             <DraftsBanner count={draftCount} />
             {hasWardrobeItems ? (
               <>
@@ -146,7 +114,7 @@ export default function WardrobeScreen() {
           </View>
         }
         ListEmptyComponent={
-          loading ? (
+          isLoading ? (
             <View style={styles.centered}>
               <ActivityIndicator color={colors.brand} size="large" />
             </View>

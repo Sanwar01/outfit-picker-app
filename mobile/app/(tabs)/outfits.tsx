@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -8,14 +8,13 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 import { Screen } from "@/components/ui/screen";
 import { ScreenSubtitle, ScreenTitle } from "@/components/ui/primitives";
 import { OutfitFilterChips } from "@/components/outfits/outfit-filter-chips";
 import { OutfitGridCard } from "@/components/outfits/outfit-grid-card";
 import { OutfitsEmptyState } from "@/components/outfits/outfits-empty-state";
-import { listSavedOutfits } from "@/lib/outfits";
-import type { SavedOutfit } from "@shared/types/outfit";
+import { useSavedOutfitsQuery } from "@/lib/queries/outfits";
 import {
   filterSavedOutfits,
   outfitsSummaryLine,
@@ -29,33 +28,12 @@ export default function OutfitsScreen() {
   const { width: windowWidth } = useWindowDimensions();
   const cardWidth = (windowWidth - spacing.screen * 2 - GRID_GAP) / 2;
 
-  const [outfits, setOutfits] = useState<SavedOutfit[]>([]);
   const [filter, setFilter] = useState<OutfitListFilter>("all");
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
 
-  const load = useCallback(async (mode: "initial" | "refresh" = "initial") => {
-    if (mode === "initial") setLoading(true);
-    if (mode === "refresh") setRefreshing(true);
+  const { data: outfits = [], error, isLoading, isFetching, refetch } =
+    useSavedOutfitsQuery();
 
-    const result = await listSavedOutfits();
-    if (result.ok) {
-      setOutfits(result.data);
-      setLoadError(null);
-    } else {
-      setLoadError(result.error);
-    }
-
-    setLoading(false);
-    setRefreshing(false);
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      void load("initial");
-    }, [load]),
-  );
+  const loadError = error instanceof Error ? error.message : null;
 
   const favoriteCount = useMemo(
     () => outfits.filter((outfit) => outfit.is_favorite).length,
@@ -67,7 +45,7 @@ export default function OutfitsScreen() {
     [outfits, filter],
   );
 
-  const showEmptyState = !loading && !loadError && outfits.length === 0;
+  const showEmptyState = !isLoading && !loadError && outfits.length === 0;
 
   return (
     <Screen>
@@ -79,8 +57,8 @@ export default function OutfitsScreen() {
         contentContainerStyle={styles.list}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => void load("refresh")}
+            refreshing={isFetching && !isLoading}
+            onRefresh={() => void refetch()}
             tintColor={colors.brand}
           />
         }
@@ -102,7 +80,7 @@ export default function OutfitsScreen() {
           </View>
         }
         ListEmptyComponent={
-          loading ? (
+          isLoading ? (
             <View style={styles.centered}>
               <ActivityIndicator color={colors.brand} size="large" />
             </View>

@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -11,17 +10,23 @@ import {
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useQueryClient } from "@tanstack/react-query";
 import { Screen } from "@/components/ui/screen";
 import { Button } from "@/components/ui/primitives";
-import { apiGet } from "@/lib/api";
+import { CachedImage } from "@/components/ui/cached-image";
+import { useAuth } from "@/lib/auth-context";
+import { queryKeys } from "@/lib/query-client";
+import {
+  invalidateClothingItemQuery,
+  invalidateWardrobeQueries,
+} from "@/lib/queries/invalidate";
+import { useClothingItemQuery } from "@/lib/queries/wardrobe";
+import { useOutfitsByItemCountQuery } from "@/lib/queries/outfits";
 import {
   archiveClothingItem,
-  getClothingItem,
   restoreClothingItem,
   updateClothingItem,
 } from "@/lib/wardrobe-items";
-import type { SavedOutfit } from "@shared/types/outfit";
-import type { ClothingDraftResponse } from "@shared/wardrobe/drafts";
 import {
   draftReviewColorSeasonLine,
   draftReviewMetaLine,
@@ -31,37 +36,18 @@ import { colors, fonts } from "@/lib/theme";
 
 export default function ItemDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const [item, setItem] = useState<ClothingDraftResponse | null>(null);
-  const [outfitCount, setOutfitCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { data: item, error, isLoading } = useClothingItemQuery(id);
+  const { data: outfitCount = 0 } = useOutfitsByItemCountQuery(id);
   const [updatingFavorite, setUpdatingFavorite] = useState(false);
 
-  const load = useCallback(async () => {
-    if (!id) return;
-    setLoading(true);
+  const loadError = error instanceof Error ? error.message : null;
 
-    const [itemResult, outfitsResult] = await Promise.all([
-      getClothingItem(id),
-      apiGet<SavedOutfit[]>(`/api/outfits?itemId=${encodeURIComponent(id)}`),
-    ]);
-
-    setLoading(false);
-
-    if (!itemResult.ok) {
-      setError(itemResult.error);
-      setItem(null);
-      return;
-    }
-
-    setItem(itemResult.data);
-    setOutfitCount(outfitsResult.ok ? outfitsResult.data.length : 0);
-    setError(null);
-  }, [id]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
+  function refreshWardrobeCaches(itemId: string) {
+    invalidateWardrobeQueries(queryClient, user?.id);
+    invalidateClothingItemQuery(queryClient, itemId);
+  }
 
   async function toggleFavorite() {
     if (!item || updatingFavorite) return;
@@ -76,7 +62,8 @@ export default function ItemDetailScreen() {
       return;
     }
 
-    setItem(result.data);
+    queryClient.setQueryData(queryKeys.wardrobe.item(item.id), result.data);
+    refreshWardrobeCaches(item.id);
   }
 
   async function handleArchiveToggle() {
@@ -104,8 +91,10 @@ export default function ItemDetailScreen() {
               return;
             }
 
+            refreshWardrobeCaches(item.id);
+
             if (isArchived) {
-              setItem(result.data);
+              queryClient.setQueryData(queryKeys.wardrobe.item(item.id), result.data);
               return;
             }
 
@@ -116,7 +105,7 @@ export default function ItemDetailScreen() {
     ]);
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Screen style={styles.centered}>
         <ActivityIndicator color={colors.brand} size="large" />
@@ -124,11 +113,11 @@ export default function ItemDetailScreen() {
     );
   }
 
-  if (error || !item) {
+  if (loadError || !item) {
     return (
       <Screen style={styles.centered}>
         <Text style={styles.errorTitle}>Couldn&apos;t load item</Text>
-        <Text style={styles.errorBody}>{error ?? "Item not found."}</Text>
+        <Text style={styles.errorBody}>{loadError ?? "Item not found."}</Text>
         <Button title="Go back" variant="outline" onPress={() => router.back()} />
       </Screen>
     );
@@ -163,11 +152,12 @@ export default function ItemDetailScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        <Image
+        <CachedImage
           source={{ uri: item.signedImageUrl }}
           style={styles.hero}
           accessibilityLabel={item.name}
           alt={item.name}
+          contentFit="cover"
         />
 
         <Text style={styles.title}>{item.name}</Text>

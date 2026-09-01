@@ -1,4 +1,5 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { CachedImage } from "@/components/ui/cached-image";
 import { needsReview } from "@shared/types/clothing";
 import type { ClothingItem } from "@shared/types/database";
 import { wardrobeItemSubtitle } from "@shared/wardrobe/wardrobe-display";
@@ -26,11 +27,12 @@ export function WardrobeGridCard({
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       {imageUrl ? (
-        <Image
+        <CachedImage
           source={{ uri: imageUrl }}
           style={styles.image}
           accessibilityLabel={item.name}
           alt={item.name}
+          contentFit="cover"
         />
       ) : (
         <View style={[styles.image, styles.placeholder]} />

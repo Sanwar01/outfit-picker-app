@@ -1,4 +1,5 @@
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { CachedImage } from "@/components/ui/cached-image";
 import type { SavedOutfit } from "@shared/types/outfit";
 import { displaySavedOutfitName } from "@shared/outfits/saved-outfit-name";
 import {
@@ -23,11 +24,12 @@ export function OutfitGridCard({ outfit, onPress }: OutfitGridCardProps) {
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       {url ? (
-        <Image
+        <CachedImage
           source={{ uri: url }}
           style={styles.image}
           accessibilityLabel={title}
           alt={title}
+          contentFit="cover"
         />
       ) : (
         <View style={[styles.image, styles.placeholder]} />

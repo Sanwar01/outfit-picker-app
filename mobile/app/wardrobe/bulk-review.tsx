@@ -10,11 +10,14 @@ import {
 } from "react-native";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useQueryClient } from "@tanstack/react-query";
 import type { DraftCategoryCount } from "@shared/wardrobe/draft-summary";
 import type { ClothingDraftResponse } from "@shared/wardrobe/drafts";
 import { Screen } from "@/components/ui/screen";
 import { Button, ScreenSubtitle, ScreenTitle } from "@/components/ui/primitives";
 import { DraftGridCard } from "@/components/wardrobe/draft-grid-card";
+import { useAuth } from "@/lib/auth-context";
+import { invalidateWardrobeQueries } from "@/lib/queries/invalidate";
 import {
   confirmAllClothingDrafts,
   listClothingDrafts,
@@ -28,6 +31,8 @@ import { colors, fonts } from "@/lib/theme";
 
 export default function BulkReviewScreen() {
   const { ids: idsParam } = useLocalSearchParams<{ ids?: string }>();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [items, setItems] = useState<ClothingDraftResponse[]>([]);
   const [summary, setSummary] = useState<DraftCategoryCount[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,6 +75,7 @@ export default function BulkReviewScreen() {
       return;
     }
 
+    invalidateWardrobeQueries(queryClient, user?.id);
     router.replace("/(tabs)/wardrobe");
   }
 

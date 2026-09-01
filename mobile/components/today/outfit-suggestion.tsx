@@ -1,8 +1,10 @@
 import { useRef, useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/auth-context';
+import { queryKeys } from '@/lib/query-client';
+import { invalidateOutfitsQueries } from '@/lib/queries/invalidate';
 import {
   checkWardrobeReadiness,
   fetchWardrobe,
@@ -26,6 +28,7 @@ type GenerateResult =
 export function OutfitSuggestion() {
   const { user } = useAuth();
   const userId = user?.id;
+  const queryClient = useQueryClient();
   const [wornToday, setWornToday] = useState(false);
   const [wearing, setWearing] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -37,7 +40,7 @@ export function OutfitSuggestion() {
   const loaderStartedAt = useRef(0);
 
   const query = useQuery({
-    queryKey: ['today-outfit', userId],
+    queryKey: queryKeys.today.outfit(userId),
     enabled: Boolean(userId),
     staleTime: Infinity,
     retry: false,
@@ -109,6 +112,7 @@ export function OutfitSuggestion() {
     setSaving(false);
     if (result.ok) {
       setSaved(true);
+      invalidateOutfitsQueries(queryClient);
       Alert.alert('Saved to My Outfits', 'You can find it on the Outfits tab.');
       return;
     }

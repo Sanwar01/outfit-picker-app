@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,14 +11,18 @@ import {
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useQueryClient } from "@tanstack/react-query";
 import { Screen } from "@/components/ui/screen";
 import { Button } from "@/components/ui/primitives";
+import { CachedImage } from "@/components/ui/cached-image";
 import {
   deleteSavedOutfit,
-  getSavedOutfit,
   updateSavedOutfit,
   wearSavedOutfit,
 } from "@/lib/outfits";
+import { queryKeys } from "@/lib/query-client";
+import { useSavedOutfitQuery } from "@/lib/queries/outfits";
+import { invalidateOutfitsQueries } from "@/lib/queries/invalidate";
 import type { SavedOutfit } from "@shared/types/outfit";
 import { displaySavedOutfitName } from "@shared/outfits/saved-outfit-name";
 import {
@@ -32,35 +35,25 @@ import { colors, fonts, radius } from "@/lib/theme";
 
 export default function OutfitDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const [outfit, setOutfit] = useState<SavedOutfit | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const { data: outfit, error, isLoading } = useSavedOutfitQuery(id);
   const [wearing, setWearing] = useState(false);
   const [savingName, setSavingName] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
 
-  const load = useCallback(async () => {
-    if (!id) return;
-    setLoading(true);
-
-    const result = await getSavedOutfit(id);
-    setLoading(false);
-
-    if (!result.ok) {
-      setError(result.error);
-      setOutfit(null);
-      return;
-    }
-
-    setOutfit(result.data);
-    setNameDraft(displaySavedOutfitName(result.data));
-    setError(null);
-  }, [id]);
-
   useEffect(() => {
-    void load();
-  }, [load]);
+    if (outfit) {
+      setNameDraft(displaySavedOutfitName(outfit));
+    }
+  }, [outfit]);
+
+  const loadError = error instanceof Error ? error.message : null;
+
+  function updateOutfitCache(next: SavedOutfit) {
+    queryClient.setQueryData(queryKeys.outfits.detail(id), next);
+    invalidateOutfitsQueries(queryClient);
+  }
 
   async function toggleFavorite() {
     if (!outfit) return;
@@ -74,7 +67,7 @@ export default function OutfitDetailScreen() {
       return;
     }
 
-    setOutfit({
+    updateOutfitCache({
       ...outfit,
       is_favorite: result.data.is_favorite,
       name: result.data.name,
@@ -98,7 +91,7 @@ export default function OutfitDetailScreen() {
       return;
     }
 
-    setOutfit({ ...outfit, name: result.data.name });
+    updateOutfitCache({ ...outfit, name: result.data.name });
     setEditingName(false);
   }
 
@@ -114,7 +107,7 @@ export default function OutfitDetailScreen() {
       return;
     }
 
-    setOutfit({
+    updateOutfitCache({
       ...outfit,
       last_worn_at: new Date().toISOString(),
     });
@@ -139,6 +132,7 @@ export default function OutfitDetailScreen() {
                 Alert.alert("Couldn't delete outfit", result.error);
                 return;
               }
+              invalidateOutfitsQueries(queryClient);
               router.back();
             })();
           },
@@ -147,7 +141,7 @@ export default function OutfitDetailScreen() {
     );
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Screen style={styles.centered}>
         <ActivityIndicator color={colors.brand} size="large" />
@@ -155,11 +149,11 @@ export default function OutfitDetailScreen() {
     );
   }
 
-  if (error || !outfit) {
+  if (loadError || !outfit) {
     return (
       <Screen style={styles.centered}>
         <Text style={styles.errorTitle}>Couldn&apos;t load outfit</Text>
-        <Text style={styles.errorBody}>{error ?? "Outfit not found."}</Text>
+        <Text style={styles.errorBody}>{loadError ?? "Outfit not found."}</Text>
         <Button title="Go back" variant="outline" onPress={() => router.back()} />
       </Screen>
     );
@@ -242,11 +236,12 @@ export default function OutfitDetailScreen() {
         )}
 
         {heroUrl ? (
-          <Image
+          <CachedImage
             source={{ uri: heroUrl }}
             style={styles.hero}
             accessibilityLabel={title}
             alt={title}
+            contentFit="cover"
           />
         ) : (
           <View style={[styles.hero, styles.placeholder]} />
@@ -279,11 +274,12 @@ export default function OutfitDetailScreen() {
                 onPress={() => router.push(`/wardrobe/${item.id}`)}
               >
                 {url ? (
-                  <Image
+                  <CachedImage
                     source={{ uri: url }}
                     style={styles.chipImage}
                     accessibilityLabel={item.name}
                     alt={item.name}
+                    contentFit="cover"
                   />
                 ) : (
                   <View style={[styles.chipImage, styles.placeholder]} />
