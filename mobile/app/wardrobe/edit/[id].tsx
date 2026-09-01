@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -36,27 +36,34 @@ export default function DraftEditScreen() {
   const fromBulk = parseBulkParam(bulkParam);
   const remainingQueue = parseReviewQueueParam(queue);
   const total = parseReviewTotal(totalParam, remainingQueue.length);
-  const [draft, setDraft] = useState<ClothingDraftResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [fetchState, setFetchState] = useState<{
+    id: string | null;
+    draft: ClothingDraftResponse | null;
+    error: string | null;
+  }>({ id: null, draft: null, error: null });
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const load = useCallback(async () => {
-    if (!id) return;
-    setLoading(true);
-    const result = await getClothingDraft(id);
-    setLoading(false);
-    if (!result.ok) {
-      setError(result.error);
-      return;
-    }
-    setDraft(result.data);
-    setError(null);
-  }, [id]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    if (!id) return;
+    let cancelled = false;
+
+    void getClothingDraft(id).then((result) => {
+      if (cancelled) return;
+      if (!result.ok) {
+        setFetchState({ id, draft: null, error: result.error });
+        return;
+      }
+      setFetchState({ id, draft: result.data, error: null });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  const loading = Boolean(id) && fetchState.id !== id;
+  const draft = fetchState.id === id ? fetchState.draft : null;
+  const error = fetchState.id === id ? fetchState.error : null;
 
   async function handleSave(patch: ClothingDraftPatch) {
     if (!id) return;
@@ -90,7 +97,7 @@ export default function DraftEditScreen() {
   if (error || !draft) {
     return (
       <Screen style={styles.centered}>
-        <Text style={styles.errorTitle}>Couldn't load item</Text>
+        <Text style={styles.errorTitle}>Couldn&apos;t load item</Text>
         <Text style={styles.errorBody}>{error ?? "Draft not found."}</Text>
       </Screen>
     );

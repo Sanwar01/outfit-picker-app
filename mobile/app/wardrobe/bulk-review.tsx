@@ -107,7 +107,7 @@ export default function BulkReviewScreen() {
   if (error) {
     return (
       <Screen style={styles.centered}>
-        <Text style={styles.errorTitle}>Couldn't load items</Text>
+        <Text style={styles.errorTitle}>Couldn&apos;t load items</Text>
         <Text style={styles.errorBody}>{error}</Text>
         <Button title="Try again" onPress={() => void load()} />
       </Screen>

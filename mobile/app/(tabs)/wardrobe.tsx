@@ -67,6 +67,8 @@ export default function WardrobeScreen() {
             <Image
               source={{ uri: urls[item.image_url] ?? undefined }}
               style={styles.image}
+              accessibilityLabel={item.name}
+              alt={item.name}
             />
             <Text style={styles.name} numberOfLines={1}>
               {item.name}

@@ -53,7 +53,12 @@ export default function OutfitsScreen() {
               onPress={() => router.push(`/outfits/${item.id}` as never)}
             >
               {url ? (
-                <Image source={{ uri: url }} style={styles.image} />
+                <Image
+                  source={{ uri: url }}
+                  style={styles.image}
+                  accessibilityLabel={item.name ?? "Saved outfit"}
+                  alt={item.name ?? "Saved outfit"}
+                />
               ) : (
                 <View style={[styles.image, styles.placeholder]} />
               )}

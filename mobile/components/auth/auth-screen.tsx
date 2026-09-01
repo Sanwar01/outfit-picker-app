@@ -14,7 +14,7 @@ import { AuthHero } from "@/components/auth/auth-hero";
 import { AuthSheet } from "@/components/auth/auth-sheet";
 import { colors } from "@/lib/theme";
 
-const heroImage = require("../../assets/images/auth-hero.jpg");
+import heroImage from "../../assets/images/auth-hero.jpg";
 
 type AuthScreenProps = {
   headline: string;
@@ -44,6 +44,8 @@ export function AuthScreen({
         contentFit="cover"
         contentPosition="top"
         pointerEvents="none"
+        accessibilityLabel=""
+        alt=""
       />
       <LinearGradient
         colors={[

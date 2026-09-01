@@ -34,7 +34,12 @@ export default function OutfitDetailScreen() {
     <Screen>
       <Text style={styles.title}>{outfit.name ?? "Saved outfit"}</Text>
       {heroUrl ? (
-        <Image source={{ uri: heroUrl }} style={styles.hero} />
+        <Image
+          source={{ uri: heroUrl }}
+          style={styles.hero}
+          accessibilityLabel={outfit.name ?? "Saved outfit"}
+          alt={outfit.name ?? "Saved outfit"}
+        />
       ) : (
         <View style={[styles.hero, styles.placeholder]} />
       )}
@@ -49,7 +54,12 @@ export default function OutfitDetailScreen() {
           return (
             <View key={item.id} style={styles.chip}>
               {url ? (
-                <Image source={{ uri: url }} style={styles.chipImage} />
+                <Image
+                  source={{ uri: url }}
+                  style={styles.chipImage}
+                  accessibilityLabel={item.name}
+                  alt={item.name}
+                />
               ) : null}
               <Text style={styles.chipName} numberOfLines={1}>
                 {item.name}

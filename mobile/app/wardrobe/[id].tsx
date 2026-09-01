@@ -46,7 +46,12 @@ export default function ItemDetailScreen() {
   return (
     <Screen>
       {imageUrl ? (
-        <Image source={{ uri: imageUrl }} style={styles.hero} />
+        <Image
+          source={{ uri: imageUrl }}
+          style={styles.hero}
+          accessibilityLabel={item.name}
+          alt={item.name}
+        />
       ) : (
         <View style={[styles.hero, styles.placeholder]} />
       )}

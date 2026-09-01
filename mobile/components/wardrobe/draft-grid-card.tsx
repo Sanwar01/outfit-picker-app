@@ -19,7 +19,12 @@ export function DraftGridCard({ draft, onPress }: DraftGridCardProps) {
       onPress={onPress}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
-      <Image source={{ uri: draft.signedImageUrl }} style={styles.image} />
+      <Image
+        source={{ uri: draft.signedImageUrl }}
+        style={styles.image}
+        accessibilityLabel={draft.name}
+        alt={draft.name}
+      />
       {flagged ? <View style={styles.flagDot} /> : null}
       <Text style={styles.name} numberOfLines={2}>
         {draft.name}

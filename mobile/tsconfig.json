@@ -3,6 +3,21 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
+      "@/lib/api": ["./lib/api"],
+      "@/lib/auth-context": ["./lib/auth-context"],
+      "@/lib/brand": ["./lib/brand"],
+      "@/lib/create-item-id": ["./lib/create-item-id"],
+      "@/lib/has-seen-welcome": ["./lib/has-seen-welcome"],
+      "@/lib/location": ["./lib/location"],
+      "@/lib/oauth": ["./lib/oauth"],
+      "@/lib/profile-display": ["./lib/profile-display"],
+      "@/lib/remember-email": ["./lib/remember-email"],
+      "@/lib/review-queue": ["./lib/review-queue"],
+      "@/lib/supabase": ["./lib/supabase"],
+      "@/lib/theme": ["./lib/theme"],
+      "@/lib/today": ["./lib/today"],
+      "@/lib/wardrobe-drafts": ["./lib/wardrobe-drafts"],
+      "@/lib/*": ["../lib/*"],
       "@/*": ["./*"],
       "@shared/*": ["../lib/*"]
     }

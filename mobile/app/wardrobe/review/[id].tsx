@@ -51,27 +51,34 @@ export default function DraftReviewScreen() {
   const total = parseReviewTotal(totalParam, remainingQueue.length);
   const currentIndex = total - remainingQueue.length;
   const progressLabel = fromBulk ? '' : reviewProgressLabel(currentIndex, total);
-  const [draft, setDraft] = useState<ClothingDraftResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [fetchState, setFetchState] = useState<{
+    id: string | null;
+    draft: ClothingDraftResponse | null;
+    error: string | null;
+  }>({ id: null, draft: null, error: null });
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const load = useCallback(async () => {
-    if (!id) return;
-    setLoading(true);
-    const result = await getClothingDraft(id);
-    setLoading(false);
-    if (!result.ok) {
-      setError(result.error);
-      return;
-    }
-    setDraft(result.data);
-    setError(null);
-  }, [id]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    if (!id) return;
+    let cancelled = false;
+
+    void getClothingDraft(id).then((result) => {
+      if (cancelled) return;
+      if (!result.ok) {
+        setFetchState({ id, draft: null, error: result.error });
+        return;
+      }
+      setFetchState({ id, draft: result.data, error: null });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  const loading = Boolean(id) && fetchState.id !== id;
+  const draft = fetchState.id === id ? fetchState.draft : null;
+  const error = fetchState.id === id ? fetchState.error : null;
 
   const handleDiscard = useCallback(() => {
     if (!id) return;
@@ -162,7 +169,12 @@ export default function DraftReviewScreen() {
         <Text style={styles.progress}>{progressLabel}</Text>
       ) : null}
 
-      <Image source={{ uri: draft.signedImageUrl }} style={styles.hero} />
+      <Image
+        source={{ uri: draft.signedImageUrl }}
+        style={styles.hero}
+        accessibilityLabel={draft.name}
+        alt={draft.name}
+      />
 
       <Text style={styles.title}>{draft.name}</Text>
       <Text style={styles.meta}>{draftReviewMetaLine(draft)}</Text>
