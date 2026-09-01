@@ -3,10 +3,13 @@ import { getRouteUserId } from "@/lib/api/route-auth";
 import { createRouteClient } from "@/lib/supabase/route-client";
 import { getSignedImageUrls } from "@/lib/storage";
 import {
+  hasRequiredOutfitSlots,
   normalizeOutfitSlots,
-  outfitSlotsHasItems,
+  orderSavedOutfitItems,
   outfitSlotsToDbRows,
+  resolveOutfitSlotsFromItems,
 } from "@/lib/outfits/slots";
+import { resolveSavedOutfitName } from "@/lib/outfits/saved-outfit-name";
 import type { ClothingCategory, ClothingItem, Outfit } from "@/lib/types/database";
 import type { Json } from "@/lib/types/database";
 import type { OutfitSlots } from "@/lib/outfits/slots";
@@ -115,10 +118,13 @@ export async function GET(request: Request) {
     );
 
     const enriched = typedOutfits.map((outfit) => {
-      const items = typedOutfitItems
-        .filter((oi) => oi.outfit_id === outfit.id)
-        .map((oi) => clothingMap.get(oi.clothing_item_id))
-        .filter((item): item is ClothingItem => !!item);
+      const rows = typedOutfitItems.filter((oi) => oi.outfit_id === outfit.id);
+      const items = orderSavedOutfitItems(
+        rows
+          .map((oi) => clothingMap.get(oi.clothing_item_id))
+          .filter((item): item is ClothingItem => !!item),
+        rows,
+      );
 
       return {
         ...outfit,
@@ -148,23 +154,45 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { slots, rationale, weather, name } = body as {
-      slots: OutfitSlots | Record<string, string | string[]>;
+    const { slots, rationale, weather, name, item_ids } = body as {
+      slots?: OutfitSlots | Record<string, string | string[]>;
+      item_ids?: string[];
       rationale: string;
       weather: WeatherSnapshot;
       name?: string;
     };
 
-    const normalizedSlots = normalizeOutfitSlots(slots);
-    if (!outfitSlotsHasItems(normalizedSlots)) {
-      return NextResponse.json({ error: "slots required" }, { status: 400 });
+    const itemIds = Array.isArray(item_ids)
+      ? item_ids.filter((id): id is string => typeof id === "string")
+      : [];
+
+    let normalizedSlots = normalizeOutfitSlots(slots);
+
+    if (!hasRequiredOutfitSlots(normalizedSlots) && itemIds.length > 0) {
+      const { data: clothing } = await supabase
+        .from("clothing_items")
+        .select("*")
+        .eq("user_id", userId)
+        .in("id", itemIds);
+
+      normalizedSlots = resolveOutfitSlotsFromItems(
+        (clothing ?? []) as ClothingItem[],
+        itemIds,
+      );
+    }
+
+    if (!hasRequiredOutfitSlots(normalizedSlots)) {
+      return NextResponse.json(
+        { error: "Outfit must include a top, bottom, and shoes" },
+        { status: 400 },
+      );
     }
 
     const { data: outfit, error: outfitError } = await supabase
       .from("outfits")
       .insert({
         user_id: userId,
-        name: name ?? "Saved outfit",
+        name: resolveSavedOutfitName(name),
         weather_snapshot: weather as unknown as Json,
         ai_rationale: rationale,
       })

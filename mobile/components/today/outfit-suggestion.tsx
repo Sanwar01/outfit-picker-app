@@ -109,6 +109,7 @@ export function OutfitSuggestion() {
     setSaving(false);
     if (result.ok) {
       setSaved(true);
+      Alert.alert('Saved to My Outfits', 'You can find it on the Outfits tab.');
       return;
     }
     Alert.alert("Couldn't save that outfit", result.error);

@@ -53,6 +53,20 @@ export function outfitSlotsHasItems(slots: OutfitSlots): boolean {
   return outfitSlotsToItemIds(slots).length > 0;
 }
 
+export function hasRequiredOutfitSlots(slots: OutfitSlots): boolean {
+  return Boolean(slots.top && slots.bottom && slots.shoes);
+}
+
+export function resolveOutfitSlotsFromItems(
+  items: ClothingItem[],
+  itemIds?: string[],
+): OutfitSlots {
+  const selected = itemIds?.length
+    ? items.filter((item) => itemIds.includes(item.id))
+    : items;
+  return itemsToOutfitSlots(selected);
+}
+
 export function outfitSlotsToDbRows(
   outfitId: string,
   slots: OutfitSlots,
@@ -138,4 +152,34 @@ export function itemsToOutfitSlots(items: ClothingItem[]): OutfitSlots {
   }
 
   return slots;
+}
+
+export function orderSavedOutfitItems(
+  items: ClothingItem[],
+  rows: Array<{ clothing_item_id: string; slot: ClothingCategory }>,
+): ClothingItem[] {
+  const byId = new Map(items.map((item) => [item.id, item]));
+  const ordered: ClothingItem[] = [];
+
+  for (const slot of CORE_SLOT_ORDER) {
+    const row = rows.find((entry) => entry.slot === slot);
+    if (!row) continue;
+    const item = byId.get(row.clothing_item_id);
+    if (item) ordered.push(item);
+  }
+
+  for (const row of rows.filter((entry) => entry.slot === "accessory")) {
+    const item = byId.get(row.clothing_item_id);
+    if (item && !ordered.some((entry) => entry.id === item.id)) {
+      ordered.push(item);
+    }
+  }
+
+  for (const item of items) {
+    if (!ordered.some((entry) => entry.id === item.id)) {
+      ordered.push(item);
+    }
+  }
+
+  return ordered;
 }

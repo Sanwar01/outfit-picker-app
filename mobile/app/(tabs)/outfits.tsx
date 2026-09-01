@@ -12,14 +12,21 @@ import { Screen } from "@/components/ui/screen";
 import { ScreenSubtitle, ScreenTitle } from "@/components/ui/primitives";
 import { apiGet } from "@/lib/api";
 import type { SavedOutfit } from "@shared/types/outfit";
+import { displaySavedOutfitName } from "@shared/outfits/saved-outfit-name";
 import { colors } from "@/lib/theme";
 
 export default function OutfitsScreen() {
   const [outfits, setOutfits] = useState<SavedOutfit[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const result = await apiGet<SavedOutfit[]>("/api/outfits");
-    if (result.ok) setOutfits(result.data);
+    if (result.ok) {
+      setOutfits(result.data);
+      setLoadError(null);
+      return;
+    }
+    setLoadError(result.error);
   }, []);
 
   useFocusEffect(
@@ -32,6 +39,10 @@ export default function OutfitsScreen() {
     <Screen>
       <ScreenTitle>My Outfits</ScreenTitle>
       <ScreenSubtitle>Outfits from your wardrobe, styled for you</ScreenSubtitle>
+
+      {loadError ? (
+        <Text style={styles.error}>{loadError}</Text>
+      ) : null}
 
       <FlatList
         data={outfits}
@@ -47,6 +58,7 @@ export default function OutfitsScreen() {
         renderItem={({ item }) => {
           const hero = item.items[0];
           const url = hero ? item.imageUrls[hero.image_url] : undefined;
+          const title = displaySavedOutfitName(item);
           return (
             <Pressable
               style={styles.card}
@@ -56,14 +68,14 @@ export default function OutfitsScreen() {
                 <Image
                   source={{ uri: url }}
                   style={styles.image}
-                  accessibilityLabel={item.name ?? "Saved outfit"}
-                  alt={item.name ?? "Saved outfit"}
+                  accessibilityLabel={title}
+                  alt={title}
                 />
               ) : (
                 <View style={[styles.image, styles.placeholder]} />
               )}
               <Text style={styles.name} numberOfLines={1}>
-                {item.name ?? "Saved outfit"}
+                {title}
               </Text>
             </Pressable>
           );
@@ -97,5 +109,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: colors.inkMuted,
     marginTop: 40,
+  },
+  error: {
+    marginTop: 8,
+    color: colors.destructive,
+    fontFamily: "DMSans_400Regular",
+    fontSize: 13,
   },
 });

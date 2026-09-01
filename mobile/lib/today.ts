@@ -2,6 +2,12 @@ import type { GeneratedOutfit } from "@shared/types/outfit";
 import type { ClothingItem } from "@shared/types/database";
 import { apiPost } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
+import { defaultSavedOutfitName } from "@shared/outfits/saved-outfit-name";
+import {
+  hasRequiredOutfitSlots,
+  itemsToOutfitSlots,
+  normalizeOutfitSlots,
+} from "@shared/outfits/slots";
 
 export type WardrobeReadiness =
   | { status: "empty" }
@@ -46,11 +52,22 @@ export async function wearOutfit(itemIds: string[]) {
   return apiPost("/api/outfits/wear", { itemIds });
 }
 
+function resolveSlotsForSave(outfit: GeneratedOutfit) {
+  let slots = normalizeOutfitSlots(outfit.slots);
+  if (!hasRequiredOutfitSlots(slots) && outfit.items.length > 0) {
+    slots = itemsToOutfitSlots(outfit.items);
+  }
+  return slots;
+}
+
 export async function saveOutfit(outfit: GeneratedOutfit, name?: string) {
+  const slots = resolveSlotsForSave(outfit);
+
   return apiPost("/api/outfits", {
-    slots: outfit.slots,
+    slots,
+    item_ids: outfit.item_ids,
     rationale: outfit.description || outfit.rationale,
     weather: outfit.weather,
-    name: name ?? "Saved outfit",
+    name: name ?? defaultSavedOutfitName(),
   });
 }

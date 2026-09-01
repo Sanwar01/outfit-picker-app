@@ -5,6 +5,7 @@ import { Screen } from "@/components/ui/screen";
 import { Button } from "@/components/ui/primitives";
 import { apiGet } from "@/lib/api";
 import type { SavedOutfit } from "@shared/types/outfit";
+import { displaySavedOutfitName } from "@shared/outfits/saved-outfit-name";
 import { colors } from "@/lib/theme";
 
 export default function OutfitDetailScreen() {
@@ -29,16 +30,17 @@ export default function OutfitDetailScreen() {
 
   const hero = outfit.items[0];
   const heroUrl = hero ? outfit.imageUrls[hero.image_url] : undefined;
+  const title = displaySavedOutfitName(outfit);
 
   return (
     <Screen>
-      <Text style={styles.title}>{outfit.name ?? "Saved outfit"}</Text>
+      <Text style={styles.title}>{title}</Text>
       {heroUrl ? (
         <Image
           source={{ uri: heroUrl }}
           style={styles.hero}
-          accessibilityLabel={outfit.name ?? "Saved outfit"}
-          alt={outfit.name ?? "Saved outfit"}
+          accessibilityLabel={title}
+          alt={title}
         />
       ) : (
         <View style={[styles.hero, styles.placeholder]} />
