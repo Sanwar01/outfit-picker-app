@@ -17,6 +17,11 @@ import {
   buildOutfitDescription,
   buildShortRationale,
 } from "@/lib/today/descriptions";
+import {
+  filterItemsForWeatherPool,
+  outfitPassesWeatherCheck,
+  POOL_SUITABILITY_MIN,
+} from "@/lib/ai/weather-suitability";
 import type { OccasionId } from "@/lib/today/occasions";
 import { getOccasion } from "@/lib/today/occasions";
 
@@ -56,15 +61,29 @@ function getDeprioritizeId(
   return undefined;
 }
 
+function weatherSafePool(
+  items: ClothingItem[],
+  weather: WeatherSnapshot,
+  minScore = POOL_SUITABILITY_MIN,
+): ClothingItem[] {
+  const filtered = filterItemsForWeatherPool(items, weather, minScore);
+  return filtered.length > 0 ? filtered : items;
+}
+
 function buildCandidatePools(
   byCategory: Map<ClothingCategory, ClothingItem[]>,
+  weather: WeatherSnapshot,
   excludeCombinations: string[][],
-  deprioritizeBySlot: Partial<Record<OutfitSlot, string>>
+  deprioritizeBySlot: Partial<Record<OutfitSlot, string>>,
 ) {
   const pool = (slot: ClothingCategory) =>
-    rankCandidates(byCategory.get(slot) ?? [], excludeCombinations, {
-      deprioritizeId: deprioritizeBySlot[slot as OutfitSlot],
-    }).slice(0, CANDIDATES_PER_SLOT);
+    rankCandidates(
+      weatherSafePool(byCategory.get(slot) ?? [], weather),
+      excludeCombinations,
+      {
+        deprioritizeId: deprioritizeBySlot[slot as OutfitSlot],
+      },
+    ).slice(0, CANDIDATES_PER_SLOT);
 
   return {
     top: pool("top"),
@@ -156,6 +175,56 @@ function pickBestOuterwear(
   return best?.item;
 }
 
+function buildOutfitFromCore(
+  bestCore: CoreCombo,
+  pools: ReturnType<typeof buildCandidatePools>,
+  input: {
+    weather: WeatherSnapshot;
+    excludeCombinations: string[][];
+    styleVibes: string[];
+    formalityTarget?: number;
+    occasionId: OccasionId;
+  },
+): { slots: OutfitSlots; selectedItems: ClothingItem[] } {
+  const coreItems = [bestCore.top, bestCore.bottom, bestCore.shoes];
+  const slots: OutfitSlots = {
+    top: bestCore.top.id,
+    bottom: bestCore.bottom.id,
+    shoes: bestCore.shoes.id,
+  };
+
+  const outerwear = pickBestOuterwear(
+    coreItems,
+    pools.outerwear,
+    input.weather,
+    input.excludeCombinations,
+    input.styleVibes,
+    input.formalityTarget,
+    input.occasionId,
+  );
+  if (outerwear) {
+    slots.outerwear = outerwear.id;
+  }
+
+  const accessories = pickAccessories(
+    outerwear ? [...coreItems, outerwear] : coreItems,
+    pools.accessory,
+  );
+  if (accessories.length > 0) {
+    slots.accessories = accessories.map((item) => item.id);
+  }
+
+  const selectedItems = [
+    bestCore.top,
+    bestCore.bottom,
+    bestCore.shoes,
+    ...(outerwear ? [outerwear] : []),
+    ...accessories,
+  ];
+
+  return { slots, selectedItems };
+}
+
 export function generateOutfitLocally(input: {
   wardrobe: ClothingItem[];
   weather: WeatherSnapshot;
@@ -189,8 +258,9 @@ export function generateOutfitLocally(input: {
 
   let pools = buildCandidatePools(
     byCategory,
+    input.weather,
     input.excludeCombinations,
-    deprioritizeBySlot
+    deprioritizeBySlot,
   );
 
   let bestCore = pickBestCoreCombo(
@@ -203,16 +273,17 @@ export function generateOutfitLocally(input: {
   );
 
   if (!bestCore) {
-    pools = buildCandidatePools(byCategory, input.excludeCombinations, {});
-    const allTops = byCategory.get("top") ?? [];
-    const allBottoms = byCategory.get("bottom") ?? [];
-    const allShoes = byCategory.get("shoes") ?? [];
-
+    pools = buildCandidatePools(
+      byCategory,
+      input.weather,
+      input.excludeCombinations,
+      {},
+    );
     bestCore = pickBestCoreCombo(
       enumerateCoreCombos({
-        top: allTops,
-        bottom: allBottoms,
-        shoes: allShoes,
+        top: weatherSafePool(byCategory.get("top") ?? [], input.weather, 35),
+        bottom: weatherSafePool(byCategory.get("bottom") ?? [], input.weather, 35),
+        shoes: weatherSafePool(byCategory.get("shoes") ?? [], input.weather, 35),
       }),
       input.weather,
       input.excludeCombinations,
@@ -231,41 +302,43 @@ export function generateOutfitLocally(input: {
     };
   }
 
-  const coreItems = [bestCore.top, bestCore.bottom, bestCore.shoes];
-  const slots: OutfitSlots = {
-    top: bestCore.top.id,
-    bottom: bestCore.bottom.id,
-    shoes: bestCore.shoes.id,
-  };
-
-  const outerwear = pickBestOuterwear(
-    coreItems,
-    pools.outerwear,
-    input.weather,
-    input.excludeCombinations,
+  let { slots, selectedItems } = buildOutfitFromCore(bestCore, pools, {
+    weather: input.weather,
+    excludeCombinations: input.excludeCombinations,
     styleVibes,
     formalityTarget,
-    input.occasionId,
-  );
-  if (outerwear) {
-    slots.outerwear = outerwear.id;
-  }
+    occasionId: input.occasionId,
+  });
 
-  const accessories = pickAccessories(
-    outerwear ? [...coreItems, outerwear] : coreItems,
-    pools.accessory,
-  );
-  if (accessories.length > 0) {
-    slots.accessories = accessories.map((item) => item.id);
+  if (!outfitPassesWeatherCheck(selectedItems, input.weather)) {
+    const strictPools = buildCandidatePools(
+      byCategory,
+      input.weather,
+      input.excludeCombinations,
+      {},
+    );
+    const strictCore = pickBestCoreCombo(
+      enumerateCoreCombos(strictPools),
+      input.weather,
+      input.excludeCombinations,
+      styleVibes,
+      formalityTarget,
+      input.occasionId,
+    );
+    if (strictCore) {
+      const retry = buildOutfitFromCore(strictCore, strictPools, {
+        weather: input.weather,
+        excludeCombinations: input.excludeCombinations,
+        styleVibes,
+        formalityTarget,
+        occasionId: input.occasionId,
+      });
+      if (outfitPassesWeatherCheck(retry.selectedItems, input.weather)) {
+        slots = retry.slots;
+        selectedItems = retry.selectedItems;
+      }
+    }
   }
-
-  const selectedItems = [
-    bestCore.top,
-    bestCore.bottom,
-    bestCore.shoes,
-    ...(outerwear ? [outerwear] : []),
-    ...accessories,
-  ];
 
   const slotsRecord = Object.fromEntries(
     Object.entries(slots).filter(([, value]) =>

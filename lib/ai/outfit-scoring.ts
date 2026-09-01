@@ -4,6 +4,12 @@ import {
   itemWarmthFit,
   styleTagOverlap,
 } from "@/lib/ai/wardrobe-relevance";
+import {
+  itemWeatherSuitability,
+  needsOuterwear,
+  outfitWeatherSuitability,
+  scoringWeights,
+} from "@/lib/ai/weather-suitability";
 import type { ClothingItem } from "@/lib/types/database";
 import type { OccasionId } from "@/lib/today/occasions";
 import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
@@ -56,20 +62,7 @@ function isPatterned(item: ClothingItem): boolean {
   return pattern !== "solid" && pattern !== "plain" && pattern !== "none";
 }
 
-export function needsOuterwear(weather: WeatherSnapshot): boolean {
-  return (
-    weather.temp_c < 14 ||
-    weather.precip_chance >= 40 ||
-    ["rain", "drizzle", "storm"].includes(weather.condition)
-  );
-}
-
-function isRainy(weather: WeatherSnapshot): boolean {
-  return (
-    weather.precip_chance >= 40 ||
-    ["rain", "drizzle", "storm"].includes(weather.condition)
-  );
-}
+export { needsOuterwear } from "@/lib/ai/weather-suitability";
 
 function buildExcludeKey(itemIds: string[]): string {
   return [...itemIds].sort().join(",");
@@ -142,49 +135,36 @@ export function weatherFitScore(
   items: ClothingItem[],
   weather: WeatherSnapshot,
 ): number {
-  let score = 70;
+  const suitability = outfitWeatherSuitability(items, weather);
+
   const outerwearItems = items.filter((item) => item.category === "outerwear");
   const hasOuterwear = outerwearItems.length > 0;
   const wantsOuterwear = needsOuterwear(weather);
 
-  if (wantsOuterwear && hasOuterwear) score += 20;
-  if (!wantsOuterwear && hasOuterwear) score -= 20;
+  let score = suitability;
 
-  const shoes = items.find((item) => item.category === "shoes");
-  if (shoes && isRainy(weather)) {
-    const name = shoes.name.toLowerCase();
-    if (
-      name.includes("boot") ||
-      name.includes("leather") ||
-      name.includes("waterproof")
-    ) {
-      score += 15;
-    }
-  }
+  if (wantsOuterwear && hasOuterwear) score += 8;
+  if (!wantsOuterwear && hasOuterwear) score -= 8;
 
-  if (weather.temp_c > 26 && hasOuterwear) {
-    const heavyOuterwear = outerwearItems.some(
-      (item) => item.warmth != null && item.warmth >= 4,
-    );
-    score -= heavyOuterwear ? 35 : 20;
-  }
-
-  const warmthItems = items.filter(
-    (item) =>
-      item.warmth != null &&
-      ["top", "bottom", "outerwear"].includes(item.category),
+  const warmthItems = items.filter((item) =>
+    ["top", "bottom", "outerwear"].includes(item.category),
   );
   if (warmthItems.length > 0) {
     const warmthAvg =
       warmthItems.reduce((sum, item) => sum + itemWarmthFit(item, weather), 0) /
       warmthItems.length;
-    score = score * 0.45 + warmthAvg * 100 * 0.55;
+    score = score * 0.55 + warmthAvg * 100 * 0.45;
   }
 
   if (items.length > 0) {
     const seasonAvg =
       items.reduce((sum, item) => sum + itemSeasonFit(item), 0) / items.length;
-    score += (seasonAvg - 0.5) * 16;
+    score += (seasonAvg - 0.5) * 12;
+  }
+
+  for (const item of items) {
+    const itemScore = itemWeatherSuitability(item, weather);
+    if (itemScore < 35) score -= 12;
   }
 
   return clamp(score, 0, 100);
@@ -293,16 +273,17 @@ export function scoreOutfitCombo(
   const penalty = shufflePenalty(items, excludeCombinations);
   if (penalty === Infinity) return -Infinity;
 
+  const weights = scoringWeights(occasionId);
   const vibeOrOccasion =
     formalityTarget !== undefined
-      ? occasionFitScore(items, formalityTarget, occasionId) * 0.14
-      : styleVibeScore(items, styleVibes) * 0.08;
+      ? occasionFitScore(items, formalityTarget, occasionId) * weights.vibe
+      : styleVibeScore(items, styleVibes) * weights.vibe;
 
   return (
-    comboFreshnessScore(items) * 0.22 +
-    formalityCohesionScore(items) * 0.22 +
-    colorHarmonyScore(items) * 0.28 +
-    weatherFitScore(items, weather) * 0.16 +
+    comboFreshnessScore(items) * weights.freshness +
+    formalityCohesionScore(items) * weights.formality +
+    colorHarmonyScore(items) * weights.color +
+    weatherFitScore(items, weather) * weights.weather +
     vibeOrOccasion -
     penalty
   );

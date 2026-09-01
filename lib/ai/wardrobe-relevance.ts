@@ -1,3 +1,4 @@
+import { itemWeatherSuitability } from "@/lib/ai/weather-suitability";
 import type { ClothingItem } from "@/lib/types/database";
 import type { OccasionId } from "@/lib/today/occasions";
 import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
@@ -103,10 +104,15 @@ export function itemRelevanceScore(
 ): number {
   const style = styleTagOverlap(item.style_tags ?? [], context.styleVibes);
   const occasion = itemOccasionMatch(item, context.occasionId);
+  const weatherSuit = itemWeatherSuitability(item, context.weather) / 100;
   const warmth = itemWarmthFit(item, context.weather);
   const season = itemSeasonFit(item);
 
-  return style * 0.3 + occasion * 0.25 + warmth * 0.3 + season * 0.15;
+  if (context.occasionId === "auto") {
+    return weatherSuit * 0.45 + warmth * 0.2 + season * 0.15 + style * 0.12 + occasion * 0.08;
+  }
+
+  return style * 0.3 + occasion * 0.25 + weatherSuit * 0.25 + warmth * 0.12 + season * 0.08;
 }
 
 function daysSince(isoDate: string | null): number {

@@ -48,7 +48,8 @@ occasions: pick from casual, walk, work, date_night, gym, formal, travel — onl
 material: infer only when reasonably visible; otherwise null.
 brand: only when a logo or label is clearly visible; otherwise null.
 fit: infer regular, slim, relaxed, or oversized when visible; otherwise null.
-warmth: 1 (very light) to 5 (very warm) for layering suitability.
+warmth: 1 (very light) to 5 (very warm) for layering suitability — shorts/skirts/sandals ≈ 1, jeans/chinos ≈ 3, wool coat/parka ≈ 4–5.
+season: include summer, winter, spring, autumn, or all-season when inferable.
 Lower confidence if uncertain. Do not invent items not visible in the image.`;
 
 async function fetchImageAsBase64(

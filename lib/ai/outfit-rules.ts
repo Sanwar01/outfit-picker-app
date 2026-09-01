@@ -1,6 +1,7 @@
 import type { ClothingCategory, ClothingItem } from "@/lib/types/database";
 import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
 import { rankWardrobeForGeneration } from "@/lib/ai/wardrobe-relevance";
+import { isItemAllowedForWeather, filterItemsForWeatherPool } from "@/lib/ai/weather-suitability";
 import type { OccasionId } from "@/lib/today/occasions";
 import {
   itemsToOutfitSlots,
@@ -62,53 +63,9 @@ export function getMissingSlots(items: ClothingItem[]): OutfitSlot[] {
 
 export function filterWardrobeForWeather(
   items: ClothingItem[],
-  weather: WeatherSnapshot
+  weather: WeatherSnapshot,
 ): ClothingItem[] {
-  const isRainy =
-    weather.precip_chance >= 40 ||
-    ["rain", "drizzle", "storm"].includes(weather.condition);
-  const isCold = weather.temp_c < 12;
-  const isHot = weather.temp_c > 26;
-
-  return items.filter((item) => {
-    if (item.status !== "active") return false;
-
-    const name = item.name.toLowerCase();
-    const colors = item.colors.join(" ").toLowerCase();
-
-    if (isRainy && item.category === "shoes") {
-      if (
-        name.includes("suede") ||
-        name.includes("canvas") ||
-        colors.includes("suede")
-      ) {
-        return false;
-      }
-    }
-
-    if (isHot && item.category === "outerwear") {
-      if (item.warmth != null && item.warmth >= 4) return false;
-      if (
-        name.includes("coat") ||
-        name.includes("jacket") ||
-        name.includes("parka")
-      ) {
-        return false;
-      }
-    }
-
-    if (isCold && item.category === "outerwear") {
-      if (item.warmth != null && item.warmth <= 1) return false;
-    }
-
-    if (isCold && item.category === "shoes") {
-      if (name.includes("sandal") || name.includes("flip")) {
-        return false;
-      }
-    }
-
-    return true;
-  });
+  return items.filter((item) => isItemAllowedForWeather(item, weather));
 }
 
 export function toWardrobeForAI(
@@ -208,7 +165,10 @@ export function repairOutfitSelection(
 
   for (const slot of REQUIRED_SLOTS) {
     if (!slots[slot]) {
-      const candidates = rankCandidates(byCategory.get(slot) ?? [], [], {});
+      const pool = weather
+        ? filterItemsForWeatherPool(byCategory.get(slot) ?? [], weather)
+        : (byCategory.get(slot) ?? []);
+      const candidates = rankCandidates(pool, [], {});
       const pick = candidates.find((item) => !usedIds.has(item.id));
       if (pick) {
         slots[slot] = pick.id;
@@ -232,9 +192,9 @@ export function repairOutfitSelection(
     byCategory.has("outerwear")
   ) {
     const candidates = rankCandidates(
-      byCategory.get("outerwear") ?? [],
+      filterItemsForWeatherPool(byCategory.get("outerwear") ?? [], weather),
       [],
-      {}
+      {},
     ).slice(0, 4);
     let best: { item: ClothingItem; score: number } | undefined;
     for (const candidate of candidates) {

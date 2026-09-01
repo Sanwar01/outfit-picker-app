@@ -12,6 +12,7 @@ import {
   toWardrobeForAI,
   validateOutfitSelection,
   wardrobeHasMinimumItems,
+  type OutfitGenerationResult,
 } from '@/lib/ai/outfit-rules';
 import { generateOutfitWithAI } from '@/lib/ai/generate-outfit';
 import { isGeminiRulesOnly } from '@/lib/ai/gemini';
@@ -23,6 +24,7 @@ import {
   normalizeOutfitSlots,
   type OutfitSlots,
 } from '@/lib/outfits/slots';
+import { outfitPassesWeatherCheck } from '@/lib/ai/weather-suitability';
 import { getOccasion } from '@/lib/today/occasions';
 import {
   buildOutfitDescription,
@@ -179,7 +181,7 @@ export async function generateOutfitForUser(
   const rulesOnly = isGeminiRulesOnly() || excludeCombinations.length > 0;
 
   let generated_by: 'ai' | 'rules' = rulesOnly ? 'rules' : 'ai';
-  let aiResult;
+  let aiResult: OutfitGenerationResult;
 
   if (rulesOnly) {
     aiResult = generateOutfitLocally({
@@ -224,6 +226,23 @@ export async function generateOutfitForUser(
   }
 
   if (!validateOutfitSelection(aiResult.item_ids, filtered)) {
+    generated_by = 'rules';
+    aiResult = generateOutfitLocally({
+      wardrobe: filtered,
+      weather,
+      excludeCombinations,
+      styleVibes: profile.style_vibes ?? [],
+      occasionId,
+    });
+  }
+
+  const selectedForWeather = filtered.filter((item) =>
+    aiResult.item_ids.includes(item.id),
+  );
+  if (
+    selectedForWeather.length > 0 &&
+    !outfitPassesWeatherCheck(selectedForWeather, weather)
+  ) {
     generated_by = 'rules';
     aiResult = generateOutfitLocally({
       wardrobe: filtered,
