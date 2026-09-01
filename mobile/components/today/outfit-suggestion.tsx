@@ -1,34 +1,27 @@
-import { useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { router } from "expo-router";
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/lib/auth-context";
+import { useRef, useState } from 'react';
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/lib/auth-context';
 import {
   checkWardrobeReadiness,
   fetchWardrobe,
   generateOutfit,
   wearOutfit,
   saveOutfit,
-} from "@/lib/today";
-import type { GeneratedOutfit } from "@shared/types/outfit";
-import { colors, fonts } from "@/lib/theme";
-import { Button } from "@/components/ui/primitives";
-import { WeatherCard } from "@/components/today/weather-card";
-import { OutfitCard } from "@/components/today/outfit-card";
-import { OccasionPicker } from "@/components/today/occasion-picker";
+} from '@/lib/today';
+import type { GeneratedOutfit } from '@shared/types/outfit';
+import { colors, fonts } from '@/lib/theme';
+import { Button } from '@/components/ui/primitives';
+import { WeatherCard } from '@/components/today/weather-card';
+import { OutfitCard } from '@/components/today/outfit-card';
 
 const INITIAL_LOADER_MIN_MS = 700;
 
 type GenerateResult =
-  | { kind: "nudge"; itemCount: number }
-  | { kind: "error"; error: string }
-  | { kind: "result"; outfit: GeneratedOutfit };
+  | { kind: 'nudge'; itemCount: number }
+  | { kind: 'error'; error: string }
+  | { kind: 'result'; outfit: GeneratedOutfit };
 
 export function OutfitSuggestion() {
   const { user } = useAuth();
@@ -37,7 +30,6 @@ export function OutfitSuggestion() {
   const [wearing, setWearing] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [activeOccasion, setActiveOccasion] = useState<string | null>(null);
   const shuffleRef = useRef(false);
   const occasionRef = useRef<string | undefined>(undefined);
   const lastOutfitIdsRef = useRef<string[] | null>(null);
@@ -45,12 +37,12 @@ export function OutfitSuggestion() {
   const loaderStartedAt = useRef(0);
 
   const query = useQuery({
-    queryKey: ["today-outfit", userId],
+    queryKey: ['today-outfit', userId],
     enabled: Boolean(userId),
     staleTime: Infinity,
     retry: false,
     queryFn: async (): Promise<GenerateResult> => {
-      if (!userId) throw new Error("Not signed in");
+      if (!userId) throw new Error('Not signed in');
 
       const shuffle = shuffleRef.current;
       const occasion = occasionRef.current;
@@ -59,10 +51,10 @@ export function OutfitSuggestion() {
       const items = await fetchWardrobe(userId);
       const readiness = checkWardrobeReadiness(items);
 
-      if (readiness.status !== "ready") {
+      if (readiness.status !== 'ready') {
         return {
-          kind: "nudge",
-          itemCount: readiness.status === "empty" ? 0 : readiness.itemCount,
+          kind: 'nudge',
+          itemCount: readiness.status === 'empty' ? 0 : readiness.itemCount,
         };
       }
 
@@ -71,7 +63,7 @@ export function OutfitSuggestion() {
       const result = await generateOutfit(excluded, occasion);
 
       if (!result.ok) {
-        return { kind: "error", error: result.error };
+        return { kind: 'error', error: result.error };
       }
 
       if (!shuffle && !hasShownOutfit.current) {
@@ -82,7 +74,7 @@ export function OutfitSuggestion() {
 
       lastOutfitIdsRef.current = result.outfit.item_ids;
       hasShownOutfit.current = true;
-      return { kind: "result", outfit: result.outfit };
+      return { kind: 'result', outfit: result.outfit };
     },
   });
 
@@ -90,7 +82,6 @@ export function OutfitSuggestion() {
     shuffleRef.current = shuffle;
     if (occasion !== undefined) {
       occasionRef.current = occasion;
-      setActiveOccasion(occasion);
     }
     setWornToday(false);
     setSaved(false);
@@ -98,8 +89,7 @@ export function OutfitSuggestion() {
   }
 
   async function handleWear() {
-    const outfit =
-      query.data?.kind === "result" ? query.data.outfit : null;
+    const outfit = query.data?.kind === 'result' ? query.data.outfit : null;
     if (!outfit) return;
     setWearing(true);
     const result = await wearOutfit(outfit.item_ids);
@@ -108,8 +98,7 @@ export function OutfitSuggestion() {
   }
 
   async function handleSave() {
-    const outfit =
-      query.data?.kind === "result" ? query.data.outfit : null;
+    const outfit = query.data?.kind === 'result' ? query.data.outfit : null;
     if (!outfit || saved) return;
     setSaving(true);
     const result = await saveOutfit(outfit);
@@ -133,7 +122,7 @@ export function OutfitSuggestion() {
     );
   }
 
-  if (query.data?.kind === "nudge") {
+  if (query.data?.kind === 'nudge') {
     const isEmpty = query.data.itemCount === 0;
     return (
       <View style={styles.stateCard}>
@@ -143,11 +132,11 @@ export function OutfitSuggestion() {
         <Text style={styles.stateBody}>
           {isEmpty
             ? "Snap a few pieces you wear often — tops, bottoms, and shoes. I'll start suggesting outfits."
-            : "Add a top, bottom, and shoes so I can put a full look together."}
+            : 'Add a top, bottom, and shoes so I can put a full look together.'}
         </Text>
         <Button
-          title={isEmpty ? "Add your first items" : "Add clothes"}
-          onPress={() => router.push("/wardrobe/add")}
+          title={isEmpty ? 'Add your first items' : 'Add clothes'}
+          onPress={() => router.push('/wardrobe/add')}
           style={styles.stateBtn}
         />
       </View>
@@ -155,10 +144,10 @@ export function OutfitSuggestion() {
   }
 
   const errorMessage =
-    query.data?.kind === "error"
+    query.data?.kind === 'error'
       ? query.data.error
       : query.isError
-        ? "Give it another try, or add a few more pieces to your wardrobe."
+        ? 'Give it another try, or add a few more pieces to your wardrobe.'
         : null;
 
   if (errorMessage) {
@@ -175,7 +164,7 @@ export function OutfitSuggestion() {
     );
   }
 
-  if (query.data?.kind !== "result") return null;
+  if (query.data?.kind !== 'result') return null;
 
   const outfit = query.data.outfit;
 
@@ -193,11 +182,6 @@ export function OutfitSuggestion() {
         onSave={() => void handleSave()}
         onShuffle={() => runGenerate(true)}
       />
-
-      <OccasionPicker
-        activeOccasion={activeOccasion}
-        onSelect={(occasionId) => runGenerate(false, occasionId)}
-      />
     </View>
   );
 }
@@ -213,21 +197,21 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     paddingHorizontal: 24,
     paddingVertical: 32,
-    alignItems: "center",
+    alignItems: 'center',
   },
   stateTitle: {
     fontFamily: fonts.serif,
     fontSize: 20,
     lineHeight: 26,
     color: colors.ink,
-    textAlign: "center",
+    textAlign: 'center',
   },
   stateBody: {
     fontFamily: fonts.sans,
     fontSize: 14,
     lineHeight: 21,
     color: colors.inkMuted,
-    textAlign: "center",
+    textAlign: 'center',
     marginTop: 8,
     maxWidth: 320,
   },
@@ -236,6 +220,6 @@ const styles = StyleSheet.create({
   },
   stateBtn: {
     marginTop: 20,
-    alignSelf: "stretch",
+    alignSelf: 'stretch',
   },
 });
