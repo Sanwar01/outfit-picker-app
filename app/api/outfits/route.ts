@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 import { createRouteClient } from "@/lib/supabase/route-client";
 import { getSignedImageUrls } from "@/lib/storage";
+import {
+  normalizeOutfitSlots,
+  outfitSlotsHasItems,
+  outfitSlotsToDbRows,
+} from "@/lib/outfits/slots";
 import type { ClothingCategory, ClothingItem, Outfit } from "@/lib/types/database";
 import type { Json } from "@/lib/types/database";
+import type { OutfitSlots } from "@/lib/outfits/slots";
 import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
 
 export const dynamic = "force-dynamic";
@@ -144,13 +150,14 @@ export async function POST(request: Request) {
     const userId = claimsData.claims.sub as string;
     const body = await request.json();
     const { slots, rationale, weather, name } = body as {
-      slots: Record<string, string>;
+      slots: OutfitSlots | Record<string, string | string[]>;
       rationale: string;
       weather: WeatherSnapshot;
       name?: string;
     };
 
-    if (!slots || !Object.keys(slots).length) {
+    const normalizedSlots = normalizeOutfitSlots(slots);
+    if (!outfitSlotsHasItems(normalizedSlots)) {
       return NextResponse.json({ error: "slots required" }, { status: 400 });
     }
 
@@ -172,11 +179,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const resolvedRows = Object.entries(slots).map(([slot, clothingItemId]) => ({
-      outfit_id: outfit.id,
-      clothing_item_id: clothingItemId,
-      slot: slot as ClothingCategory,
-    }));
+    const resolvedRows = outfitSlotsToDbRows(outfit.id, normalizedSlots);
 
     const { error: itemsError } = await supabase
       .from("outfit_items")

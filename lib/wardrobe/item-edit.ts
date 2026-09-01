@@ -99,6 +99,7 @@ export const SUB_CATEGORY_OPTIONS: Record<ClothingCategory, string[]> = {
     'Hat',
     'Scarf',
     'Watch',
+    'Necklace',
     'Jewellery',
     'Sunglasses',
     'Other',

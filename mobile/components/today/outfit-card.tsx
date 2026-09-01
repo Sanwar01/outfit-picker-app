@@ -2,7 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { ClothingItem } from '@shared/types/database';
 
-import { SLOT_ORDER, type GeneratedOutfit } from '@shared/types/outfit';
+import { CORE_SLOT_ORDER, type GeneratedOutfit } from '@shared/types/outfit';
+import { normalizeOutfitSlots } from '@shared/outfits/slots';
 import { colors, fonts } from '@/lib/theme';
 import { Button } from '@/components/ui/primitives';
 import { CATEGORY_LABELS } from '@shared/types/clothing';
@@ -46,12 +47,19 @@ export function OutfitCard({
   onSave,
   onShuffle,
 }: OutfitCardProps) {
-  const sortedItems = SLOT_ORDER.flatMap((slot) => {
-    const itemId = outfit.slots[slot];
-    if (!itemId) return [];
-    const item = outfit.items.find((i) => i.id === itemId);
-    return item ? [item] : [];
-  });
+  const slots = normalizeOutfitSlots(outfit.slots);
+  const sortedItems = [
+    ...CORE_SLOT_ORDER.flatMap((slot) => {
+      const itemId = slots[slot];
+      if (!itemId) return [];
+      const item = outfit.items.find((i) => i.id === itemId);
+      return item ? [item] : [];
+    }),
+    ...(slots.accessories ?? []).flatMap((itemId) => {
+      const item = outfit.items.find((i) => i.id === itemId);
+      return item ? [item] : [];
+    }),
+  ];
   const items = sortedItems.length > 0 ? sortedItems : outfit.items;
   const heroItem = pickHeroItem(items);
   const heroUrl = heroItem ? outfit.imageUrls[heroItem.image_url] : undefined;

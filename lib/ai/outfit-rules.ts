@@ -2,18 +2,30 @@ import type { ClothingCategory, ClothingItem } from "@/lib/types/database";
 import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
 import { rankWardrobeForGeneration } from "@/lib/ai/wardrobe-relevance";
 import type { OccasionId } from "@/lib/today/occasions";
+import {
+  itemsToOutfitSlots,
+  normalizeOutfitSlots,
+  outfitSlotsToItemIds,
+  type OutfitSlots,
+} from "@/lib/outfits/slots";
 import { generateOutfitLocally } from "@/lib/ai/generate-outfit-local";
 import {
-  accessoryFitScore,
-  ACCESSORY_SCORE_THRESHOLD,
   needsOuterwear,
+  pickAccessories,
   rankCandidates,
   scoreOutfitCombo,
 } from "@/lib/ai/outfit-scoring";
 
 export { generateOutfitLocally };
 
-export type OutfitSlot = "top" | "bottom" | "outerwear" | "shoes" | "accessory";
+export type OutfitSlot = "top" | "bottom" | "outerwear" | "shoes";
+
+export interface OutfitGenerationResult {
+  item_ids: string[];
+  rationale: string;
+  description: string;
+  slots: OutfitSlots;
+}
 
 export interface WardrobeItemForAI {
   id: string;
@@ -28,13 +40,6 @@ export interface WardrobeItemForAI {
   warmth: number | null;
   season: string[];
   last_worn_at: string | null;
-}
-
-export interface OutfitGenerationResult {
-  item_ids: string[];
-  rationale: string;
-  description: string;
-  slots: Partial<Record<OutfitSlot, string>>;
 }
 
 const REQUIRED_SLOTS: OutfitSlot[] = ["top", "bottom", "shoes"];
@@ -185,16 +190,21 @@ export function repairOutfitSelection(
     byCategory.set(item.category, list);
   }
 
-  const slots: Partial<Record<OutfitSlot, string>> = { ...result.slots };
+  const slots = normalizeOutfitSlots(result.slots);
   const usedIds = new Set<string>();
 
   for (const id of result.item_ids) {
     const item = wardrobeById.get(id);
     if (item) {
-      slots[item.category as OutfitSlot] = id;
       usedIds.add(id);
     }
   }
+
+  Object.assign(slots, itemsToOutfitSlots(
+    [...usedIds]
+      .map((id) => wardrobeById.get(id))
+      .filter((item): item is ClothingItem => !!item),
+  ));
 
   for (const slot of REQUIRED_SLOTS) {
     if (!slots[slot]) {
@@ -245,27 +255,24 @@ export function repairOutfitSelection(
     }
   }
 
-  if (!slots.accessory && byCategory.has("accessory")) {
+  const accessoryIds = new Set(slots.accessories ?? []);
+  if (accessoryIds.size === 0 && byCategory.has("accessory")) {
     const currentCore = selectedItems.filter(
-      (item) => item.category !== "accessory"
+      (item) => item.category !== "accessory",
     );
-    const candidates = rankCandidates(
-      byCategory.get("accessory") ?? [],
-      [],
-      {}
-    ).slice(0, 4);
-    let best: { item: ClothingItem; score: number } | undefined;
-    for (const candidate of candidates) {
-      const score = accessoryFitScore(currentCore, candidate);
-      if (!best || score > best.score) best = { item: candidate, score };
-    }
-    if (best && best.score >= ACCESSORY_SCORE_THRESHOLD) {
-      slots.accessory = best.item.id;
-      usedIds.add(best.item.id);
+    const picked = pickAccessories(
+      currentCore,
+      rankCandidates(byCategory.get("accessory") ?? [], [], {}).slice(0, 8),
+    );
+    if (picked.length > 0) {
+      slots.accessories = picked.map((item) => item.id);
+      for (const item of picked) {
+        usedIds.add(item.id);
+      }
     }
   }
 
-  const item_ids = [...usedIds];
+  const item_ids = outfitSlotsToItemIds(slots);
   return {
     item_ids,
     rationale: result.rationale,

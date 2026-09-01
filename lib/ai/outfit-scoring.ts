@@ -308,9 +308,54 @@ export function scoreOutfitCombo(
   );
 }
 
+export const MAX_OUTFIT_ACCESSORIES = 3;
+
+function normalizeAccessoryKey(item: ClothingItem): string {
+  const sub = (item.sub_category ?? item.name).trim().toLowerCase();
+  if (sub.includes("watch")) return "watch";
+  if (sub.includes("necklace") || sub.includes("jewel")) return "jewellery";
+  if (sub.includes("hat") || sub.includes("cap") || sub.includes("beanie")) {
+    return "hat";
+  }
+  if (sub.includes("scarf")) return "scarf";
+  if (sub.includes("bag") || sub.includes("tote") || sub.includes("purse")) {
+    return "bag";
+  }
+  if (sub.includes("belt")) return "belt";
+  if (sub.includes("sunglass")) return "sunglasses";
+  return sub || item.id;
+}
+
+export function pickAccessories(
+  core: ClothingItem[],
+  candidates: ClothingItem[],
+  max = MAX_OUTFIT_ACCESSORIES,
+): ClothingItem[] {
+  if (candidates.length === 0) return [];
+
+  const ranked = rankCandidates(candidates, [], {});
+  const picked: ClothingItem[] = [];
+  const usedKeys = new Set<string>();
+
+  for (const candidate of ranked) {
+    if (picked.length >= max) break;
+
+    const key = normalizeAccessoryKey(candidate);
+    if (usedKeys.has(key)) continue;
+
+    const score = accessoryFitScore([...core, ...picked], candidate);
+    if (score >= ACCESSORY_SCORE_THRESHOLD) {
+      picked.push(candidate);
+      usedKeys.add(key);
+    }
+  }
+
+  return picked;
+}
+
 export function accessoryFitScore(
   core: ClothingItem[],
-  accessory: ClothingItem
+  accessory: ClothingItem,
 ): number {
   const combo = [...core, accessory];
   return (
@@ -374,7 +419,13 @@ export function buildLocalRationale(
   }
 
   if (items.some((item) => item.category === "accessory")) {
-    rationale += ", finished with an accessory";
+    const accessoryCount = items.filter(
+      (item) => item.category === "accessory",
+    ).length;
+    rationale +=
+      accessoryCount === 1
+        ? ", finished with an accessory"
+        : `, finished with ${accessoryCount} accessories`;
   }
 
   const sharedNeutrals = items.some((item) =>

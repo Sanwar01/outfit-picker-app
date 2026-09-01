@@ -19,6 +19,10 @@ import { getSignedImageUrls } from '@/lib/storage';
 import type { ClothingCategory } from '@/lib/types/database';
 import { CATEGORY_LABELS } from '@/lib/types/clothing';
 import { recommendableWardrobeItems } from '@/lib/wardrobe/filters';
+import {
+  normalizeOutfitSlots,
+  type OutfitSlots,
+} from '@/lib/outfits/slots';
 import { getOccasion } from '@/lib/today/occasions';
 import {
   buildOutfitDescription,
@@ -31,7 +35,7 @@ export interface GeneratedOutfitResponse {
   rationale: string;
   description: string;
   occasion: OccasionId;
-  slots: Record<string, string>;
+  slots: OutfitSlots;
   items: ClothingItem[];
   imageUrls: Record<string, string>;
   weather: WeatherSnapshot;
@@ -98,7 +102,7 @@ async function buildResponse(
     item_ids: string[];
     rationale: string;
     description?: string;
-    slots: Record<string, string>;
+    slots: OutfitSlots;
   },
   filtered: ClothingItem[],
   weather: WeatherSnapshot,
@@ -230,9 +234,7 @@ export async function generateOutfitForUser(
     });
   }
 
-  const slots = Object.fromEntries(
-    Object.entries(aiResult.slots).filter(([, id]) => !!id),
-  ) as Record<string, string>;
+  const slots = normalizeOutfitSlots(aiResult.slots);
 
   const response = await buildResponse(
     {

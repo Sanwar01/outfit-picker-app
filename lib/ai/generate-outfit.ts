@@ -4,6 +4,7 @@ import {
   type WardrobeItemForAI,
   type OutfitGenerationResult,
 } from "@/lib/ai/outfit-rules";
+import { normalizeOutfitSlots } from "@/lib/outfits/slots";
 import type { OccasionId } from "@/lib/today/occasions";
 import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
 import {
@@ -21,6 +22,7 @@ const OutfitSchema = z.object({
     bottom: z.string().optional(),
     outerwear: z.string().optional(),
     shoes: z.string().optional(),
+    accessories: z.array(z.string()).optional(),
     accessory: z.string().optional(),
   }),
 });
@@ -32,6 +34,7 @@ Each wardrobe item may include style_tags, occasions, warmth (1=light, 5=heavy),
 Prefer higher warmth outerwear when cool or rainy; skip heavy outerwear when hot.
 Prefer variety: avoid recently repeated items when alternatives exist.
 Must include top, bottom, and shoes. Add outerwear when weather is cool or rainy.
+Add 0-3 accessories when they complement the outfit — e.g. watch, necklace, hat, scarf, bag, belt, sunglasses. Avoid duplicate accessory types (one watch, one hat, etc.).
 Return a short rationale (one sentence) and a description that names each selected piece by its exact wardrobe name.`;
 
 async function callGemini(input: {
@@ -77,7 +80,7 @@ async function callGemini(input: {
     item_ids: parsed.item_ids,
     rationale: parsed.rationale,
     description: parsed.description ?? "",
-    slots: parsed.slots,
+    slots: normalizeOutfitSlots(parsed.slots),
   };
 }
 

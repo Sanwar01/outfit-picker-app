@@ -2,7 +2,7 @@ import { getSignedImageUrls } from "@/lib/storage";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ClothingCategory, ClothingItem, Outfit } from "@/lib/types/database";
 import type { SavedOutfit } from "@/lib/types/outfit";
-import { SLOT_ORDER } from "@/lib/types/outfit";
+import { CORE_SLOT_ORDER } from "@/lib/types/outfit";
 import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
 
 type OutfitItemRow = {
@@ -79,7 +79,7 @@ export async function getSavedOutfitById(
     // Dev without storage credentials
   }
 
-  const items = SLOT_ORDER.flatMap((slot) => {
+  const coreItems = CORE_SLOT_ORDER.flatMap((slot) => {
     const itemId = typedOutfitItems.find((row) => row.slot === slot)
       ?.clothing_item_id;
     if (!itemId) return [];
@@ -87,10 +87,22 @@ export async function getSavedOutfitById(
     return item ? [item] : [];
   });
 
+  const accessories = typedOutfitItems
+    .filter((row) => row.slot === "accessory")
+    .map((row) => clothingMap.get(row.clothing_item_id))
+    .filter((item): item is ClothingItem => !!item);
+
+  const ordered = [...coreItems];
+  for (const item of accessories) {
+    if (!ordered.some((entry) => entry.id === item.id)) {
+      ordered.push(item);
+    }
+  }
+
   const unsorted = typedClothing.filter(
-    (item) => !items.some((sorted) => sorted.id === item.id),
+    (item) => !ordered.some((sorted) => sorted.id === item.id),
   );
-  const allItems = [...items, ...unsorted];
+  const allItems = [...ordered, ...unsorted];
 
   return toSavedOutfit(typedOutfit, {
     last_worn_at: wearLogs?.[0]?.worn_at ?? null,

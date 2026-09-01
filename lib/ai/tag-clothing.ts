@@ -41,7 +41,7 @@ const SYSTEM_PROMPT = `You are a wardrobe cataloging assistant. Analyze the clot
 Return structured data for the primary visible item only.
 
 Categories: top, bottom, outerwear, shoes, accessory.
-sub_category should be a specific garment type (e.g. Overshirt, Chinos, Sneakers, Tote bag).
+sub_category should be a specific garment type (e.g. Overshirt, Chinos, Sneakers, Watch, Necklace, Hat, Scarf, Tote bag).
 colors: primary colour first, optional secondary colour second.
 style_tags: 2-4 short style descriptors (e.g. minimal, smart casual, layering piece, neutral).
 occasions: pick from casual, walk, work, date_night, gym, formal, travel — only where appropriate.

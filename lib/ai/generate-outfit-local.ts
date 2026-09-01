@@ -1,15 +1,18 @@
 import type { ClothingCategory, ClothingItem } from "@/lib/types/database";
 import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
 import {
-  ACCESSORY_SCORE_THRESHOLD,
   CANDIDATES_PER_SLOT,
-  accessoryFitScore,
   needsOuterwear,
+  pickAccessories,
   rankCandidates,
   scoreOutfitCombo,
 } from "@/lib/ai/outfit-scoring";
 import { rankWardrobeForGeneration } from "@/lib/ai/wardrobe-relevance";
 import type { OutfitGenerationResult, OutfitSlot } from "@/lib/ai/outfit-rules";
+import {
+  outfitSlotsToItemIds,
+  type OutfitSlots,
+} from "@/lib/outfits/slots";
 import {
   buildOutfitDescription,
   buildShortRationale,
@@ -153,26 +156,6 @@ function pickBestOuterwear(
   return best?.item;
 }
 
-function pickBestAccessory(
-  core: ClothingItem[],
-  candidates: ClothingItem[]
-): ClothingItem | undefined {
-  if (candidates.length === 0) return undefined;
-
-  let best: { item: ClothingItem; score: number } | undefined;
-  for (const candidate of candidates) {
-    const score = accessoryFitScore(core, candidate);
-    if (!best || score > best.score) {
-      best = { item: candidate, score };
-    }
-  }
-
-  if (best && best.score >= ACCESSORY_SCORE_THRESHOLD) {
-    return best.item;
-  }
-  return undefined;
-}
-
 export function generateOutfitLocally(input: {
   wardrobe: ClothingItem[];
   weather: WeatherSnapshot;
@@ -249,7 +232,7 @@ export function generateOutfitLocally(input: {
   }
 
   const coreItems = [bestCore.top, bestCore.bottom, bestCore.shoes];
-  const slots: Partial<Record<OutfitSlot, string>> = {
+  const slots: OutfitSlots = {
     top: bestCore.top.id,
     bottom: bestCore.bottom.id,
     shoes: bestCore.shoes.id,
@@ -268,12 +251,12 @@ export function generateOutfitLocally(input: {
     slots.outerwear = outerwear.id;
   }
 
-  const accessory = pickBestAccessory(
+  const accessories = pickAccessories(
     outerwear ? [...coreItems, outerwear] : coreItems,
-    pools.accessory
+    pools.accessory,
   );
-  if (accessory) {
-    slots.accessory = accessory.id;
+  if (accessories.length > 0) {
+    slots.accessories = accessories.map((item) => item.id);
   }
 
   const selectedItems = [
@@ -281,21 +264,23 @@ export function generateOutfitLocally(input: {
     bestCore.bottom,
     bestCore.shoes,
     ...(outerwear ? [outerwear] : []),
-    ...(accessory ? [accessory] : []),
+    ...accessories,
   ];
 
   const slotsRecord = Object.fromEntries(
-    Object.entries(slots).filter(([, id]) => !!id)
-  ) as Record<string, string>;
+    Object.entries(slots).filter(([, value]) =>
+      Array.isArray(value) ? value.length > 0 : !!value,
+    ),
+  ) as Record<string, string | string[]>;
 
   return {
-    item_ids: selectedItems.map((item) => item.id),
+    item_ids: outfitSlotsToItemIds(slots),
     rationale: buildShortRationale(input.occasionId, input.weather),
     description: buildOutfitDescription(
       selectedItems,
       slotsRecord,
       input.occasionId,
-      input.weather
+      input.weather,
     ),
     slots,
   };

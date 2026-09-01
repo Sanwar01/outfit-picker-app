@@ -1,6 +1,10 @@
 import type { ClothingItem } from "@/lib/types/database";
 import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
-import { SLOT_ORDER } from "@/lib/types/outfit";
+import {
+  CORE_SLOT_ORDER,
+  normalizeOutfitSlots,
+  type OutfitSlots,
+} from "@/lib/outfits/slots";
 import type { OccasionId } from "@/lib/today/occasions";
 import { getOccasion, occasionLabel } from "@/lib/today/occasions";
 
@@ -15,18 +19,36 @@ function formatItemList(items: ClothingItem[]): string {
   return `your ${rest}, and ${last.name}`;
 }
 
-export function buildOutfitDescription(
+function orderedItemsFromSlots(
   items: ClothingItem[],
-  slots: Record<string, string>,
-  occasionId: OccasionId,
-  weather: WeatherSnapshot
-): string {
-  const ordered = SLOT_ORDER.flatMap((slot) => {
+  slots: OutfitSlots,
+): ClothingItem[] {
+  const byId = new Map(items.map((item) => [item.id, item]));
+  const ordered = CORE_SLOT_ORDER.flatMap((slot) => {
     const id = slots[slot];
     if (!id) return [];
-    const item = items.find((i) => i.id === id);
+    const item = byId.get(id);
     return item ? [item] : [];
   });
+
+  for (const id of slots.accessories ?? []) {
+    const item = byId.get(id);
+    if (item && !ordered.some((entry) => entry.id === item.id)) {
+      ordered.push(item);
+    }
+  }
+
+  return ordered;
+}
+
+export function buildOutfitDescription(
+  items: ClothingItem[],
+  slots: OutfitSlots | Record<string, string | string[]>,
+  occasionId: OccasionId,
+  weather: WeatherSnapshot,
+): string {
+  const normalized = normalizeOutfitSlots(slots);
+  const ordered = orderedItemsFromSlots(items, normalized);
 
   if (ordered.length === 0) {
     return "Here's a look from your wardrobe.";
@@ -50,7 +72,7 @@ export function buildOutfitDescription(
 
 export function buildShortRationale(
   occasionId: OccasionId,
-  weather: WeatherSnapshot
+  weather: WeatherSnapshot,
 ): string {
   const label =
     occasionId === "auto"

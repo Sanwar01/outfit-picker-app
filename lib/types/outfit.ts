@@ -1,12 +1,13 @@
 import type { ClothingItem } from "./database";
 import type { WeatherSnapshot } from "./weather";
+import type { OutfitSlots } from "@/lib/outfits/slots";
 
 export interface GeneratedOutfit {
   item_ids: string[];
   rationale: string;
   description: string;
   occasion: string;
-  slots: Record<string, string>;
+  slots: OutfitSlots;
   items: ClothingItem[];
   imageUrls: Record<string, string>;
   weather: WeatherSnapshot;
@@ -25,10 +26,12 @@ export interface SavedOutfit {
   imageUrls: Record<string, string>;
 }
 
-export const SLOT_ORDER = [
+export const CORE_SLOT_ORDER = [
   "top",
   "bottom",
   "outerwear",
   "shoes",
-  "accessory",
 ] as const;
+
+/** Display order: core pieces first, then all accessories. */
+export const SLOT_ORDER = [...CORE_SLOT_ORDER, "accessories"] as const;
