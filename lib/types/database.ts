@@ -13,7 +13,11 @@ export type ClothingCategory =
   | "shoes"
   | "accessory";
 
-export type ClothingStatus = "active" | "archived";
+export type ClothingStatus = "active" | "archived" | "draft";
+
+export type ClothingFit = "regular" | "slim" | "relaxed" | "oversized";
+
+export type TaggingStatus = "pending" | "complete" | "failed";
 
 export interface Database {
   public: {
@@ -86,6 +90,14 @@ export interface Database {
           purchase_price: number | null;
           description: string | null;
           sub_category: string | null;
+          size: string | null;
+          fit: ClothingFit | null;
+          purchase_date: string | null;
+          exclude_from_recommendations: boolean;
+          confirmed_at: string | null;
+          ai_tagged_at: string | null;
+          tagging_status: TaggingStatus | null;
+          ai_suggested: Json | null;
           created_at: string;
         };
         Insert: {
@@ -113,6 +125,14 @@ export interface Database {
           purchase_price?: number | null;
           description?: string | null;
           sub_category?: string | null;
+          size?: string | null;
+          fit?: ClothingFit | null;
+          purchase_date?: string | null;
+          exclude_from_recommendations?: boolean;
+          confirmed_at?: string | null;
+          ai_tagged_at?: string | null;
+          tagging_status?: TaggingStatus | null;
+          ai_suggested?: Json | null;
           created_at?: string;
         };
         Update: {
@@ -140,6 +160,14 @@ export interface Database {
           purchase_price?: number | null;
           description?: string | null;
           sub_category?: string | null;
+          size?: string | null;
+          fit?: ClothingFit | null;
+          purchase_date?: string | null;
+          exclude_from_recommendations?: boolean;
+          confirmed_at?: string | null;
+          ai_tagged_at?: string | null;
+          tagging_status?: TaggingStatus | null;
+          ai_suggested?: Json | null;
           created_at?: string;
         };
         Relationships: [];

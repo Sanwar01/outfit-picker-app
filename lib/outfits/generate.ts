@@ -1,6 +1,9 @@
-import type { ClothingItem, Profile } from "@/lib/types/database";
-import { fetchWeatherDetail, defaultWeatherBundle } from "@/lib/weather/open-meteo";
-import type { WeatherBundle, WeatherSnapshot } from "@/lib/weather/open-meteo";
+import type { ClothingItem, Profile } from '@/lib/types/database';
+import {
+  fetchWeatherDetail,
+  defaultWeatherBundle,
+} from '@/lib/weather/open-meteo';
+import type { WeatherBundle, WeatherSnapshot } from '@/lib/weather/open-meteo';
 import {
   filterWardrobeForWeather,
   generateOutfitLocally,
@@ -9,18 +12,19 @@ import {
   toWardrobeForAI,
   validateOutfitSelection,
   wardrobeHasMinimumItems,
-} from "@/lib/ai/outfit-rules";
-import { generateOutfitWithAI } from "@/lib/ai/generate-outfit";
-import { isGeminiRulesOnly } from "@/lib/ai/gemini";
-import { getSignedImageUrls } from "@/lib/storage";
-import { CATEGORY_LABELS } from "@/lib/types/clothing";
-import type { ClothingCategory } from "@/lib/types/database";
-import { getOccasion } from "@/lib/today/occasions";
+} from '@/lib/ai/outfit-rules';
+import { generateOutfitWithAI } from '@/lib/ai/generate-outfit';
+import { isGeminiRulesOnly } from '@/lib/ai/gemini';
+import { getSignedImageUrls } from '@/lib/storage';
+import type { ClothingCategory } from '@/lib/types/database';
+import { CATEGORY_LABELS } from '@/lib/types/clothing';
+import { recommendableWardrobeItems } from '@/lib/wardrobe/filters';
+import { getOccasion } from '@/lib/today/occasions';
 import {
   buildOutfitDescription,
   buildShortRationale,
-} from "@/lib/today/descriptions";
-import type { OccasionId } from "@/lib/today/occasions";
+} from '@/lib/today/descriptions';
+import type { OccasionId } from '@/lib/today/occasions';
 
 export interface GeneratedOutfitResponse {
   item_ids: string[];
@@ -31,7 +35,7 @@ export interface GeneratedOutfitResponse {
   items: ClothingItem[];
   imageUrls: Record<string, string>;
   weather: WeatherSnapshot;
-  generated_by: "ai" | "rules";
+  generated_by: 'ai' | 'rules';
 }
 
 const CACHE_TTL_MS = 4 * 60 * 60 * 1000;
@@ -44,7 +48,7 @@ function buildCacheKey(
   userId: string,
   weather: WeatherSnapshot,
   occasionId: OccasionId,
-  excludeCombinations: string[][]
+  excludeCombinations: string[][],
 ): string | null {
   if (excludeCombinations.length > 0) return null;
 
@@ -52,9 +56,7 @@ function buildCacheKey(
   return `${userId}:${today}:${occasionId}:${weather.temp_c}:${weather.condition}:${weather.precip_chance}`;
 }
 
-function getCachedOutfit(
-  key: string | null
-): GeneratedOutfitResponse | null {
+function getCachedOutfit(key: string | null): GeneratedOutfitResponse | null {
   if (!key) return null;
   const entry = outfitCache.get(key);
   if (!entry) return null;
@@ -70,17 +72,21 @@ function setCachedOutfit(key: string | null, result: GeneratedOutfitResponse) {
   outfitCache.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, result });
 }
 
-export async function resolveWeather(profile: Profile): Promise<WeatherSnapshot> {
+export async function resolveWeather(
+  profile: Profile,
+): Promise<WeatherSnapshot> {
   const bundle = await resolveWeatherBundle(profile);
   return bundle.current;
 }
 
-export async function resolveWeatherBundle(profile: Profile): Promise<WeatherBundle> {
+export async function resolveWeatherBundle(
+  profile: Profile,
+): Promise<WeatherBundle> {
   if (profile.location_lat != null && profile.location_lng != null) {
     return fetchWeatherDetail(
       profile.location_lat,
       profile.location_lng,
-      profile.location_city
+      profile.location_city,
     );
   }
 
@@ -97,13 +103,13 @@ async function buildResponse(
   filtered: ClothingItem[],
   weather: WeatherSnapshot,
   occasionId: OccasionId,
-  generated_by: "ai" | "rules"
+  generated_by: 'ai' | 'rules',
 ): Promise<GeneratedOutfitResponse> {
   const selectedItems = filtered.filter((i) =>
-    aiResult.item_ids.includes(i.id)
+    aiResult.item_ids.includes(i.id),
   );
   const imageUrls = await getSignedImageUrls(
-    selectedItems.map((i) => i.image_url)
+    selectedItems.map((i) => i.image_url),
   );
 
   const slots = aiResult.slots;
@@ -131,21 +137,21 @@ export async function generateOutfitForUser(
   profile: Profile,
   excludeCombinations: string[][] = [],
   userId?: string,
-  occasionId: OccasionId = "auto"
+  occasionId: OccasionId = 'auto',
 ): Promise<GeneratedOutfitResponse> {
-  const activeItems = wardrobe.filter((i) => i.status === "active");
+  const activeItems = recommendableWardrobeItems(wardrobe);
 
   if (!wardrobeHasMinimumItems(activeItems)) {
     const missing = getMissingSlots(activeItems);
-    const labels = missing.map(
-      (slot) => CATEGORY_LABELS[slot as ClothingCategory].toLowerCase()
+    const labels = missing.map((slot) =>
+      CATEGORY_LABELS[slot as ClothingCategory].toLowerCase(),
     );
     const need =
       labels.length === 1
         ? `a ${labels[0]}`
-        : `${labels.slice(0, -1).join(", ")} and a ${labels[labels.length - 1]}`;
+        : `${labels.slice(0, -1).join(', ')} and a ${labels[labels.length - 1]}`;
     throw new Error(
-      `Add ${need} to your wardrobe — I'll take care of the outfit from there.`
+      `Add ${need} to your wardrobe — I'll take care of the outfit from there.`,
     );
   }
 
@@ -160,16 +166,15 @@ export async function generateOutfitForUser(
 
   if (!wardrobeHasMinimumItems(filtered)) {
     throw new Error(
-      "Nothing in your closet fits today's weather. A different layer or pair of shoes might do the trick."
+      "Nothing in your closet fits today's weather. A different layer or pair of shoes might do the trick.",
     );
   }
 
   const occasion = getOccasion(occasionId);
 
-  const rulesOnly =
-    isGeminiRulesOnly() || excludeCombinations.length > 0;
+  const rulesOnly = isGeminiRulesOnly() || excludeCombinations.length > 0;
 
-  let generated_by: "ai" | "rules" = rulesOnly ? "rules" : "ai";
+  let generated_by: 'ai' | 'rules' = rulesOnly ? 'rules' : 'ai';
   let aiResult;
 
   if (rulesOnly) {
@@ -193,8 +198,8 @@ export async function generateOutfitForUser(
       });
       aiResult = repairOutfitSelection(aiResult, filtered, weather);
     } catch (error) {
-      console.warn("AI outfit generation failed, using rules fallback:", error);
-      generated_by = "rules";
+      console.warn('AI outfit generation failed, using rules fallback:', error);
+      generated_by = 'rules';
       aiResult = generateOutfitLocally({
         wardrobe: filtered,
         weather,
@@ -206,7 +211,7 @@ export async function generateOutfitForUser(
   }
 
   if (!validateOutfitSelection(aiResult.item_ids, filtered)) {
-    generated_by = "rules";
+    generated_by = 'rules';
     aiResult = generateOutfitLocally({
       wardrobe: filtered,
       weather,
@@ -217,7 +222,7 @@ export async function generateOutfitForUser(
   }
 
   const slots = Object.fromEntries(
-    Object.entries(aiResult.slots).filter(([, id]) => !!id)
+    Object.entries(aiResult.slots).filter(([, id]) => !!id),
   ) as Record<string, string>;
 
   const response = await buildResponse(
@@ -230,7 +235,7 @@ export async function generateOutfitForUser(
     filtered,
     weather,
     occasionId,
-    generated_by
+    generated_by,
   );
 
   setCachedOutfit(cacheKey, response);

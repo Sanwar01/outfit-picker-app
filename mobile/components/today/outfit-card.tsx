@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { ClothingItem } from '@shared/types/database';
-import { CATEGORY_LABELS } from '@shared/types/clothing';
+
 import { SLOT_ORDER, type GeneratedOutfit } from '@shared/types/outfit';
 import { colors, fonts } from '@/lib/theme';
 import { Button } from '@/components/ui/primitives';
+import { CATEGORY_LABELS } from '@shared/types/clothing';
 
 function pickHeroItem(items: ClothingItem[]): ClothingItem {
   const byCategory = new Map(items.map((item) => [item.category, item]));
@@ -143,7 +144,7 @@ export function OutfitCard({
           style={styles.actionBtn}
         />
         <Button
-          title={saved ? "Saved" : "Save outfit"}
+          title={saved ? 'Saved' : 'Save outfit'}
           variant="outline"
           onPress={onSave}
           loading={saving}

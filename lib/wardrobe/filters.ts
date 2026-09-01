@@ -48,3 +48,11 @@ export function countActiveFilters(
   if (status !== "active") count += 1;
   return count;
 }
+
+export function recommendableWardrobeItems(
+  items: ClothingItem[],
+): ClothingItem[] {
+  return items.filter(
+    (item) => item.status === "active" && !item.exclude_from_recommendations,
+  );
+}

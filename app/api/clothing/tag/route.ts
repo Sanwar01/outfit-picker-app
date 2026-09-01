@@ -4,6 +4,8 @@ import { createRouteClient } from "@/lib/supabase/route-client";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isGeminiUnavailableError } from "@/lib/ai/gemini";
 import { tagClothingFromImage } from "@/lib/ai/tag-clothing";
+import { getRouteUserId } from "@/lib/api/route-auth";
+import { clothingTagsToUpdate } from "@/lib/wardrobe/apply-clothing-tags";
 import type { TagClothingResponse } from "@/lib/wardrobe/tagging";
 import type { ClothingItem } from "@/lib/types/database";
 
@@ -12,13 +14,12 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createRouteClient(request);
-    const { data: claimsData } = await supabase.auth.getClaims();
+    const userId = await getRouteUserId(supabase);
 
-    if (!claimsData?.claims?.sub) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = claimsData.claims.sub as string;
     const body = await request.json();
     const itemId = body.itemId as string | undefined;
 
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
     if (signedUrlError || !signedUrlData?.signedUrl) {
       return NextResponse.json(
         { error: "Failed to create signed URL" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -68,16 +69,7 @@ export async function POST(request: NextRequest) {
 
     const { data: updated, error: updateError } = await supabase
       .from("clothing_items")
-      .update({
-        name: tags.name,
-        category: tags.category,
-        sub_category: tags.sub_category,
-        colors: tags.colors,
-        season: tags.season,
-        pattern: tags.pattern,
-        formality: tags.formality,
-        ai_confidence: tags.confidence,
-      })
+      .update(clothingTagsToUpdate(tags))
       .eq("id", itemId)
       .eq("user_id", userId)
       .select()
