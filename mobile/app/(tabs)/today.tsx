@@ -2,19 +2,16 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { OutfitSuggestion } from '@/components/today/outfit-suggestion';
 import { useAuth } from '@/lib/auth-context';
+import { getProfileFirstName, getTimeGreeting } from '@/lib/profile-display';
 import { colors, fonts, spacing } from '@/lib/theme';
 
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
-}
-
 export default function TodayScreen() {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const insets = useSafeAreaInsets();
-  const firstName = profile?.display_name;
+  const firstName = getProfileFirstName(
+    profile?.display_name,
+    user?.email ?? '',
+  );
 
   return (
     <ScrollView
@@ -30,7 +27,7 @@ export default function TodayScreen() {
     >
       <View style={styles.header}>
         <Text style={styles.greeting}>
-          {getGreeting()}, {firstName} 👋
+          {getTimeGreeting()}, {firstName} 👋
         </Text>
         <Text style={styles.sub}>
           Here&apos;s what I recommend for you today
