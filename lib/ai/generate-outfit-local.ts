@@ -8,6 +8,7 @@ import {
   rankCandidates,
   scoreOutfitCombo,
 } from "@/lib/ai/outfit-scoring";
+import { rankWardrobeForGeneration } from "@/lib/ai/wardrobe-relevance";
 import type { OutfitGenerationResult, OutfitSlot } from "@/lib/ai/outfit-rules";
 import {
   buildOutfitDescription,
@@ -92,7 +93,8 @@ function pickBestCoreCombo(
   weather: WeatherSnapshot,
   excludeCombinations: string[][],
   styleVibes: string[],
-  formalityTarget?: number
+  formalityTarget?: number,
+  occasionId?: OccasionId,
 ): CoreCombo | null {
   const scored = combos
     .map((combo) => {
@@ -104,7 +106,8 @@ function pickBestCoreCombo(
           weather,
           excludeCombinations,
           styleVibes,
-          formalityTarget
+          formalityTarget,
+          occasionId,
         ),
       };
     })
@@ -128,7 +131,8 @@ function pickBestOuterwear(
   weather: WeatherSnapshot,
   excludeCombinations: string[][],
   styleVibes: string[],
-  formalityTarget?: number
+  formalityTarget?: number,
+  occasionId?: OccasionId,
 ): ClothingItem | undefined {
   if (!needsOuterwear(weather) || candidates.length === 0) return undefined;
 
@@ -139,7 +143,8 @@ function pickBestOuterwear(
       weather,
       excludeCombinations,
       styleVibes,
-      formalityTarget
+      formalityTarget,
+      occasionId,
     );
     if (!best || score > best.score) {
       best = { item: candidate, score };
@@ -179,12 +184,17 @@ export function generateOutfitLocally(input: {
   const occasion = getOccasion(input.occasionId);
   const formalityTarget =
     input.occasionId === "auto" ? undefined : occasion.formalityTarget;
-  const byCategory = groupByCategory(input.wardrobe);
+  const rankedWardrobe = rankWardrobeForGeneration(input.wardrobe, {
+    styleVibes,
+    occasionId: input.occasionId,
+    weather: input.weather,
+  });
+  const byCategory = groupByCategory(rankedWardrobe);
 
   const rotateSlot =
     ROTATE_SLOTS[input.excludeCombinations.length % ROTATE_SLOTS.length];
   const deprioritizeId = getDeprioritizeId(
-    input.wardrobe,
+    rankedWardrobe,
     input.excludeCombinations,
     rotateSlot
   );
@@ -205,7 +215,8 @@ export function generateOutfitLocally(input: {
     input.weather,
     input.excludeCombinations,
     styleVibes,
-    formalityTarget
+    formalityTarget,
+    input.occasionId,
   );
 
   if (!bestCore) {
@@ -223,7 +234,8 @@ export function generateOutfitLocally(input: {
       input.weather,
       input.excludeCombinations,
       styleVibes,
-      formalityTarget
+      formalityTarget,
+      input.occasionId,
     );
   }
 
@@ -249,7 +261,8 @@ export function generateOutfitLocally(input: {
     input.weather,
     input.excludeCombinations,
     styleVibes,
-    formalityTarget
+    formalityTarget,
+    input.occasionId,
   );
   if (outerwear) {
     slots.outerwear = outerwear.id;

@@ -1,4 +1,11 @@
+import {
+  itemOccasionMatch,
+  itemSeasonFit,
+  itemWarmthFit,
+  styleTagOverlap,
+} from "@/lib/ai/wardrobe-relevance";
 import type { ClothingItem } from "@/lib/types/database";
+import type { OccasionId } from "@/lib/today/occasions";
 import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
 
 const NEUTRALS = new Set([
@@ -133,14 +140,15 @@ export function colorHarmonyScore(items: ClothingItem[]): number {
 
 export function weatherFitScore(
   items: ClothingItem[],
-  weather: WeatherSnapshot
+  weather: WeatherSnapshot,
 ): number {
   let score = 70;
-  const outerwear = items.some((item) => item.category === "outerwear");
+  const outerwearItems = items.filter((item) => item.category === "outerwear");
+  const hasOuterwear = outerwearItems.length > 0;
   const wantsOuterwear = needsOuterwear(weather);
 
-  if (wantsOuterwear && outerwear) score += 20;
-  if (!wantsOuterwear && outerwear) score -= 20;
+  if (wantsOuterwear && hasOuterwear) score += 20;
+  if (!wantsOuterwear && hasOuterwear) score -= 20;
 
   const shoes = items.find((item) => item.category === "shoes");
   if (shoes && isRainy(weather)) {
@@ -154,18 +162,39 @@ export function weatherFitScore(
     }
   }
 
-  if (weather.temp_c > 26 && outerwear) {
-    score -= 30;
+  if (weather.temp_c > 26 && hasOuterwear) {
+    const heavyOuterwear = outerwearItems.some(
+      (item) => item.warmth != null && item.warmth >= 4,
+    );
+    score -= heavyOuterwear ? 35 : 20;
+  }
+
+  const warmthItems = items.filter(
+    (item) =>
+      item.warmth != null &&
+      ["top", "bottom", "outerwear"].includes(item.category),
+  );
+  if (warmthItems.length > 0) {
+    const warmthAvg =
+      warmthItems.reduce((sum, item) => sum + itemWarmthFit(item, weather), 0) /
+      warmthItems.length;
+    score = score * 0.45 + warmthAvg * 100 * 0.55;
+  }
+
+  if (items.length > 0) {
+    const seasonAvg =
+      items.reduce((sum, item) => sum + itemSeasonFit(item), 0) / items.length;
+    score += (seasonAvg - 0.5) * 16;
   }
 
   return clamp(score, 0, 100);
 }
 
-export function styleVibeScore(
+function formalityVibeScore(
   items: ClothingItem[],
-  styleVibes: string[]
-): number {
-  if (styleVibes.length === 0 || items.length === 0) return 70;
+  styleVibes: string[],
+): number | null {
+  if (styleVibes.length === 0 || items.length === 0) return null;
 
   const avgFormality =
     items.reduce((sum, item) => sum + item.formality, 0) / items.length;
@@ -174,13 +203,35 @@ export function styleVibeScore(
     .map((vibe) => STYLE_FORMALITY_TARGETS[vibe.toLowerCase()])
     .filter((value): value is number => value !== undefined);
 
-  if (targets.length === 0) return 70;
+  if (targets.length === 0) return null;
 
   const target =
     targets.reduce((sum, value) => sum + value, 0) / targets.length;
   const distance = Math.abs(avgFormality - target);
 
   return clamp(100 - distance * 25, 0, 100);
+}
+
+export function styleVibeScore(
+  items: ClothingItem[],
+  styleVibes: string[],
+): number {
+  if (items.length === 0) return 70;
+
+  const formalityScore = formalityVibeScore(items, styleVibes);
+  const tagScores = items.map((item) =>
+    styleTagOverlap(item.style_tags ?? [], styleVibes),
+  );
+  const hasTags = items.some((item) => (item.style_tags?.length ?? 0) > 0);
+  const tagScore = hasTags
+    ? (tagScores.reduce((sum, value) => sum + value, 0) / tagScores.length) *
+      100
+    : null;
+
+  if (formalityScore === null && tagScore === null) return 70;
+  if (formalityScore === null) return tagScore!;
+  if (tagScore === null) return formalityScore;
+  return formalityScore * 0.35 + tagScore * 0.65;
 }
 
 export function shufflePenalty(
@@ -205,12 +256,30 @@ export function shufflePenalty(
 
 export function occasionFitScore(
   items: ClothingItem[],
-  formalityTarget: number
+  formalityTarget: number,
+  occasionId?: OccasionId,
 ): number {
   const avgFormality =
     items.reduce((sum, item) => sum + item.formality, 0) / items.length;
   const distance = Math.abs(avgFormality - formalityTarget);
-  return clamp(100 - distance * 22, 0, 100);
+  const formalityScore = clamp(100 - distance * 22, 0, 100);
+
+  if (!occasionId || occasionId === "auto") return formalityScore;
+
+  const occasionScores = items.map((item) =>
+    itemOccasionMatch(item, occasionId),
+  );
+  const hasOccasionTags = items.some(
+    (item) => (item.occasions?.length ?? 0) > 0,
+  );
+  if (!hasOccasionTags) return formalityScore;
+
+  const occasionTagScore =
+    (occasionScores.reduce((sum, value) => sum + value, 0) /
+      occasionScores.length) *
+    100;
+
+  return formalityScore * 0.45 + occasionTagScore * 0.55;
 }
 
 export function scoreOutfitCombo(
@@ -218,21 +287,22 @@ export function scoreOutfitCombo(
   weather: WeatherSnapshot,
   excludeCombinations: string[][],
   styleVibes: string[] = [],
-  formalityTarget?: number
+  formalityTarget?: number,
+  occasionId?: OccasionId,
 ): number {
   const penalty = shufflePenalty(items, excludeCombinations);
   if (penalty === Infinity) return -Infinity;
 
   const vibeOrOccasion =
     formalityTarget !== undefined
-      ? occasionFitScore(items, formalityTarget) * 0.12
-      : styleVibeScore(items, styleVibes) * 0.05;
+      ? occasionFitScore(items, formalityTarget, occasionId) * 0.14
+      : styleVibeScore(items, styleVibes) * 0.08;
 
   return (
-    comboFreshnessScore(items) * 0.25 +
-    formalityCohesionScore(items) * 0.25 +
-    colorHarmonyScore(items) * 0.3 +
-    weatherFitScore(items, weather) * 0.15 +
+    comboFreshnessScore(items) * 0.22 +
+    formalityCohesionScore(items) * 0.22 +
+    colorHarmonyScore(items) * 0.28 +
+    weatherFitScore(items, weather) * 0.16 +
     vibeOrOccasion -
     penalty
   );

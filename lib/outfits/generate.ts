@@ -186,7 +186,11 @@ export async function generateOutfitForUser(
       occasionId,
     });
   } else {
-    const wardrobeForAI = toWardrobeForAI(filtered);
+    const wardrobeForAI = toWardrobeForAI(filtered, {
+      styleVibes: profile.style_vibes ?? [],
+      occasionId,
+      weather,
+    });
     try {
       aiResult = await generateOutfitWithAI({
         weather,
@@ -196,7 +200,12 @@ export async function generateOutfitForUser(
         occasionId,
         occasionHint: occasion.aiHint,
       });
-      aiResult = repairOutfitSelection(aiResult, filtered, weather);
+      aiResult = repairOutfitSelection(
+        aiResult,
+        filtered,
+        weather,
+        occasionId,
+      );
     } catch (error) {
       console.warn('AI outfit generation failed, using rules fallback:', error);
       generated_by = 'rules';

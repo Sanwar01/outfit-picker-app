@@ -1,5 +1,7 @@
 import type { ClothingCategory, ClothingItem } from "@/lib/types/database";
 import type { WeatherSnapshot } from "@/lib/weather/open-meteo";
+import { rankWardrobeForGeneration } from "@/lib/ai/wardrobe-relevance";
+import type { OccasionId } from "@/lib/today/occasions";
 import { generateOutfitLocally } from "@/lib/ai/generate-outfit-local";
 import {
   accessoryFitScore,
@@ -17,9 +19,14 @@ export interface WardrobeItemForAI {
   id: string;
   name: string;
   category: ClothingCategory;
+  sub_category: string | null;
   colors: string[];
   formality: number;
   pattern: string;
+  style_tags: string[];
+  occasions: string[];
+  warmth: number | null;
+  season: string[];
   last_worn_at: string | null;
 }
 
@@ -75,6 +82,7 @@ export function filterWardrobeForWeather(
     }
 
     if (isHot && item.category === "outerwear") {
+      if (item.warmth != null && item.warmth >= 4) return false;
       if (
         name.includes("coat") ||
         name.includes("jacket") ||
@@ -82,6 +90,10 @@ export function filterWardrobeForWeather(
       ) {
         return false;
       }
+    }
+
+    if (isCold && item.category === "outerwear") {
+      if (item.warmth != null && item.warmth <= 1) return false;
     }
 
     if (isCold && item.category === "shoes") {
@@ -94,18 +106,34 @@ export function filterWardrobeForWeather(
   });
 }
 
-export function toWardrobeForAI(items: ClothingItem[]): WardrobeItemForAI[] {
-  return items
-    .sort((a, b) => daysSince(a.last_worn_at) - daysSince(b.last_worn_at))
-    .map((item) => ({
-      id: item.id,
-      name: item.name,
-      category: item.category,
-      colors: item.colors,
-      formality: item.formality,
-      pattern: item.pattern,
-      last_worn_at: item.last_worn_at,
-    }));
+export function toWardrobeForAI(
+  items: ClothingItem[],
+  context?: {
+    styleVibes: string[];
+    occasionId: OccasionId;
+    weather: WeatherSnapshot;
+  },
+): WardrobeItemForAI[] {
+  const ordered = context
+    ? rankWardrobeForGeneration(items, context)
+    : [...items].sort(
+        (a, b) => daysSince(a.last_worn_at) - daysSince(b.last_worn_at),
+      );
+
+  return ordered.map((item) => ({
+    id: item.id,
+    name: item.name,
+    category: item.category,
+    sub_category: item.sub_category,
+    colors: item.colors,
+    formality: item.formality,
+    pattern: item.pattern,
+    style_tags: item.style_tags ?? [],
+    occasions: item.occasions ?? [],
+    warmth: item.warmth,
+    season: item.season ?? [],
+    last_worn_at: item.last_worn_at,
+  }));
 }
 
 export function validateOutfitSelection(
@@ -145,7 +173,8 @@ export function compactWardrobeForAI(
 export function repairOutfitSelection(
   result: OutfitGenerationResult,
   wardrobe: ClothingItem[],
-  weather?: WeatherSnapshot
+  weather?: WeatherSnapshot,
+  occasionId: OccasionId = "auto",
 ): OutfitGenerationResult {
   const wardrobeById = new Map(wardrobe.map((i) => [i.id, i]));
   const byCategory = new Map<ClothingCategory, ClothingItem[]>();
@@ -203,7 +232,9 @@ export function repairOutfitSelection(
         [...coreItems, candidate],
         weather,
         [],
-        []
+        [],
+        undefined,
+        occasionId,
       );
       if (!best || score > best.score) best = { item: candidate, score };
     }
