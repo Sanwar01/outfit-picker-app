@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/primitives';
 import { useAuth } from '@/lib/auth-context';
 import { createClothingDraft } from '@/lib/wardrobe-drafts';
 import { createItemId } from '@/lib/create-item-id';
-import { navigateToDraftReview } from '@/lib/review-queue';
+import { navigateToBulkReview, navigateToDraftReview } from '@/lib/review-queue';
 import { supabase } from '@/lib/supabase';
 import { colors, fonts } from '@/lib/theme';
 
@@ -102,8 +102,11 @@ export default function AddClothingScreen() {
         );
       }
 
-      const [first, ...rest] = uploadedIds;
-      navigateToDraftReview(first, rest, uploadedIds.length);
+      if (uploadedIds.length === 1) {
+        navigateToDraftReview(uploadedIds[0], [], 1);
+      } else {
+        navigateToBulkReview(uploadedIds);
+      }
     } finally {
       setUploading(false);
       setProgress(null);

@@ -18,6 +18,7 @@ import {
 } from "@/lib/wardrobe-drafts";
 import {
   navigateAfterDraftSaved,
+  parseBulkParam,
   parseReviewQueueParam,
   parseReviewTotal,
 } from "@/lib/review-queue";
@@ -26,11 +27,13 @@ import type { ClothingDraftResponse } from "@shared/wardrobe/drafts";
 import { colors, fonts } from "@/lib/theme";
 
 export default function DraftEditScreen() {
-  const { id, queue, total: totalParam } = useLocalSearchParams<{
+  const { id, queue, total: totalParam, bulk: bulkParam } = useLocalSearchParams<{
     id: string;
     queue?: string;
     total?: string;
+    bulk?: string;
   }>();
+  const fromBulk = parseBulkParam(bulkParam);
   const remainingQueue = parseReviewQueueParam(queue);
   const total = parseReviewTotal(totalParam, remainingQueue.length);
   const [draft, setDraft] = useState<ClothingDraftResponse | null>(null);
@@ -73,7 +76,7 @@ export default function DraftEditScreen() {
       return;
     }
 
-    navigateAfterDraftSaved(remainingQueue, total);
+    navigateAfterDraftSaved(remainingQueue, total, fromBulk);
   }
 
   if (loading) {

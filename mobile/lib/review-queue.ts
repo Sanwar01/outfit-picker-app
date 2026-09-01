@@ -19,9 +19,28 @@ export function parseReviewTotal(
   return queueLength + 1;
 }
 
+export function parseBulkParam(
+  bulk: string | string[] | undefined,
+): boolean {
+  if (!bulk) return false;
+  const value = Array.isArray(bulk) ? bulk[0] : bulk;
+  return value === "1" || value === "true";
+}
+
 export function reviewProgressLabel(current: number, total: number): string {
   if (total <= 1) return "";
   return `Item ${current} of ${total}`;
+}
+
+export function navigateToBulkReview(ids?: string[]) {
+  router.push({
+    pathname: "/wardrobe/bulk-review",
+    params: ids?.length ? { ids: ids.join(",") } : undefined,
+  });
+}
+
+export function navigateAfterBulkItemReview() {
+  router.replace("/wardrobe/bulk-review");
 }
 
 export function navigateToDraftReview(
@@ -44,10 +63,23 @@ export function navigateToDraftReview(
   });
 }
 
+export function navigateToDraftReviewFromBulk(id: string) {
+  router.push({
+    pathname: "/wardrobe/review/[id]",
+    params: { id, bulk: "1" },
+  });
+}
+
 export function navigateAfterDraftSaved(
   remainingQueue: string[],
   total: number,
+  fromBulk = false,
 ) {
+  if (fromBulk) {
+    navigateAfterBulkItemReview();
+    return;
+  }
+
   if (remainingQueue.length === 0) {
     router.replace("/(tabs)/wardrobe");
     return;
@@ -68,14 +100,15 @@ export function editDraftRoute(
   id: string,
   queue: string[],
   total: number,
+  fromBulk = false,
 ): `/wardrobe/edit/${string}` {
-  if (queue.length === 0 && total <= 1) {
-    return `/wardrobe/edit/${id}`;
+  const params = new URLSearchParams();
+  if (fromBulk) {
+    params.set("bulk", "1");
+  } else if (queue.length > 0 || total > 1) {
+    params.set("queue", queue.join(","));
+    params.set("total", String(total));
   }
-
-  const params = new URLSearchParams({
-    queue: queue.join(","),
-    total: String(total),
-  });
-  return `/wardrobe/edit/${id}?${params.toString()}`;
+  const query = params.toString();
+  return query ? `/wardrobe/edit/${id}?${query}` : `/wardrobe/edit/${id}`;
 }

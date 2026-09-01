@@ -9,7 +9,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { needsReview } from '@shared/types/clothing';
 import {
@@ -26,6 +26,7 @@ import {
 import {
   editDraftRoute,
   navigateAfterDraftSaved,
+  parseBulkParam,
   parseReviewQueueParam,
   parseReviewTotal,
   reviewProgressLabel,
@@ -38,15 +39,18 @@ export default function DraftReviewScreen() {
     id,
     queue,
     total: totalParam,
+    bulk: bulkParam,
   } = useLocalSearchParams<{
     id: string;
     queue?: string;
     total?: string;
+    bulk?: string;
   }>();
+  const fromBulk = parseBulkParam(bulkParam);
   const remainingQueue = parseReviewQueueParam(queue);
   const total = parseReviewTotal(totalParam, remainingQueue.length);
   const currentIndex = total - remainingQueue.length;
-  const progressLabel = reviewProgressLabel(currentIndex, total);
+  const progressLabel = fromBulk ? '' : reviewProgressLabel(currentIndex, total);
   const [draft, setDraft] = useState<ClothingDraftResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -79,22 +83,29 @@ export default function DraftReviewScreen() {
         onPress: () => {
           void (async () => {
             await discardClothingDraft(id);
-            navigateAfterDraftSaved(remainingQueue, total);
+            navigateAfterDraftSaved(remainingQueue, total, fromBulk);
           })();
         },
       },
     ]);
-  }, [id, remainingQueue, total]);
-  useCallback(() => {
-    const subscription = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        handleDiscard();
-        return true;
-      },
-    );
-    return () => subscription.remove();
-  }, [handleDiscard]);
+  }, [fromBulk, id, remainingQueue, total]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        () => {
+          if (fromBulk) {
+            router.back();
+            return true;
+          }
+          handleDiscard();
+          return true;
+        },
+      );
+      return () => subscription.remove();
+    }, [fromBulk, handleDiscard]),
+  );
 
   async function handleConfirm() {
     if (!id) return;
@@ -105,7 +116,7 @@ export default function DraftReviewScreen() {
       Alert.alert("Couldn't save item", result.error);
       return;
     }
-    navigateAfterDraftSaved(remainingQueue, total);
+    navigateAfterDraftSaved(remainingQueue, total, fromBulk);
   }
 
   if (loading) {
@@ -139,7 +150,10 @@ export default function DraftReviewScreen() {
   return (
     <Screen>
       <View style={styles.header}>
-        <Pressable onPress={handleDiscard} hitSlop={12}>
+        <Pressable
+          onPress={fromBulk ? () => router.back() : handleDiscard}
+          hitSlop={12}
+        >
           <Ionicons name="close" size={24} color={colors.ink} />
         </Pressable>
       </View>
@@ -148,11 +162,7 @@ export default function DraftReviewScreen() {
         <Text style={styles.progress}>{progressLabel}</Text>
       ) : null}
 
-      <Image
-        alt="Clothing item"
-        source={{ uri: draft.signedImageUrl }}
-        style={styles.hero}
-      />
+      <Image source={{ uri: draft.signedImageUrl }} style={styles.hero} />
 
       <Text style={styles.title}>{draft.name}</Text>
       <Text style={styles.meta}>{draftReviewMetaLine(draft)}</Text>
@@ -181,7 +191,9 @@ export default function DraftReviewScreen() {
           variant="outline"
           disabled={saving}
           onPress={() =>
-            router.push(editDraftRoute(id!, remainingQueue, total))
+            router.push(
+              editDraftRoute(id!, remainingQueue, total, fromBulk),
+            )
           }
         />
       </View>

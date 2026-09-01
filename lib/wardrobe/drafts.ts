@@ -1,9 +1,21 @@
 import type { ClothingItem } from "@/lib/types/database";
+import type { DraftCategoryCount } from "@/lib/wardrobe/draft-summary";
 
 export type TaggingStatus = "pending" | "complete" | "failed";
 
 export type ClothingDraftResponse = ClothingItem & {
   signedImageUrl: string;
+};
+
+export type ClothingDraftListResponse = {
+  items: ClothingDraftResponse[];
+  summary: DraftCategoryCount[];
+  total: number;
+};
+
+export type ConfirmAllDraftsResponse = {
+  confirmed: ClothingItem[];
+  count: number;
 };
 
 export type ClothingDraftPatch = Partial<

@@ -8,10 +8,40 @@ import {
   runDraftTagging,
   toDraftResponse,
   getSignedWardrobeUrl,
+  fetchAllDraftsForUser,
 } from "@/lib/wardrobe/draft-service";
+import { summarizeDraftCategories } from "@/lib/wardrobe/draft-summary";
 import type { ClothingItem } from "@/lib/types/database";
 
 export const dynamic = "force-dynamic";
+
+export async function GET(request: NextRequest) {
+  try {
+    const supabase = await createRouteClient(request);
+    const userId = await getRouteUserId(supabase);
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const idsParam = request.nextUrl.searchParams.get("ids");
+    const itemIds = idsParam?.split(",").filter(Boolean);
+
+    const items = await fetchAllDraftsForUser(supabase, userId, itemIds);
+
+    return NextResponse.json({
+      items,
+      summary: summarizeDraftCategories(items),
+      total: items.length,
+    });
+  } catch (error) {
+    console.error("List clothing drafts error:", error);
+    return NextResponse.json(
+      { error: "Failed to load drafts" },
+      { status: 500 },
+    );
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {

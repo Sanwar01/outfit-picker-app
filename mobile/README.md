@@ -54,6 +54,7 @@ mobile/                    Expo Router app
   app/(auth)/              Login / signup
   app/onboarding/          Onboarding stub (full flow on web for now)
   app/wardrobe/add         Photo upload → AI draft → review
+  app/wardrobe/bulk-review Multi-item review + Add all
   app/wardrobe/review/[id] Confirm AI tags before saving
   app/wardrobe/edit/[id]   Edit draft details before save
   lib/                     Supabase client, API wrapper, theme
@@ -68,7 +69,7 @@ Mobile authenticates with Supabase directly (AsyncStorage session). API routes a
 
 - **Today** — AI outfit suggestion, shuffle, wear
 - **Wardrobe** — grid of clothing items
-- **Add** — photo upload, AI tagging, review & confirm before wardrobe save
+- **Add** — photo upload, AI tagging, bulk review or single-item confirm
 - **Outfits** — saved outfits list + detail
 - **Profile** — basic info + sign out
 

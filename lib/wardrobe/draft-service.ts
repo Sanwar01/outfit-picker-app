@@ -10,6 +10,15 @@ import type { ClothingItem, Database } from "@/lib/types/database";
 
 type RouteSupabase = SupabaseClient<Database>;
 
+function listDraftsQuery(supabase: RouteSupabase, userId: string) {
+  return supabase
+    .from("clothing_items")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("notes", DRAFT_NOTES_MARKER)
+    .order("created_at", { ascending: true });
+}
+
 export async function getSignedWardrobeUrl(
   imagePath: string,
 ): Promise<string | null> {
@@ -121,4 +130,49 @@ export function buildDraftConfirmUpdate() {
     status: "active",
     notes: null,
   });
+}
+
+export async function fetchAllDraftsForUser(
+  supabase: RouteSupabase,
+  userId: string,
+  itemIds?: string[],
+): Promise<ClothingDraftResponse[]> {
+  let query = listDraftsQuery(supabase, userId);
+
+  if (itemIds && itemIds.length > 0) {
+    query = query.in("id", itemIds);
+  }
+
+  const { data, error } = await query;
+  if (error || !data) return [];
+
+  const drafts: ClothingDraftResponse[] = [];
+
+  for (const row of data) {
+    if (!isDraftItem(row)) continue;
+    const signedImageUrl = await getSignedWardrobeUrl(row.image_url);
+    if (!signedImageUrl) continue;
+    drafts.push(await toDraftResponse(row as ClothingItem, signedImageUrl));
+  }
+
+  return drafts;
+}
+
+export async function confirmDraftsForUser(
+  supabase: RouteSupabase,
+  userId: string,
+  itemIds: string[],
+): Promise<ClothingItem[]> {
+  if (itemIds.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("clothing_items")
+    .update(buildDraftConfirmUpdate())
+    .eq("user_id", userId)
+    .eq("notes", DRAFT_NOTES_MARKER)
+    .in("id", itemIds)
+    .select();
+
+  if (error || !data) return [];
+  return data as ClothingItem[];
 }
