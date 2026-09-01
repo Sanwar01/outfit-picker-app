@@ -10,6 +10,7 @@
       "@/lib/has-seen-welcome": ["./lib/has-seen-welcome"],
       "@/lib/location": ["./lib/location"],
       "@/lib/oauth": ["./lib/oauth"],
+      "@/lib/outfits": ["./lib/outfits"],
       "@/lib/profile-display": ["./lib/profile-display"],
       "@/lib/remember-email": ["./lib/remember-email"],
       "@/lib/review-queue": ["./lib/review-queue"],

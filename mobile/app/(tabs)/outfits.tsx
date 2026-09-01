@@ -1,119 +1,174 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
-  Image,
-  Pressable,
+  RefreshControl,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { Screen } from "@/components/ui/screen";
 import { ScreenSubtitle, ScreenTitle } from "@/components/ui/primitives";
-import { apiGet } from "@/lib/api";
+import { OutfitFilterChips } from "@/components/outfits/outfit-filter-chips";
+import { OutfitGridCard } from "@/components/outfits/outfit-grid-card";
+import { OutfitsEmptyState } from "@/components/outfits/outfits-empty-state";
+import { listSavedOutfits } from "@/lib/outfits";
 import type { SavedOutfit } from "@shared/types/outfit";
-import { displaySavedOutfitName } from "@shared/outfits/saved-outfit-name";
-import { colors } from "@/lib/theme";
+import {
+  filterSavedOutfits,
+  outfitsSummaryLine,
+  type OutfitListFilter,
+} from "@shared/outfits/outfit-display";
+import { colors, fonts, spacing } from "@/lib/theme";
+
+const GRID_GAP = 12;
 
 export default function OutfitsScreen() {
+  const { width: windowWidth } = useWindowDimensions();
+  const cardWidth = (windowWidth - spacing.screen * 2 - GRID_GAP) / 2;
+
   const [outfits, setOutfits] = useState<SavedOutfit[]>([]);
+  const [filter, setFilter] = useState<OutfitListFilter>("all");
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    const result = await apiGet<SavedOutfit[]>("/api/outfits");
+  const load = useCallback(async (mode: "initial" | "refresh" = "initial") => {
+    if (mode === "initial") setLoading(true);
+    if (mode === "refresh") setRefreshing(true);
+
+    const result = await listSavedOutfits();
     if (result.ok) {
       setOutfits(result.data);
       setLoadError(null);
-      return;
+    } else {
+      setLoadError(result.error);
     }
-    setLoadError(result.error);
+
+    setLoading(false);
+    setRefreshing(false);
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      void load();
+      void load("initial");
     }, [load]),
   );
 
+  const favoriteCount = useMemo(
+    () => outfits.filter((outfit) => outfit.is_favorite).length,
+    [outfits],
+  );
+
+  const filteredOutfits = useMemo(
+    () => filterSavedOutfits(outfits, filter),
+    [outfits, filter],
+  );
+
+  const showEmptyState = !loading && !loadError && outfits.length === 0;
+
   return (
     <Screen>
-      <ScreenTitle>My Outfits</ScreenTitle>
-      <ScreenSubtitle>Outfits from your wardrobe, styled for you</ScreenSubtitle>
-
-      {loadError ? (
-        <Text style={styles.error}>{loadError}</Text>
-      ) : null}
-
       <FlatList
-        data={outfits}
-        keyExtractor={(o) => o.id}
+        data={filteredOutfits}
+        keyExtractor={(outfit) => outfit.id}
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <Text style={styles.empty}>
-            Save outfits from Today to see them here.
-          </Text>
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => void load("refresh")}
+            tintColor={colors.brand}
+          />
         }
-        renderItem={({ item }) => {
-          const hero = item.items[0];
-          const url = hero ? item.imageUrls[hero.image_url] : undefined;
-          const title = displaySavedOutfitName(item);
-          return (
-            <Pressable
-              style={styles.card}
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <ScreenTitle>My Outfits</ScreenTitle>
+            <ScreenSubtitle>
+              Outfits from your wardrobe, styled for you
+            </ScreenSubtitle>
+            <Text style={styles.summary}>
+              {outfitsSummaryLine(outfits.length, favoriteCount)}
+            </Text>
+            {loadError ? <Text style={styles.error}>{loadError}</Text> : null}
+            {outfits.length > 0 ? (
+              <View style={styles.controls}>
+                <OutfitFilterChips value={filter} onChange={setFilter} />
+              </View>
+            ) : null}
+          </View>
+        }
+        ListEmptyComponent={
+          loading ? (
+            <View style={styles.centered}>
+              <ActivityIndicator color={colors.brand} size="large" />
+            </View>
+          ) : showEmptyState ? (
+            <OutfitsEmptyState />
+          ) : (
+            <Text style={styles.filteredEmpty}>
+              {filter === "favorites"
+                ? "No favourite outfits yet. Tap the heart on an outfit to save it here."
+                : "No outfits to show."}
+            </Text>
+          )
+        }
+        renderItem={({ item }) => (
+          <View style={[styles.cardCell, { width: cardWidth }]}>
+            <OutfitGridCard
+              outfit={item}
               onPress={() => router.push(`/outfits/${item.id}` as never)}
-            >
-              {url ? (
-                <Image
-                  source={{ uri: url }}
-                  style={styles.image}
-                  accessibilityLabel={title}
-                  alt={title}
-                />
-              ) : (
-                <View style={[styles.image, styles.placeholder]} />
-              )}
-              <Text style={styles.name} numberOfLines={1}>
-                {title}
-              </Text>
-            </Pressable>
-          );
-        }}
+            />
+          </View>
+        )}
       />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  list: { paddingTop: 16 },
-  row: { gap: 12 },
-  card: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: "hidden",
-    marginBottom: 12,
+  header: {
+    gap: 4,
+    marginBottom: 8,
   },
-  image: { width: "100%", aspectRatio: 3 / 4 },
-  placeholder: { backgroundColor: colors.cream },
-  name: {
-    padding: 10,
+  summary: {
+    marginTop: 4,
     fontSize: 13,
-    fontFamily: "DMSans_500Medium",
-    color: colors.ink,
-  },
-  empty: {
-    textAlign: "center",
     color: colors.inkMuted,
-    marginTop: 40,
+    fontFamily: fonts.sans,
+  },
+  controls: {
+    marginTop: 8,
   },
   error: {
     marginTop: 8,
     color: colors.destructive,
-    fontFamily: "DMSans_400Regular",
+    fontFamily: fonts.sans,
     fontSize: 13,
+  },
+  list: {
+    paddingBottom: 24,
+  },
+  row: {
+    gap: GRID_GAP,
+    justifyContent: "flex-start",
+  },
+  cardCell: {
+    marginBottom: 12,
+  },
+  centered: {
+    paddingTop: 48,
+    alignItems: "center",
+  },
+  filteredEmpty: {
+    textAlign: "center",
+    color: colors.inkMuted,
+    marginTop: 40,
+    fontFamily: fonts.sans,
+    paddingHorizontal: 12,
+    lineHeight: 20,
   },
 });
