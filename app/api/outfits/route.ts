@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getRouteUserId } from "@/lib/api/route-auth";
 import { createRouteClient } from "@/lib/supabase/route-client";
 import { getSignedImageUrls } from "@/lib/storage";
 import {
@@ -22,13 +23,12 @@ type OutfitItemRow = {
 export async function GET(request: Request) {
   try {
     const supabase = await createRouteClient(request);
-    const { data: claimsData } = await supabase.auth.getClaims();
+    const userId = await getRouteUserId(supabase);
 
-    if (!claimsData?.claims?.sub) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = claimsData.claims.sub as string;
     const { searchParams } = new URL(request.url);
     const favoritesOnly = searchParams.get("favorites") === "true";
     const itemId = searchParams.get("itemId");
@@ -141,13 +141,12 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const supabase = await createRouteClient(request);
-    const { data: claimsData } = await supabase.auth.getClaims();
+    const userId = await getRouteUserId(supabase);
 
-    if (!claimsData?.claims?.sub) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = claimsData.claims.sub as string;
     const body = await request.json();
     const { slots, rationale, weather, name } = body as {
       slots: OutfitSlots | Record<string, string | string[]>;

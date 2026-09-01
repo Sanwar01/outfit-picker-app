@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getRouteUserId } from "@/lib/api/route-auth";
 import { createRouteClient } from "@/lib/supabase/route-client";
 import type { ClothingCategory } from "@/lib/types/database";
 
@@ -11,13 +12,12 @@ export async function POST(
   try {
     const { id: outfitId } = await params;
     const supabase = await createRouteClient(request);
-    const { data: claimsData } = await supabase.auth.getClaims();
+    const userId = await getRouteUserId(supabase);
 
-    if (!claimsData?.claims?.sub) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = claimsData.claims.sub as string;
     const body = await request.json();
     const clothingItemId = body.clothing_item_id as string | undefined;
 

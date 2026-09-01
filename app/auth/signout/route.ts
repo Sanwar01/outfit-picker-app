@@ -6,9 +6,11 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
-  const { data: claimsData } = await supabase.auth.getClaims();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (claimsData?.claims) {
+  if (user) {
     await supabase.auth.signOut();
   }
 

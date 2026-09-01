@@ -73,7 +73,7 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  await supabase.auth.getClaims();
+  await supabase.auth.getUser();
 
   if (!isPublicPath(pathname)) {
     const url = request.nextUrl.clone();

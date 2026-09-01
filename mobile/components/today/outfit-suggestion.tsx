@@ -90,11 +90,15 @@ export function OutfitSuggestion() {
 
   async function handleWear() {
     const outfit = query.data?.kind === 'result' ? query.data.outfit : null;
-    if (!outfit) return;
+    if (!outfit?.item_ids.length) return;
     setWearing(true);
     const result = await wearOutfit(outfit.item_ids);
     setWearing(false);
-    if (result.ok) setWornToday(true);
+    if (result.ok) {
+      setWornToday(true);
+      return;
+    }
+    Alert.alert("Couldn't log this outfit", result.error);
   }
 
   async function handleSave() {
@@ -178,7 +182,7 @@ export function OutfitSuggestion() {
         wearing={wearing}
         saved={saved}
         saving={saving}
-        onWear={handleWear}
+        onWear={() => void handleWear()}
         onSave={() => void handleSave()}
         onShuffle={() => runGenerate(true)}
       />

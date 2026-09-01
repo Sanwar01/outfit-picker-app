@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getRouteUserId } from "@/lib/api/route-auth";
 import { createRouteClient } from "@/lib/supabase/route-client";
 import { generateOutfitForUser } from "@/lib/outfits/generate";
 import type { OccasionId } from "@/lib/today/occasions";
@@ -10,11 +11,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createRouteClient(request);
-    const [{ data: claimsData }, { data: userData }] = await Promise.all([
-      supabase.auth.getClaims(),
-      supabase.auth.getUser(),
-    ]);
-    const userId = userData.user?.id ?? claimsData?.claims?.sub ?? null;
+    const userId = await getRouteUserId(supabase);
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getRouteUserId } from "@/lib/api/route-auth";
 import { createRouteClient } from "@/lib/supabase/route-client";
 import { getSavedOutfitById } from "@/lib/outfits/get-outfit";
 
@@ -11,13 +12,12 @@ export async function GET(
   try {
     const { id } = await params;
     const supabase = await createRouteClient(request);
-    const { data: claimsData } = await supabase.auth.getClaims();
+    const userId = await getRouteUserId(supabase);
 
-    if (!claimsData?.claims?.sub) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = claimsData.claims.sub as string;
     const outfit = await getSavedOutfitById(supabase, userId, id);
 
     if (!outfit) {
@@ -38,13 +38,12 @@ export async function PATCH(
   try {
     const { id } = await params;
     const supabase = await createRouteClient(request);
-    const { data: claimsData } = await supabase.auth.getClaims();
+    const userId = await getRouteUserId(supabase);
 
-    if (!claimsData?.claims?.sub) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = claimsData.claims.sub as string;
     const body = await request.json();
     const updates: { is_favorite?: boolean; name?: string } = {};
 
@@ -81,13 +80,11 @@ export async function DELETE(
   try {
     const { id } = await params;
     const supabase = await createRouteClient(request);
-    const { data: claimsData } = await supabase.auth.getClaims();
+    const userId = await getRouteUserId(supabase);
 
-    if (!claimsData?.claims?.sub) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const userId = claimsData.claims.sub as string;
 
     const { error } = await supabase
       .from("outfits")

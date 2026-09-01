@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getRouteUserId } from "@/lib/api/route-auth";
 import { createRouteClient } from "@/lib/supabase/route-client";
 import { resolveWeatherBundle } from "@/lib/outfits/generate";
 
@@ -7,16 +8,16 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   try {
     const supabase = await createRouteClient(request);
-    const { data: claimsData } = await supabase.auth.getClaims();
+    const userId = await getRouteUserId(supabase);
 
-    if (!claimsData?.claims?.sub) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { data: profile } = await supabase
       .from("profiles")
       .select("*")
-      .eq("id", claimsData.claims.sub as string)
+      .eq("id", userId)
       .single();
 
     if (!profile) {
