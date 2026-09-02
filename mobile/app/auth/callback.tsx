@@ -1,15 +1,14 @@
-import { Redirect } from "expo-router";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
-import * as Linking from "expo-linking";
-import * as QueryParams from "expo-auth-session/build/QueryParams";
-import { useAuth } from "@/lib/auth-context";
-import { supabase } from "@/lib/supabase";
-import { colors } from "@/lib/theme";
+import { Redirect } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import * as Linking from 'expo-linking';
+import { useAuth } from '@/lib/auth-context';
+import { createSessionFromUrl } from '@/lib/oauth';
+import { colors } from '@/lib/theme';
 
 /**
- * Deep-link landing page for OAuth returns when the app is cold-started
- * via outfitpicker://auth/callback (or Expo Go equivalent).
+ * Deep-link landing for OAuth, email confirmation, and password reset
+ * (`outfitpicker://auth/callback` or Expo Go equivalent).
  */
 export default function AuthCallbackScreen() {
   const { session, loading } = useAuth();
@@ -25,30 +24,18 @@ export default function AuthCallbackScreen() {
         return;
       }
 
-      const { params, errorCode } = QueryParams.getQueryParams(url);
-      if (errorCode) {
-        if (!cancelled) {
-          setFailed(true);
-          setDone(true);
-        }
+      // Ignore URLs that aren't auth callbacks (no code / token).
+      if (
+        !url.includes('code=') &&
+        !url.includes('token_hash=') &&
+        !url.includes('access_token=')
+      ) {
+        if (!cancelled) setDone(true);
         return;
       }
 
       try {
-        const code = params.code;
-        if (typeof code === "string" && code.length > 0) {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
-          if (error) throw error;
-        } else if (
-          typeof params.access_token === "string" &&
-          typeof params.refresh_token === "string"
-        ) {
-          const { error } = await supabase.auth.setSession({
-            access_token: params.access_token,
-            refresh_token: params.refresh_token,
-          });
-          if (error) throw error;
-        }
+        await createSessionFromUrl(url);
       } catch {
         if (!cancelled) setFailed(true);
       } finally {
@@ -58,7 +45,7 @@ export default function AuthCallbackScreen() {
 
     void Linking.getInitialURL().then((url) => completeFromUrl(url));
 
-    const subscription = Linking.addEventListener("url", ({ url }) => {
+    const subscription = Linking.addEventListener('url', ({ url }) => {
       void completeFromUrl(url);
     });
 
@@ -90,8 +77,8 @@ export default function AuthCallbackScreen() {
 const styles = StyleSheet.create({
   loader: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.page,
   },
 });

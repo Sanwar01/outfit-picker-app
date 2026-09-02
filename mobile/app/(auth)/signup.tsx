@@ -2,6 +2,7 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { router } from "expo-router";
 import { supabase } from "@/lib/supabase";
+import { getAuthRedirectUrl } from "@/lib/oauth";
 import { brand } from "@/lib/brand";
 import {
   AuthDivider,
@@ -25,11 +26,13 @@ export default function SignupScreen() {
     setLoading(true);
     setError(null);
 
-    const { error: authError } = await supabase.auth.signUp({
-      email: email.trim(),
+    const trimmedEmail = email.trim();
+    const { data, error: authError } = await supabase.auth.signUp({
+      email: trimmedEmail,
       password,
       options: {
-        data: { display_name: fullName.trim() || email.split("@")[0] },
+        data: { display_name: fullName.trim() || trimmedEmail.split("@")[0] },
+        emailRedirectTo: getAuthRedirectUrl(),
       },
     });
 
@@ -40,7 +43,16 @@ export default function SignupScreen() {
       return;
     }
 
-    router.replace("/");
+    // Email confirmation off → session exists; otherwise wait for the link.
+    if (data.session) {
+      router.replace("/");
+      return;
+    }
+
+    router.replace({
+      pathname: "/(auth)/check-email",
+      params: { email: trimmedEmail },
+    });
   }
 
   return (
@@ -84,7 +96,11 @@ export default function SignupScreen() {
           placeholder="Password"
         />
 
-        <Button title="Create account" loading={loading} onPress={handleSignup} />
+        <Button
+          title="Create account"
+          loading={loading}
+          onPress={() => void handleSignup()}
+        />
       </View>
 
       <View style={styles.footer}>

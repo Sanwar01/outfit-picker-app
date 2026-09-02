@@ -18,7 +18,7 @@ cp .env.example .env
 Edit `mobile/.env`:
 
 | Variable | Description |
-|----------|-------------|
+| ---------- | ------------- |
 | `EXPO_PUBLIC_SUPABASE_URL` | Same as `NEXT_PUBLIC_SUPABASE_URL` in root `.env.local` |
 | `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Same as `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` |
 | `EXPO_PUBLIC_API_URL` | Next.js API base URL |
@@ -66,6 +66,29 @@ mobile/                    Expo Router app
 
 Mobile authenticates with Supabase directly (AsyncStorage session). API routes accept `Authorization: Bearer <token>` from mobile or cookies from web.
 
+## Email confirmation (mobile)
+
+Signup and password-reset emails must open the **app**, not `localhost:3000`.
+
+1. Keep these Redirect URLs in Supabase (Auth → URL Configuration):
+
+   ```
+   outfitpicker://**
+   exp://**
+   http://localhost:3000/auth/callback
+   ```
+
+2. Mobile `signUp` / `resend` / `resetPasswordForEmail` pass
+   `emailRedirectTo` / `redirectTo` via `getAuthRedirectUrl()`
+   (`outfitpicker://auth/callback`, or Expo Go’s `exp://…` equivalent).
+3. After email signup with confirmation enabled, the app shows
+   **Check your email**. Opening the link cold-starts
+   `app/auth/callback.tsx`, which exchanges the code and continues.
+
+Email template tip: use the default `{{ .ConfirmationURL }}` so Supabase
+honors `emailRedirectTo`. Don’t hardcode `http://localhost:3000` in the
+template if you need mobile deep links.
+
 ## Google social login
 
 Login and signup both include **Continue with Google** (Supabase OAuth + Expo deep link).
@@ -74,20 +97,24 @@ Login and signup both include **Continue with Google** (Supabase OAuth + Expo de
 
 1. Create (or open) an OAuth 2.0 Client ID of type **Web application**.
 2. Under **Authorized redirect URIs**, add:
+
    ```
    https://vnmbqgezqitcmspmuqre.supabase.co/auth/v1/callback
    ```
+
    (Replace the project ref if yours differs.)
 
 ### 2. Supabase Dashboard
 
 1. **Authentication → Providers → Google** → enable, paste Client ID + Client Secret.
 2. **Authentication → URL Configuration → Redirect URLs**, add:
+
    ```
    outfitpicker://**
    exp://**
    http://localhost:3000/auth/callback
    ```
+
 3. Site URL can stay `http://localhost:3000` for local web.
 
 ### 3. Apply profile migration (optional but recommended)

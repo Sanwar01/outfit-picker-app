@@ -1,28 +1,37 @@
 import { makeRedirectUri } from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as WebBrowser from "expo-web-browser";
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export type OAuthProvider = "google" | "apple";
 
-/** Redirect used by Supabase after Google/Apple consent. Must be allow-listed. */
-export function getOAuthRedirectUrl() {
+/**
+ * Deep link used after OAuth, email confirmation, and password reset.
+ * Must be allow-listed in Supabase Auth → URL Configuration.
+ */
+export function getAuthRedirectUrl(path = "auth/callback") {
   return makeRedirectUri({
     scheme: "outfitpicker",
-    path: "auth/callback",
+    path,
   });
 }
 
-async function createSessionFromUrl(url: string) {
+/** @deprecated Prefer getAuthRedirectUrl */
+export function getOAuthRedirectUrl() {
+  return getAuthRedirectUrl();
+}
+
+export async function createSessionFromUrl(url: string) {
   const { params, errorCode } = QueryParams.getQueryParams(url);
 
   if (errorCode) {
     throw new Error(
       typeof errorCode === "string"
         ? decodeURIComponent(errorCode.replace(/\+/g, " "))
-        : "Social login failed.",
+        : "Authentication failed.",
     );
   }
 
@@ -31,6 +40,17 @@ async function createSessionFromUrl(url: string) {
     throw new Error(
       decodeURIComponent(String(errorDescription).replace(/\+/g, " ")),
     );
+  }
+
+  const tokenHash = params.token_hash;
+  const type = params.type as EmailOtpType | undefined;
+  if (typeof tokenHash === "string" && tokenHash.length > 0 && type) {
+    const { error } = await supabase.auth.verifyOtp({
+      type,
+      token_hash: tokenHash,
+    });
+    if (error) throw error;
+    return;
   }
 
   const code = params.code;
@@ -56,7 +76,7 @@ async function createSessionFromUrl(url: string) {
     return;
   }
 
-  throw new Error("Couldn't finish social login. Please try again.");
+  throw new Error("Couldn't finish authentication. Please try again.");
 }
 
 /**
@@ -66,7 +86,7 @@ async function createSessionFromUrl(url: string) {
 export async function signInWithOAuth(
   provider: OAuthProvider,
 ): Promise<"signed_in" | "cancelled"> {
-  const redirectTo = getOAuthRedirectUrl();
+  const redirectTo = getAuthRedirectUrl();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,

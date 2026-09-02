@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { supabase } from "@/lib/supabase";
+import { getAuthRedirectUrl } from "@/lib/oauth";
 import { colors, fonts } from "@/lib/theme";
 import {
   AuthError,
@@ -20,12 +21,9 @@ export default function ForgotPasswordScreen() {
     setLoading(true);
     setError(null);
 
-    const siteUrl = process.env.EXPO_PUBLIC_SITE_URL;
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(
       email.trim(),
-      siteUrl
-        ? { redirectTo: `${siteUrl}/auth/callback?next=/reset-password` }
-        : undefined,
+      { redirectTo: getAuthRedirectUrl() },
     );
 
     setLoading(false);
@@ -54,7 +52,8 @@ export default function ForgotPasswordScreen() {
 
       {sent ? (
         <Text style={styles.sent}>
-          Check your inbox for a reset link. It may take a minute to arrive.
+          Check your inbox for a reset link. Open it on this phone so the app
+          can continue — it may take a minute to arrive.
         </Text>
       ) : (
         <View style={styles.form}>
