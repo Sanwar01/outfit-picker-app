@@ -6,21 +6,41 @@ import {
   Text,
   View,
 } from "react-native";
+import { router } from "expo-router";
 import { AppleIcon, GoogleIcon } from "@/components/auth/social-icons";
-import { signInWithOAuth } from "@/lib/oauth";
+import {
+  signInWithOAuth,
+  type OAuthProvider,
+} from "@/lib/oauth";
 import { colors, fonts, radius } from "@/lib/theme";
 
 type SocialAuthButtonsProps = {
+  /** Defaults to Google only until Apple Sign In is configured. */
+  providers?: OAuthProvider[];
   onError?: (message: string) => void;
+  onSuccess?: () => void;
 };
 
-export function SocialAuthButtons({ onError }: SocialAuthButtonsProps) {
-  const [loading, setLoading] = useState<"apple" | "google" | null>(null);
+const LABELS: Record<OAuthProvider, string> = {
+  google: "Continue with Google",
+  apple: "Continue with Apple",
+};
 
-  async function handlePress(provider: "apple" | "google") {
+export function SocialAuthButtons({
+  providers = ["google"],
+  onError,
+  onSuccess,
+}: SocialAuthButtonsProps) {
+  const [loading, setLoading] = useState<OAuthProvider | null>(null);
+
+  async function handlePress(provider: OAuthProvider) {
     setLoading(provider);
     try {
-      await signInWithOAuth(provider);
+      const result = await signInWithOAuth(provider);
+      if (result === "signed_in") {
+        onSuccess?.();
+        router.replace("/");
+      }
     } catch (error) {
       onError?.(
         error instanceof Error ? error.message : "Social login failed.",
@@ -32,35 +52,25 @@ export function SocialAuthButtons({ onError }: SocialAuthButtonsProps) {
 
   return (
     <View style={styles.stack}>
-      <Pressable
-        style={({ pressed }) => [styles.button, pressed && styles.pressed]}
-        onPress={() => handlePress("apple")}
-        disabled={loading !== null}
-      >
-        {loading === "apple" ? (
-          <ActivityIndicator color={colors.ink} />
-        ) : (
-          <>
-            <AppleIcon />
-            <Text style={styles.label}>Continue with Apple</Text>
-          </>
-        )}
-      </Pressable>
-
-      <Pressable
-        style={({ pressed }) => [styles.button, pressed && styles.pressed]}
-        onPress={() => handlePress("google")}
-        disabled={loading !== null}
-      >
-        {loading === "google" ? (
-          <ActivityIndicator color={colors.ink} />
-        ) : (
-          <>
-            <GoogleIcon />
-            <Text style={styles.label}>Continue with Google</Text>
-          </>
-        )}
-      </Pressable>
+      {providers.map((provider) => (
+        <Pressable
+          key={provider}
+          style={({ pressed }) => [styles.button, pressed && styles.pressed]}
+          onPress={() => void handlePress(provider)}
+          disabled={loading !== null}
+          accessibilityRole="button"
+          accessibilityLabel={LABELS[provider]}
+        >
+          {loading === provider ? (
+            <ActivityIndicator color={colors.ink} />
+          ) : (
+            <>
+              {provider === "google" ? <GoogleIcon /> : <AppleIcon />}
+              <Text style={styles.label}>{LABELS[provider]}</Text>
+            </>
+          )}
+        </Pressable>
+      ))}
     </View>
   );
 }

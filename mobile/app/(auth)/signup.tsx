@@ -4,11 +4,13 @@ import { router } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { brand } from "@/lib/brand";
 import {
+  AuthDivider,
   AuthError,
   AuthField,
   AuthFooterLink,
   AuthScreen,
   AuthSheetHeader,
+  SocialAuthButtons,
 } from "@/components/auth";
 import { Button } from "@/components/ui/primitives";
 
@@ -52,6 +54,11 @@ export default function SignupScreen() {
 
       {error ? <AuthError message={error} /> : null}
 
+      <View style={styles.stack}>
+        <SocialAuthButtons onError={setError} />
+        <AuthDivider label="or continue with email" />
+      </View>
+
       <View style={styles.form}>
         <AuthField
           type="text"
@@ -92,9 +99,12 @@ export default function SignupScreen() {
 }
 
 const styles = StyleSheet.create({
+  stack: {
+    gap: 16,
+    marginBottom: 16,
+  },
   form: {
     gap: 12,
-    marginTop: 4,
   },
   footer: {
     marginTop: 24,

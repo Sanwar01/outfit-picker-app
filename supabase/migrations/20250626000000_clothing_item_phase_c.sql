@@ -17,6 +17,7 @@ create index if not exists clothing_item_images_item_idx
 
 alter table clothing_item_images enable row level security;
 
+drop policy if exists "clothing_item_images_select_own" on clothing_item_images;
 create policy "clothing_item_images_select_own" on clothing_item_images
   for select using (
     exists (
@@ -26,6 +27,7 @@ create policy "clothing_item_images_select_own" on clothing_item_images
     )
   );
 
+drop policy if exists "clothing_item_images_insert_own" on clothing_item_images;
 create policy "clothing_item_images_insert_own" on clothing_item_images
   for insert with check (
     exists (
@@ -35,6 +37,7 @@ create policy "clothing_item_images_insert_own" on clothing_item_images
     )
   );
 
+drop policy if exists "clothing_item_images_delete_own" on clothing_item_images;
 create policy "clothing_item_images_delete_own" on clothing_item_images
   for delete using (
     exists (

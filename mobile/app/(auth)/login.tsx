@@ -10,11 +10,13 @@ import {
 import { colors, fonts } from "@/lib/theme";
 import {
   AuthCheckbox,
+  AuthDivider,
   AuthError,
   AuthField,
   AuthFooterLink,
   AuthScreen,
   AuthSheetHeader,
+  SocialAuthButtons,
 } from "@/components/auth";
 import { Button } from "@/components/ui/primitives";
 
@@ -62,6 +64,11 @@ export default function LoginScreen() {
 
       {error ? <AuthError message={error} /> : null}
 
+      <View style={styles.stack}>
+        <SocialAuthButtons onError={setError} />
+        <AuthDivider label="or continue with email" />
+      </View>
+
       <View style={styles.form}>
         <AuthField
           type="email"
@@ -108,9 +115,12 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
+  stack: {
+    gap: 16,
+    marginBottom: 16,
+  },
   form: {
     gap: 12,
-    marginTop: 4,
   },
   options: {
     flexDirection: "row",

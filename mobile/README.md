@@ -52,6 +52,7 @@ Scan the QR code with Expo Go, or press `i` / `a` for iOS / Android simulator.
 mobile/                    Expo Router app
   app/(tabs)/              Today, Wardrobe, Outfits, Profile
   app/(auth)/              Login / signup
+  app/auth/callback        OAuth deep-link return
   app/onboarding/          Onboarding stub (full flow on web for now)
   app/wardrobe/add         Photo upload → AI draft → review
   app/wardrobe/bulk-review Multi-item review + Add all
@@ -64,6 +65,46 @@ mobile/                    Expo Router app
 ```
 
 Mobile authenticates with Supabase directly (AsyncStorage session). API routes accept `Authorization: Bearer <token>` from mobile or cookies from web.
+
+## Google social login
+
+Login and signup both include **Continue with Google** (Supabase OAuth + Expo deep link).
+
+### 1. Google Cloud Console
+
+1. Create (or open) an OAuth 2.0 Client ID of type **Web application**.
+2. Under **Authorized redirect URIs**, add:
+   ```
+   https://vnmbqgezqitcmspmuqre.supabase.co/auth/v1/callback
+   ```
+   (Replace the project ref if yours differs.)
+
+### 2. Supabase Dashboard
+
+1. **Authentication → Providers → Google** → enable, paste Client ID + Client Secret.
+2. **Authentication → URL Configuration → Redirect URLs**, add:
+   ```
+   outfitpicker://**
+   exp://**
+   http://localhost:3000/auth/callback
+   ```
+3. Site URL can stay `http://localhost:3000` for local web.
+
+### 3. Apply profile migration (optional but recommended)
+
+```bash
+supabase db push
+```
+
+This updates `handle_new_user` so Google’s `full_name` / `name` populate `profiles.display_name`.
+
+### Test
+
+1. Restart the Expo app after env/config changes.
+2. On Login or Sign up, tap **Continue with Google**.
+3. Complete consent in the browser sheet; you should land back in the app signed in (onboarding if new).
+
+Apple Sign In is supported in code (`providers={['google','apple']}`) but not shown until Apple is configured in Supabase.
 
 ## Screens (v1)
 
