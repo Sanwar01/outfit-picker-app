@@ -16,6 +16,7 @@ import {
 } from '@/lib/ai/outfit-rules';
 import { generateOutfitWithAI } from '@/lib/ai/generate-outfit';
 import { isGeminiRulesOnly } from '@/lib/ai/gemini';
+import { tryReserveOutfitAi } from '@/lib/billing/usage';
 import { getSignedImageUrls } from '@/lib/storage';
 import type { ClothingCategory } from '@/lib/types/database';
 import { CATEGORY_LABELS } from '@/lib/types/clothing';
@@ -42,6 +43,12 @@ export interface GeneratedOutfitResponse {
   imageUrls: Record<string, string>;
   weather: WeatherSnapshot;
   generated_by: 'ai' | 'rules';
+  quota?: {
+    meter: 'outfit_ai_daily' | 'outfit_shuffle_daily';
+    used: number;
+    limit: number | null;
+    aiAllowed: boolean;
+  };
 }
 
 const CACHE_TTL_MS = 4 * 60 * 60 * 1000;
@@ -177,13 +184,31 @@ export async function generateOutfitForUser(
   }
 
   const occasion = getOccasion(occasionId);
+  const isShuffle = excludeCombinations.length > 0;
 
-  const rulesOnly = isGeminiRulesOnly() || excludeCombinations.length > 0;
+  let quotaMeta: GeneratedOutfitResponse['quota'];
+  let allowAi = !isGeminiRulesOnly() && Boolean(userId);
 
-  let generated_by: 'ai' | 'rules' = rulesOnly ? 'rules' : 'ai';
+  if (allowAi && userId) {
+    try {
+      const reservation = await tryReserveOutfitAi(userId, isShuffle);
+      allowAi = reservation.allowed;
+      quotaMeta = {
+        meter: reservation.meter,
+        used: reservation.used,
+        limit: reservation.limit,
+        aiAllowed: reservation.allowed,
+      };
+    } catch (error) {
+      console.warn('Outfit AI quota check failed, using rules:', error);
+      allowAi = false;
+    }
+  }
+
+  let generated_by: 'ai' | 'rules' = allowAi ? 'ai' : 'rules';
   let aiResult: OutfitGenerationResult;
 
-  if (rulesOnly) {
+  if (!allowAi) {
     aiResult = generateOutfitLocally({
       wardrobe: filtered,
       weather,
@@ -267,6 +292,10 @@ export async function generateOutfitForUser(
     occasionId,
     generated_by,
   );
+
+  if (quotaMeta) {
+    response.quota = quotaMeta;
+  }
 
   setCachedOutfit(cacheKey, response);
   return response;

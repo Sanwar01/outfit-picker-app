@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getRouteUserId } from "@/lib/api/route-auth";
+import {
+  isQuotaExceededError,
+  quotaExceededResponse,
+} from "@/lib/billing/errors";
+import { assertWardrobeCapacity } from "@/lib/billing/usage";
 import { createRouteClient } from "@/lib/supabase/route-client";
 import { isDraftItem } from "@/lib/wardrobe/draft-constants";
 import { buildDraftConfirmUpdate } from "@/lib/wardrobe/draft-service";
@@ -33,6 +38,15 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: "Draft not found" }, { status: 404 });
     }
 
+    try {
+      await assertWardrobeCapacity(supabase, userId, 1);
+    } catch (error) {
+      if (isQuotaExceededError(error)) {
+        return quotaExceededResponse(error);
+      }
+      throw error;
+    }
+
     const { data: confirmed, error } = await supabase
       .from("clothing_items")
       .update(buildDraftConfirmUpdate())
@@ -50,6 +64,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
     return NextResponse.json(confirmed as ClothingItem);
   } catch (error) {
+    if (isQuotaExceededError(error)) {
+      return quotaExceededResponse(error);
+    }
     console.error("Confirm clothing draft error:", error);
     return NextResponse.json(
       { error: "Failed to confirm draft" },

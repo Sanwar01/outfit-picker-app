@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getRouteUserId, isUserImagePath } from "@/lib/api/route-auth";
+import {
+  isQuotaExceededError,
+  quotaExceededResponse,
+} from "@/lib/billing/errors";
+import { assertAiTagQuota } from "@/lib/billing/usage";
 import { resolveItemId } from "@/lib/ids/uuid";
 import { createRouteClient } from "@/lib/supabase/route-client";
 import {
@@ -71,6 +76,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    try {
+      await assertAiTagQuota(userId);
+    } catch (error) {
+      if (isQuotaExceededError(error)) {
+        return quotaExceededResponse(error);
+      }
+      throw error;
+    }
+
     const { data: draft, error: insertError } = await supabase
       .from("clothing_items")
       .insert(buildDraftInsert({ id: itemId, userId, imagePath }))
@@ -99,6 +113,9 @@ export async function POST(request: NextRequest) {
       await toDraftResponse((tagged ?? draft) as ClothingItem, signedImageUrl),
     );
   } catch (error) {
+    if (isQuotaExceededError(error)) {
+      return quotaExceededResponse(error);
+    }
     console.error("Create clothing draft error:", error);
     return NextResponse.json(
       {

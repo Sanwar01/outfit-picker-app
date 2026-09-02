@@ -5,6 +5,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { isGeminiUnavailableError } from "@/lib/ai/gemini";
 import { tagClothingFromImage } from "@/lib/ai/tag-clothing";
 import { getRouteUserId } from "@/lib/api/route-auth";
+import {
+  isQuotaExceededError,
+  quotaExceededResponse,
+} from "@/lib/billing/errors";
+import { assertAiTagQuota } from "@/lib/billing/usage";
 import { clothingTagsToUpdate } from "@/lib/wardrobe/apply-clothing-tags";
 import type { TagClothingResponse } from "@/lib/wardrobe/tagging";
 import type { ClothingItem } from "@/lib/types/database";
@@ -52,6 +57,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    try {
+      await assertAiTagQuota(userId);
+    } catch (error) {
+      if (isQuotaExceededError(error)) {
+        return quotaExceededResponse(error);
+      }
+      throw error;
+    }
+
     let tags;
     try {
       tags = await tagClothingFromImage(signedUrlData.signedUrl);
@@ -88,6 +102,9 @@ export async function POST(request: NextRequest) {
     };
     return NextResponse.json(response);
   } catch (error) {
+    if (isQuotaExceededError(error)) {
+      return quotaExceededResponse(error);
+    }
     console.error("Tag clothing error:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Tagging failed" },

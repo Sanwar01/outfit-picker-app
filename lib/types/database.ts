@@ -34,6 +34,7 @@ export interface Database {
           style_goals: string[];
           onboarding_audience: string | null;
           onboarding_complete: boolean;
+          plan: "free" | "pro" | "family";
           created_at: string;
         };
         Insert: {
@@ -47,6 +48,7 @@ export interface Database {
           style_goals?: string[];
           onboarding_audience?: string | null;
           onboarding_complete?: boolean;
+          plan?: "free" | "pro" | "family";
           created_at?: string;
         };
         Update: {
@@ -60,7 +62,35 @@ export interface Database {
           style_goals?: string[];
           onboarding_audience?: string | null;
           onboarding_complete?: boolean;
+          plan?: "free" | "pro" | "family";
           created_at?: string;
+        };
+        Relationships: [];
+      };
+      usage_counters: {
+        Row: {
+          id: string;
+          user_id: string;
+          meter: string;
+          period_key: string;
+          count: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          meter: string;
+          period_key: string;
+          count?: number;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          meter?: string;
+          period_key?: string;
+          count?: number;
+          updated_at?: string;
         };
         Relationships: [];
       };
@@ -288,7 +318,17 @@ export interface Database {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      try_consume_usage: {
+        Args: {
+          p_user_id: string;
+          p_meter: string;
+          p_period_key: string;
+          p_limit: number;
+        };
+        Returns: Json;
+      };
+    };
     Enums: {
       clothing_category: ClothingCategory;
       clothing_status: ClothingStatus;

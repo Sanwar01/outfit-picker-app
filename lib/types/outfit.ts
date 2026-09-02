@@ -12,6 +12,12 @@ export interface GeneratedOutfit {
   imageUrls: Record<string, string>;
   weather: WeatherSnapshot;
   generated_by?: "ai" | "rules";
+  quota?: {
+    meter: "outfit_ai_daily" | "outfit_shuffle_daily";
+    used: number;
+    limit: number | null;
+    aiAllowed: boolean;
+  };
 }
 
 export interface SavedOutfit {

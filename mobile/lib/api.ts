@@ -38,6 +38,29 @@ function networkErrorMessage(path: string, apiBase: string): string {
   return `Network error calling ${apiBase}${path}. Is the Next.js API running on port 3000?`;
 }
 
+function formatApiError(data: {
+  error?: string;
+  meter?: string;
+  limit?: number;
+  used?: number;
+}): string {
+  if (data.error === "quota_exceeded") {
+    switch (data.meter) {
+      case "ai_tags":
+        return `You've used your free AI tagging allowance${
+          typeof data.limit === "number" ? ` (${data.limit}/month)` : ""
+        }. Try again next month or upgrade later.`;
+      case "wardrobe_items":
+        return `Your wardrobe is full${
+          typeof data.limit === "number" ? ` (${data.limit} items)` : ""
+        }. Archive or delete something to add more.`;
+      default:
+        return "You've reached a free-plan limit for this action.";
+    }
+  }
+  return data.error ?? "Request failed";
+}
+
 async function authHeaders(): Promise<HeadersInit> {
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
@@ -60,7 +83,7 @@ export async function apiPost<T>(
     });
     const data = await res.json();
     if (!res.ok) {
-      return { ok: false, error: data.error ?? "Request failed" };
+      return { ok: false, error: formatApiError(data) };
     }
     return { ok: true, data: data as T };
   } catch (error) {
@@ -79,7 +102,7 @@ export async function apiGet<T>(
     });
     const data = await res.json();
     if (!res.ok) {
-      return { ok: false, error: data.error ?? "Request failed" };
+      return { ok: false, error: formatApiError(data) };
     }
     return { ok: true, data: data as T };
   } catch (error) {
@@ -101,7 +124,7 @@ export async function apiPatch<T>(
     });
     const data = await res.json();
     if (!res.ok) {
-      return { ok: false, error: data.error ?? "Request failed" };
+      return { ok: false, error: formatApiError(data) };
     }
     return { ok: true, data: data as T };
   } catch (error) {
@@ -121,7 +144,7 @@ export async function apiDelete(
     });
     if (!res.ok) {
       const data = await res.json();
-      return { ok: false, error: data.error ?? "Request failed" };
+      return { ok: false, error: formatApiError(data) };
     }
     return { ok: true };
   } catch (error) {
