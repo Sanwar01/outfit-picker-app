@@ -6,3 +6,6 @@ export { SearchBar } from "./search-bar";
 export { EmptyState } from "./empty-state";
 export { Banner } from "./banner";
 export { FooterLink } from "./footer-link";
+export { ComingSoonBadge } from "./coming-soon-badge";
+export { MenuRow } from "./menu-row";
+export { PaginationDots } from "./pagination-dots";

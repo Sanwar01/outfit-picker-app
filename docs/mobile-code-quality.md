@@ -48,7 +48,7 @@ Must not:
 
 ### Molecules (`mobile/components/molecules`)
 
-Small composites built from atoms. Examples: `TextField`, `Chip`, `Checkbox`, `Divider`, `SearchBar`, `EmptyState`, `Banner`, `FooterLink`.
+Small composites built from atoms. Examples: `TextField`, `Chip`, `Checkbox`, `Divider`, `SearchBar`, `EmptyState`, `Banner`, `FooterLink`, `ComingSoonBadge`, `MenuRow`, `PaginationDots`.
 
 Must not:
 
@@ -58,7 +58,7 @@ Must not:
 
 ### Organisms (`mobile/components/organisms`)
 
-Larger generic chrome built from atoms and molecules. Example: `Sheet`.
+Larger generic chrome built from atoms and molecules. Examples: `Sheet`, `CitySearchField`, `StyleChips`.
 
 Must not:
 
@@ -131,7 +131,7 @@ A screen with no local styles may be a single `wardrobe-list-screen.tsx` plus `i
 2. Prefer `@/features/<name>/screens/<screen>` and `@/features/<name>/sections/<section>`.
 3. Data and infra: `@/lib/...` and `@shared/...`.
 4. Features do not import other features. Lift shared UI into atoms/molecules/organisms instead.
-5. Do not import from `@/components/ui/primitives` or old `@/components/auth` / `@/components/wardrobe` folders — those are gone.
+5. Do not import from `@/components/ui/primitives` or the old `@/components/{auth,wardrobe,today,outfits,profile,welcome}` folders — those are gone.
 
 ## Styling
 
@@ -175,19 +175,9 @@ Add a **feature section** when the piece knows a domain model (`ClothingItem`, d
 
 If a pattern appears in two features (chip rows, empty states, text fields), extract the generic part to molecules and keep the domain mapping in each feature section.
 
-## Future feature migration checklist
+## Migrated features
 
-When migrating today, outfits, profile, welcome, or onboarding:
-
-1. Identify screens and the sections they need.
-2. Replace atom imports with `@/components/atoms` (already done for primitives).
-3. Move domain components from `mobile/components/<domain>/` into `mobile/features/<name>/sections/`.
-4. Move screen bodies from `mobile/app/...` into `mobile/features/<name>/screens/`.
-5. Leave `app/` files as default re-exports.
-6. Delete the old `mobile/components/<domain>/` folder.
-7. Grep for the old import path and for `StyleSheet.create` left in screen files that should have moved.
-8. Typecheck: `npx tsc --noEmit` in `mobile/`.
-9. Exercise the migrated flow on device (not only a screenshot).
+Auth, wardrobe, welcome, onboarding, today, outfits, and profile live under `mobile/features/<name>/`. Expo Router files in `mobile/app/` are default re-exports. When adding a new flow, follow the same pattern: sections + screens in a feature, thin route files, no cross-feature imports.
 
 ## Do not
 
