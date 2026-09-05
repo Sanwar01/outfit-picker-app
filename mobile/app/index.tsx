@@ -1,9 +1,9 @@
 import { Redirect } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
-import { useAuth } from "@/lib/auth-context";
-import { getHasSeenWelcome } from "@/lib/has-seen-welcome";
-import { colors } from "@/lib/theme";
+import { useAuth } from "@/hooks/use-auth";
+import { getHasSeenWelcome } from "@/features/welcome/api";
+import { colors } from "@/theme";
 
 export default function Index() {
   const { session, profile, loading } = useAuth();

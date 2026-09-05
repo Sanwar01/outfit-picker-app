@@ -6,13 +6,13 @@ import {
 } from "@expo-google-fonts/dm-sans";
 import { InstrumentSerif_400Regular } from "@expo-google-fonts/instrument-serif";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/lib/query-client";
+import { queryClient } from "@/services/query-client";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
-import { AuthProvider } from "@/lib/auth-context";
-import { colors } from "@/lib/theme";
+import { AuthProvider } from "@/hooks/use-auth";
+import { colors } from "@/theme";
 
 export { ErrorBoundary } from "expo-router";
 

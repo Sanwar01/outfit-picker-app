@@ -1,6 +1,6 @@
 import { Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "@/lib/theme";
+import { colors } from "@/theme";
 import { styles } from "./banner.styles";
 
 type BannerProps = {

@@ -5,7 +5,7 @@ import {
   type PressableProps,
   type ViewStyle,
 } from "react-native";
-import { colors } from "@/lib/theme";
+import { colors } from "@/theme";
 import { styles } from "./button.styles";
 
 type ButtonProps = PressableProps & {

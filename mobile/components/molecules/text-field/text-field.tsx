@@ -7,7 +7,7 @@ import {
   type TextInputProps,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "@/lib/theme";
+import { colors } from "@/theme";
 import { styles } from "./text-field.styles";
 
 type TextFieldType = "text" | "email" | "password";

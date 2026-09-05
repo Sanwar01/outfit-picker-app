@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import Svg, { Path } from "react-native-svg";
-import { colors, radius } from "@/lib/theme";
+import { colors, radius } from "@/theme";
 import { styles } from "./hanger-logo.styles";
 
 export function HangerLogo({ size = 44 }: { size?: number }) {

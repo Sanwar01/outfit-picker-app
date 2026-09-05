@@ -2,7 +2,7 @@ import { Tabs, router } from "expo-router";
 import { View, Pressable, StyleSheet, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, spacing } from "@/lib/theme";
+import { colors, spacing } from "@/theme";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function TabBar({ state, navigation }: any) {

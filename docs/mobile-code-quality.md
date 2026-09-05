@@ -1,22 +1,29 @@
 # Mobile code quality and architecture
 
-Source of truth for the Expo/React Native app in `mobile/`. Follow this when adding or changing mobile UI. Visual behavior stays the same unless the task is a redesign.
+UI and folder contract for the Expo/React Native app in `mobile/`. Aligns with `.cursor/rules/app-architecture.md`. Visual behavior stays the same unless the task is a redesign.
 
 ## Folder map
 
 ```
 mobile/
-  app/                         # Expo Router only — thin re-exports
+  app/                         # Screens (Expo Router) + layouts
+  features/
+    <name>/
+      components/              # Domain-aware UI used by those screens
+      hooks/                   # Feature TanStack Query / local hooks (when needed)
+      api/                     # Feature API / data access (when needed)
+      styles/                  # StyleSheets for that feature's screens
   components/
     atoms/                     # Domain-agnostic primitives
     molecules/                 # Small composites, still domain-agnostic
     organisms/                 # Larger generic chrome
-  features/
-    <name>/
-      screens/                 # Full screens composed of sections
-      sections/                # Domain-aware pieces of a screen
-  lib/                         # Auth, queries, API clients, theme
+  services/                    # Central API client, supabase, oauth, billing, location
+  hooks/                       # Shared hooks (auth, usage)
+  theme/                       # Colors, fonts, radius, brand copy
+  assets/
 ```
+
+Do not create empty feature folders (`stores/`, `schemas/`, `api/`) until they contain meaningful code.
 
 Shared UI is imported from barrels:
 
@@ -26,78 +33,44 @@ import { TextField, Chip } from "@/components/molecules";
 import { Sheet } from "@/components/organisms";
 ```
 
-Feature screens are imported from the feature, never the other way around:
+Screens live in `app/` and import feature components:
 
 ```ts
-import { WardrobeListScreen } from "@/features/wardrobe/screens/wardrobe-list-screen";
+import { WardrobeGridCard } from "@/features/wardrobe/components/wardrobe-grid-card";
+import { styles } from "@/features/wardrobe/styles/list";
+
+export default function WardrobeListScreen() {
+  // ...
+}
 ```
 
-Existing `"@/*": ["./*"]` in `mobile/tsconfig.json` covers these paths. Do not add a new alias prefix unless a collision appears.
+`"@/*": ["./*"]` in `mobile/tsconfig.json` covers these paths.
 
 ## Layer responsibilities
 
-### Atoms (`mobile/components/atoms`)
+### Atoms / molecules / organisms (`components`)
 
-Domain-agnostic primitives. Examples: `Box`, `Text`, `Button`, `Screen`, `ScreenTitle`, `ScreenSubtitle`, `CachedImage`, `HangerLogo`, `BrandMark`.
+Same rules as before: domain-agnostic. Must not fetch data or import features.
 
-Must not:
+Auth heroes, wardrobe cards, and similar stay in `features/<name>/components`.
 
-- Call APIs or hooks that fetch data
-- Import feature types (`ClothingItem`, drafts, outfits)
-- Import molecules, organisms, or features
+### Feature components
 
-### Molecules (`mobile/components/molecules`)
+Know domain models. Compose atoms, molecules, and organisms. May use `services`, feature `api`/`hooks`, and `@shared`.
 
-Small composites built from atoms. Examples: `TextField`, `Chip`, `Checkbox`, `Divider`, `SearchBar`, `EmptyState`, `Banner`, `FooterLink`, `ComingSoonBadge`, `MenuRow`, `PaginationDots`.
+Must not import another feature or `app/` screens.
 
-Must not:
+### App screens (`app`)
 
-- Know wardrobe/outfit/auth domain models
-- Fetch data
-- Import features or organisms
+Compose UI, connect hooks, handle navigation, show loading/error. Target 80–120 lines; extract a feature component when a screen grows past that.
 
-### Organisms (`mobile/components/organisms`)
+Must not contain raw `fetch()`, provider SDK details, or large data transformations — those belong in feature `api` / `hooks` / `services`.
 
-Larger generic chrome built from atoms and molecules. Examples: `Sheet`, `CitySearchField`, `StyleChips`.
-
-Must not:
-
-- Know feature domain models
-- Import features
-
-Auth-specific heroes, wardrobe cards, and similar stay in `features/<name>/sections`.
-
-### Feature sections (`mobile/features/<name>/sections`)
-
-Know domain models. Compose atoms, molecules, and organisms. May use `mobile/lib` and `@shared`.
-
-Must not:
-
-- Import another feature
-- Deep-import another component’s internals (`button.tsx`, `button.styles.ts`)
-
-### Feature screens (`mobile/features/<name>/screens`)
-
-Wiring only: hooks, navigation, composing sections. Target 80–120 lines. Extract a section when a screen grows past that.
-
-Must not:
-
-- Import another feature
-- Own large StyleSheets — those live with the section that needs them
-
-### Expo Router (`mobile/app`)
-
-File-based routes and layouts only. Screen files re-export:
-
-```ts
-export { WardrobeListScreen as default } from "@/features/wardrobe/screens/wardrobe-list-screen";
-```
+Expo Router treats every file under `app/` as a route, so do not colocate styles, helpers, or components there. Screen styles live in `features/<name>/styles`.
 
 Layouts (`_layout.tsx`) stay in `app/`.
 
 ## Component folder contract
-
-Every shared component and every feature section/screen that has styles uses this shape:
 
 ```
 button/
@@ -107,52 +80,38 @@ button/
 ```
 
 - kebab-case folder names
-- PascalCase named exports (`Button`, not `default` except Expo Router re-exports)
+- PascalCase named exports (`Button`; Expo Router files default-export)
 - Relative imports inside the folder: `import { styles } from "./button.styles"`
-- Barrel `index.ts` re-exports the public API
-- Layer barrel (`atoms/index.ts`) re-exports each component’s public API
-
-Outside the folder, import from the layer or feature barrel — not from `button.tsx` or `button.styles.ts`.
-
-Screens and sections follow the same contract when they have styles:
-
-```
-wardrobe-list-screen/
-  wardrobe-list-screen.tsx
-  wardrobe-list-screen.styles.ts
-  index.ts
-```
-
-A screen with no local styles may be a single `wardrobe-list-screen.tsx` plus `index.ts`.
+- Import from the layer or feature path — not from `button.tsx` or `button.styles.ts`
 
 ## Import rules
 
 1. Prefer `@/components/atoms`, `@/components/molecules`, `@/components/organisms`.
-2. Prefer `@/features/<name>/screens/<screen>` and `@/features/<name>/sections/<section>`.
-3. Data and infra: `@/lib/...` and `@shared/...`.
-4. Features do not import other features. Lift shared UI into atoms/molecules/organisms instead.
-5. Do not import from `@/components/ui/primitives` or the old `@/components/{auth,wardrobe,today,outfits,profile,welcome}` folders — those are gone.
+2. Prefer `@/features/<name>/components/<component>` for domain UI and `@/features/<name>/styles/<screen>` for that screen's styles.
+3. Shared infra: `@/services/...`, `@/hooks/...`, `@/theme`.
+4. Domain data: `@/features/<name>/api` and `@/features/<name>/hooks`.
+5. Shared domain: `@shared/...`.
+6. Features do not import other features. Lift shared UI into atoms/molecules/organisms, shared data into `services`/`hooks`.
+7. Feature components do not import `app/` screens.
+8. Do not put non-route files in `app/`.
 
 ## Styling
 
-- `StyleSheet.create` in the sibling `*.styles.ts` file
-- Tokens from `@/lib/theme` (`colors`, `spacing`, `radius`, `fonts`)
-- No new styling system (no NativeWind, no theme provider swap)
-- No `StyleSheet` in the component file unless the file is a one-off with fewer than ~10 style keys *and* it is not a shared component — shared components always split styles
-
-## TypeScript and exports
-
-- `strict: true` stays on
-- Named exports for components
-- No `any`
-- Props types live next to the component (same file, or `button.types.ts` if they grow large)
-- Prefer explicit prop types over inferring from a giant inline object
+- `StyleSheet.create` in the sibling `*.styles.ts` file (feature components) or `features/<name>/styles/<screen>.ts` (app screens)
+- Tokens from `@/theme`
+- No new styling system
+- Shared components always split styles
 
 ## Data and hooks
 
-- Stay in `mobile/lib` (queries, supabase, API clients, auth context) and `@shared`
-- Do not colocate API clients inside features unless a later pass explicitly moves them
-- Screens subscribe to hooks; atoms/molecules do not
+```
+Screen → feature hook → TanStack Query → feature API → apiClient / supabase
+```
+
+- Server/API state: TanStack Query
+- One-screen state: `useState`
+- Do not introduce Zustand until genuinely shared client state needs it
+- Atoms/molecules do not subscribe to data hooks
 
 ## File-size targets
 
@@ -160,29 +119,14 @@ A screen with no local styles may be a single `wardrobe-list-screen.tsx` plus `i
 | --- | --- | --- |
 | Atom / molecule | ~80 lines of component logic | It starts encoding domain rules |
 | Organism | ~120 lines | It needs a feature-specific variant |
-| Feature section | ~150 lines | It mixes two visual jobs |
-| Feature screen | 80–120 lines | Pull a section out |
-
-Line counts are guidance, not a linter. Repeated UI and mixed concerns are the real signal.
-
-## How to add a new atom vs a feature section
-
-Add an **atom** when the piece is reusable with no domain types (a layout box, a button variant, a text style).
-
-Add a **molecule** when two atoms are always used together and still have no domain types (a labeled input, a chip).
-
-Add a **feature section** when the piece knows a domain model (`ClothingItem`, draft ID, occasion) or copy specific to one flow.
-
-If a pattern appears in two features (chip rows, empty states, text fields), extract the generic part to molecules and keep the domain mapping in each feature section.
-
-## Migrated features
-
-Auth, wardrobe, welcome, onboarding, today, outfits, and profile live under `mobile/features/<name>/`. Expo Router files in `mobile/app/` are default re-exports. When adding a new flow, follow the same pattern: sections + screens in a feature, thin route files, no cross-feature imports.
+| Feature component | ~150 lines | It mixes two visual jobs |
+| App screen | 80–120 lines | Pull a feature component out |
 
 ## Do not
 
-- Relocate `mobile/lib` as part of a UI refactor
+- Relocate shared repo `lib/` as part of a mobile UI refactor
 - Import one feature from another
 - Put business logic in atoms
 - Redesign while restructuring
 - Deep-import component internals from outside the folder
+- Put non-route files in `app/`

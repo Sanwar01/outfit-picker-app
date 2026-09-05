@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 import { ComingSoonBadge } from "../coming-soon-badge";
-import { colors } from "@/lib/theme";
+import { colors } from "@/theme";
 import { styles } from "./menu-row.styles";
 
 type MenuRowProps = {

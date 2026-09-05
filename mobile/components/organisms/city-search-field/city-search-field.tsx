@@ -7,8 +7,8 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { searchCities, type ResolvedLocation } from "@/lib/location";
-import { colors } from "@/lib/theme";
+import { searchCities, type ResolvedLocation } from "@/services/location";
+import { colors } from "@/theme";
 import { styles } from "./city-search-field.styles";
 
 const DEBOUNCE_MS = 350;

@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 import { HangerLogo } from "../hanger-logo";
-import { brand } from "@/lib/brand";
+import { brand } from "@/theme/brand";
 import { styles } from "./brand-mark.styles";
 
 type BrandMarkProps = {

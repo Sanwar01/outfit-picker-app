@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { colors, radius } from "@/lib/theme";
+import { colors, radius } from "@/theme";
 
 export const styles = StyleSheet.create({
   sheet: {

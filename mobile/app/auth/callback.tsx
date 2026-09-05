@@ -2,9 +2,9 @@ import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import * as Linking from 'expo-linking';
-import { useAuth } from '@/lib/auth-context';
-import { createSessionFromUrl } from '@/lib/oauth';
-import { colors } from '@/lib/theme';
+import { useAuth } from '@/hooks/use-auth';
+import { createSessionFromUrl } from '@/services/oauth';
+import { colors } from '@/theme';
 
 /**
  * Deep-link landing for OAuth, email confirmation, and password reset

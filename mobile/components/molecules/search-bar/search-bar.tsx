@@ -1,6 +1,6 @@
 import { Pressable, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "@/lib/theme";
+import { colors } from "@/theme";
 import { styles } from "./search-bar.styles";
 
 type SearchBarProps = {

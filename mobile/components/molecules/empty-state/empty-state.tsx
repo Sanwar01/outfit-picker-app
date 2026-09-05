@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Button } from "@/components/atoms";
-import { colors } from "@/lib/theme";
+import { colors } from "@/theme";
 import { styles } from "./empty-state.styles";
 
 type EmptyStateProps = {
