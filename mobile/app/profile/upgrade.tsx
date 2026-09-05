@@ -9,8 +9,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
-import { Screen } from "@/components/ui/screen";
-import { Button, ScreenSubtitle, ScreenTitle } from "@/components/ui/primitives";
+import { Screen, Button, ScreenSubtitle, ScreenTitle } from "@/components/atoms";
 import {
   getJoinedProWaitlist,
   setJoinedProWaitlist,

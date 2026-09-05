@@ -9,8 +9,7 @@ import {
   View,
 } from "react-native";
 import { router } from "expo-router";
-import { Screen } from "@/components/ui/screen";
-import { ScreenSubtitle, ScreenTitle } from "@/components/ui/primitives";
+import { Screen, ScreenSubtitle, ScreenTitle } from "@/components/atoms";
 import { OutfitFilterChips } from "@/components/outfits/outfit-filter-chips";
 import { OutfitGridCard } from "@/components/outfits/outfit-grid-card";
 import { OutfitsEmptyState } from "@/components/outfits/outfits-empty-state";

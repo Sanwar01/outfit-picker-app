@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { CachedImage } from "@/components/ui/cached-image";
+import { CachedImage } from "@/components/atoms";
 import type { SavedOutfit } from "@shared/types/outfit";
 import { displaySavedOutfitName } from "@shared/outfits/saved-outfit-name";
 import {

@@ -12,9 +12,7 @@ import {
 import { useLocalSearchParams, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
-import { Screen } from "@/components/ui/screen";
-import { Button } from "@/components/ui/primitives";
-import { CachedImage } from "@/components/ui/cached-image";
+import { Screen, Button, CachedImage } from "@/components/atoms";
 import {
   deleteSavedOutfit,
   updateSavedOutfit,

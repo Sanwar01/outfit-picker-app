@@ -5,7 +5,7 @@ import type { ClothingItem } from '@shared/types/database';
 import { CORE_SLOT_ORDER, type GeneratedOutfit } from '@shared/types/outfit';
 import { normalizeOutfitSlots } from '@shared/outfits/slots';
 import { colors, fonts } from '@/lib/theme';
-import { Button } from '@/components/ui/primitives';
+import { Button } from '@/components/atoms';
 import { CATEGORY_LABELS } from '@shared/types/clothing';
 
 function pickHeroItem(items: ClothingItem[]): ClothingItem {

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { Button } from "@/components/ui/primitives";
+import { Button } from "@/components/atoms";
 import { colors, fonts } from "@/lib/theme";
 
 export function OutfitsEmptyState() {

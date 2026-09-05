@@ -14,7 +14,7 @@ import {
 } from '@/lib/today';
 import type { GeneratedOutfit } from '@shared/types/outfit';
 import { colors, fonts } from '@/lib/theme';
-import { Button } from '@/components/ui/primitives';
+import { Button } from '@/components/atoms';
 import { WeatherCard } from '@/components/today/weather-card';
 import { OutfitCard } from '@/components/today/outfit-card';
 

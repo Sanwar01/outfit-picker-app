@@ -4,10 +4,8 @@ import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BrandMark } from '@/components/brand/brand-mark';
-import { WelcomeFeatureRow } from '@/components/welcome/welcome-feature-row';
-import { Button } from '@/components/ui/primitives';
-import { AuthFooterLink } from '@/components/auth/auth-footer-link';
+import { BrandMark, Button } from '@/components/atoms';
+import { FooterLink } from '@/components/molecules';
 import { welcomeSlides } from '@/lib/brand';
 import { setHasSeenWelcome } from '@/lib/has-seen-welcome';
 import { colors, fonts, radius } from '@/lib/theme';
@@ -81,7 +79,7 @@ export default function WelcomeScreen() {
         />
 
         <View style={styles.footer}>
-          <AuthFooterLink
+          <FooterLink
             prompt="Already have an account?"
             actionLabel="Log in"
             href="/(auth)/login"

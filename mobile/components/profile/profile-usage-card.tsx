@@ -5,7 +5,7 @@ import {
   planLabel,
   type UsageSnapshot,
 } from "@/lib/billing";
-import { Button } from "@/components/ui/primitives";
+import { Button } from "@/components/atoms";
 import { colors, fonts } from "@/lib/theme";
 
 type ProfileUsageCardProps = {

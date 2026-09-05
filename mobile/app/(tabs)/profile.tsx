@@ -12,9 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
-import { Screen } from '@/components/ui/screen';
-import { ScreenSubtitle, ScreenTitle } from '@/components/ui/primitives';
-import { Button } from '@/components/ui/primitives';
+import { Screen, ScreenSubtitle, ScreenTitle, Button } from '@/components/atoms';
 import { CompleteProfileBanner } from '@/components/profile/complete-profile-banner';
 import { ProfileMenuRow } from '@/components/profile/menu-row';
 import { ProfileStatsCard } from '@/components/profile/profile-stats-card';

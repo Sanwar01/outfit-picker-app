@@ -13,7 +13,7 @@ import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { STYLE_VIBES, type StyleVibe } from "@shared/types/clothing";
-import { Button } from "@/components/ui/primitives";
+import { Button } from "@/components/atoms";
 import { CitySearchField } from "@/components/profile/city-search";
 import { StyleChips } from "@/components/profile/style-chips";
 import { useAuth } from "@/lib/auth-context";
