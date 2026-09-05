@@ -17,7 +17,7 @@ import { Screen } from "@/components/ui/screen";
 import { Button, ScreenSubtitle, ScreenTitle } from "@/components/ui/primitives";
 import { DraftGridCard } from "@/components/wardrobe/draft-grid-card";
 import { useAuth } from "@/lib/auth-context";
-import { invalidateWardrobeQueries } from "@/lib/queries/invalidate";
+import { invalidateBillingUsage, invalidateWardrobeQueries } from "@/lib/queries/invalidate";
 import {
   confirmAllClothingDrafts,
   listClothingDrafts,
@@ -76,6 +76,7 @@ export default function BulkReviewScreen() {
     }
 
     invalidateWardrobeQueries(queryClient, user?.id);
+    invalidateBillingUsage(queryClient);
     router.replace("/(tabs)/wardrobe");
   }
 

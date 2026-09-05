@@ -24,6 +24,10 @@ export function invalidateOutfitsQueries(queryClient: QueryClient) {
   void queryClient.invalidateQueries({ queryKey: queryKeys.outfits.all });
 }
 
+export function invalidateBillingUsage(queryClient: QueryClient) {
+  void queryClient.invalidateQueries({ queryKey: queryKeys.billing.usage() });
+}
+
 export function invalidateSavedOutfitQuery(
   queryClient: QueryClient,
   id: string,

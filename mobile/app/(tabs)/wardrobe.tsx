@@ -1,54 +1,60 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Pressable,
   RefreshControl,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
-} from "react-native";
-import { router } from "expo-router";
-import { Screen } from "@/components/ui/screen";
-import { ScreenSubtitle, ScreenTitle } from "@/components/ui/primitives";
-import { CategoryFilterChips } from "@/components/wardrobe/category-filter-chips";
-import { DraftsBanner } from "@/components/wardrobe/drafts-banner";
-import { WardrobeEmptyState } from "@/components/wardrobe/wardrobe-empty-state";
-import { WardrobeGridCard } from "@/components/wardrobe/wardrobe-grid-card";
-import { WardrobeSearchBar } from "@/components/wardrobe/wardrobe-search-bar";
-import { WardrobeSortChips } from "@/components/wardrobe/wardrobe-sort-chips";
-import { useAuth } from "@/lib/auth-context";
-import { useWardrobeScreenQuery } from "@/lib/queries/wardrobe";
-import type { FilterValue } from "@/lib/wardrobe-items";
+} from 'react-native';
+import { router } from 'expo-router';
+import { Screen } from '@/components/ui/screen';
+import { ScreenSubtitle, ScreenTitle } from '@/components/ui/primitives';
+import { CategoryFilterChips } from '@/components/wardrobe/category-filter-chips';
+import { DraftsBanner } from '@/components/wardrobe/drafts-banner';
+import { WardrobeEmptyState } from '@/components/wardrobe/wardrobe-empty-state';
+import { WardrobeGridCard } from '@/components/wardrobe/wardrobe-grid-card';
+import { WardrobeSearchBar } from '@/components/wardrobe/wardrobe-search-bar';
+import { WardrobeSortChips } from '@/components/wardrobe/wardrobe-sort-chips';
+import { useAuth } from '@/lib/auth-context';
+import { useWardrobeScreenQuery } from '@/lib/queries/wardrobe';
+import type { FilterValue } from '@/lib/wardrobe-items';
 import {
   prepareWardrobeList,
   wardrobeSummaryLine,
   type WardrobeSortValue,
-} from "@shared/wardrobe/wardrobe-display";
-import { colors, fonts, spacing } from "@/lib/theme";
+} from '@shared/wardrobe/wardrobe-display';
+import { colors, fonts, spacing } from '@/lib/theme';
+import { formatUsageFraction } from '@/lib/billing';
+import { useUsageSnapshotQuery } from '@/lib/queries/billing';
+import type { ClothingItem } from '@shared/types/database';
 
 const GRID_GAP = 12;
+const EMPTY_ITEMS: ClothingItem[] = [];
+const EMPTY_URLS: Record<string, string> = {};
 
 export default function WardrobeScreen() {
   const { user } = useAuth();
   const { width: windowWidth } = useWindowDimensions();
   const cardWidth = (windowWidth - spacing.screen * 2 - GRID_GAP) / 2;
 
-  const [filter, setFilter] = useState<FilterValue>("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sort, setSort] = useState<WardrobeSortValue>("recent");
+  const [filter, setFilter] = useState<FilterValue>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sort, setSort] = useState<WardrobeSortValue>('recent');
 
-  const { data, error, isLoading, isFetching, refetch } = useWardrobeScreenQuery(
-    user?.id,
-  );
+  const { data, error, isLoading, isFetching, refetch } =
+    useWardrobeScreenQuery(user?.id);
+  const { data: usage } = useUsageSnapshotQuery(Boolean(user?.id));
 
-  const items = data?.items ?? [];
-  const urls = data?.urls ?? {};
+  const items = useMemo(() => data?.items ?? EMPTY_ITEMS, [data?.items]);
+  const urls = data?.urls ?? EMPTY_URLS;
   const draftCount = data?.draftCount ?? 0;
   const loadError = error instanceof Error ? error.message : null;
 
   const activeCount = useMemo(
-    () => items.filter((item) => item.status === "active").length,
+    () => items.filter((item) => item.status === 'active').length,
     [items],
   );
 
@@ -59,19 +65,23 @@ export default function WardrobeScreen() {
 
   const hasWardrobeItems = items.length > 0;
   const showEmptyState =
-    !isLoading && !loadError && activeCount === 0 && filter === "all" && !searchQuery;
+    !isLoading &&
+    !loadError &&
+    activeCount === 0 &&
+    filter === 'all' &&
+    !searchQuery;
 
   function emptyMessage(): string {
     if (searchQuery.trim()) {
-      return "No items match your search.";
+      return 'No items match your search.';
     }
-    if (filter === "archived") {
-      return "No archived items yet.";
+    if (filter === 'archived') {
+      return 'No archived items yet.';
     }
-    if (filter !== "all") {
-      return "No items in this category yet.";
+    if (filter !== 'all') {
+      return 'No items in this category yet.';
     }
-    return "No items in this category yet.";
+    return 'No items in this category yet.';
   }
 
   return (
@@ -93,8 +103,31 @@ export default function WardrobeScreen() {
         ListHeaderComponent={
           <View style={styles.header}>
             <ScreenTitle>My Wardrobe</ScreenTitle>
-            <ScreenSubtitle>Everything you own, perfectly organised</ScreenSubtitle>
-            <Text style={styles.summary}>{wardrobeSummaryLine(activeCount)}</Text>
+            <ScreenSubtitle>
+              Everything you own, perfectly organised
+            </ScreenSubtitle>
+            <Text style={styles.summary}>
+              {wardrobeSummaryLine(activeCount)}
+            </Text>
+            {usage?.wardrobe.limit != null ? (
+              <Pressable
+                onPress={() => {
+                  if (usage.plan === 'free') router.push('/profile/upgrade');
+                }}
+                disabled={usage.plan !== 'free'}
+              >
+                <Text style={styles.quotaHint}>
+                  Plan limit {formatUsageFraction(usage.wardrobe)}
+                  {usage.wardrobe.remaining === 0
+                    ? ' — archive items to free space'
+                    : ''}
+                  {usage.plan === 'free' &&
+                  usage.wardrobe.used / usage.wardrobe.limit >= 0.7
+                    ? ' · Upgrade for more room'
+                    : ''}
+                </Text>
+              </Pressable>
+            ) : null}
             {loadError ? <Text style={styles.error}>{loadError}</Text> : null}
             <DraftsBanner count={draftCount} />
             {hasWardrobeItems ? (
@@ -149,6 +182,12 @@ const styles = StyleSheet.create({
     color: colors.inkMuted,
     fontFamily: fonts.sans,
   },
+  quotaHint: {
+    marginTop: 2,
+    fontSize: 12,
+    color: colors.inkMuted,
+    fontFamily: fonts.sans,
+  },
   error: {
     marginTop: 8,
     color: colors.destructive,
@@ -164,7 +203,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.inkMuted,
     fontFamily: fonts.sansMedium,
-    textTransform: "uppercase",
+    textTransform: 'uppercase',
     letterSpacing: 0.4,
   },
   list: {
@@ -172,17 +211,17 @@ const styles = StyleSheet.create({
   },
   row: {
     gap: GRID_GAP,
-    justifyContent: "flex-start",
+    justifyContent: 'flex-start',
   },
   cardCell: {
     marginBottom: 12,
   },
   centered: {
     paddingTop: 48,
-    alignItems: "center",
+    alignItems: 'center',
   },
   filteredEmpty: {
-    textAlign: "center",
+    textAlign: 'center',
     color: colors.inkMuted,
     marginTop: 40,
     fontFamily: fonts.sans,

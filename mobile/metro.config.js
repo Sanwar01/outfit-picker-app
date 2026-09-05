@@ -22,6 +22,20 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     );
   }
 
+  // Mobile-local modules that would otherwise match @/lib/* → ../lib/*
+  const mobileLibOverrides = {
+    "@/lib/billing": path.resolve(projectRoot, "lib/billing.ts"),
+    "@/lib/queries/billing": path.resolve(projectRoot, "lib/queries/billing.ts"),
+    "@/lib/pro-waitlist": path.resolve(projectRoot, "lib/pro-waitlist.ts"),
+  };
+  if (moduleName in mobileLibOverrides) {
+    return context.resolveRequest(
+      context,
+      mobileLibOverrides[moduleName],
+      platform,
+    );
+  }
+
   // Shared lib/ files use the Next.js @/ alias — resolve them from the repo root
   if (moduleName.startsWith("@/")) {
     const origin = context.originModulePath ?? "";

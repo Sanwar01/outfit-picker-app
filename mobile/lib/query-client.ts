@@ -30,4 +30,7 @@ export const queryKeys = {
   today: {
     outfit: (userId?: string) => ["today-outfit", userId] as const,
   },
+  billing: {
+    usage: () => ["billing", "usage"] as const,
+  },
 } as const;

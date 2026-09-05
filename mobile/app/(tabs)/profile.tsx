@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -8,47 +8,66 @@ import {
   StyleSheet,
   Text,
   View,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useQueryClient } from "@tanstack/react-query";
-import { Screen } from "@/components/ui/screen";
-import { ScreenSubtitle, ScreenTitle } from "@/components/ui/primitives";
-import { Button } from "@/components/ui/primitives";
-import { CompleteProfileBanner } from "@/components/profile/complete-profile-banner";
-import { ProfileMenuRow } from "@/components/profile/menu-row";
-import { ProfileStatsCard } from "@/components/profile/profile-stats-card";
-import { useAuth } from "@/lib/auth-context";
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useQueryClient } from '@tanstack/react-query';
+import { Screen } from '@/components/ui/screen';
+import { ScreenSubtitle, ScreenTitle } from '@/components/ui/primitives';
+import { Button } from '@/components/ui/primitives';
+import { CompleteProfileBanner } from '@/components/profile/complete-profile-banner';
+import { ProfileMenuRow } from '@/components/profile/menu-row';
+import { ProfileStatsCard } from '@/components/profile/profile-stats-card';
+import { ProfileUsageCard } from '@/components/profile/profile-usage-card';
+import { useAuth } from '@/lib/auth-context';
 import {
   formatStyleVibesLabel,
   getProfileCompletionIssues,
   getProfileFirstName,
   getProfileInitials,
   getTimeGreeting,
-} from "@/lib/profile-display";
-import { invalidateOutfitsQueries, invalidateWardrobeQueries } from "@/lib/queries/invalidate";
-import { useSavedOutfitsQuery } from "@/lib/queries/outfits";
-import { useWardrobeScreenQuery } from "@/lib/queries/wardrobe";
-import { colors, fonts } from "@/lib/theme";
+} from '@/lib/profile-display';
+import {
+  invalidateOutfitsQueries,
+  invalidateWardrobeQueries,
+} from '@/lib/queries/invalidate';
+import { useSavedOutfitsQuery } from '@/lib/queries/outfits';
+import { useWardrobeScreenQuery } from '@/lib/queries/wardrobe';
+import { colors, fonts } from '@/lib/theme';
+import { useUsageSnapshotQuery } from '@/lib/queries/billing';
 
 export default function ProfileScreen() {
   const { profile, user, loading, refreshProfile, signOut } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: wardrobe, isFetching: wardrobeFetching, refetch: refetchWardrobe } =
-    useWardrobeScreenQuery(user?.id);
-  const { data: outfits = [], isFetching: outfitsFetching, refetch: refetchOutfits } =
-    useSavedOutfitsQuery();
+  const {
+    data: wardrobe,
+    isFetching: wardrobeFetching,
+    refetch: refetchWardrobe,
+  } = useWardrobeScreenQuery(user?.id);
+  const {
+    data: outfits = [],
+    isFetching: outfitsFetching,
+    refetch: refetchOutfits,
+  } = useSavedOutfitsQuery();
+  const {
+    data: usage,
+    isFetching: usageFetching,
+    refetch: refetchUsage,
+  } = useUsageSnapshotQuery(Boolean(user?.id));
 
-  const displayName = profile?.display_name?.trim() || "Your profile";
-  const firstName = getProfileFirstName(profile?.display_name, user?.email ?? "");
-  const initials = getProfileInitials(profile?.display_name, user?.email ?? "");
+  const displayName = profile?.display_name?.trim() || 'Your profile';
+  const firstName = getProfileFirstName(
+    profile?.display_name,
+    user?.email ?? '',
+  );
+  const initials = getProfileInitials(profile?.display_name, user?.email ?? '');
   const vibes = profile?.style_vibes ?? [];
   const completionIssues = getProfileCompletionIssues(profile);
 
   const stats = useMemo(() => {
     const activeItems =
-      wardrobe?.items.filter((item) => item.status === "active") ?? [];
+      wardrobe?.items.filter((item) => item.status === 'active') ?? [];
     return {
       wardrobeCount: activeItems.length,
       outfitCount: outfits.length,
@@ -56,28 +75,37 @@ export default function ProfileScreen() {
     };
   }, [wardrobe?.items, outfits.length]);
 
-  const refreshing = wardrobeFetching || outfitsFetching;
+  const refreshing = wardrobeFetching || outfitsFetching || usageFetching;
 
   async function handleRefresh() {
-    await Promise.all([refreshProfile(), refetchWardrobe(), refetchOutfits()]);
+    await Promise.all([
+      refreshProfile(),
+      refetchWardrobe(),
+      refetchOutfits(),
+      refetchUsage(),
+    ]);
     invalidateWardrobeQueries(queryClient, user?.id);
     invalidateOutfitsQueries(queryClient);
   }
 
   function handleSignOut() {
-    Alert.alert("Sign out?", "You'll need to sign in again to access your wardrobe.", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Sign out",
-        style: "destructive",
-        onPress: () => {
-          void (async () => {
-            await signOut();
-            router.replace("/(auth)/login");
-          })();
+    Alert.alert(
+      'Sign out?',
+      "You'll need to sign in again to access your wardrobe.",
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Sign out',
+          style: 'destructive',
+          onPress: () => {
+            void (async () => {
+              await signOut();
+              router.replace('/(auth)/login');
+            })();
+          },
         },
-      },
-    ]);
+      ],
+    );
   }
 
   if (loading) {
@@ -137,15 +165,18 @@ export default function ProfileScreen() {
               </Text>
               <Text style={styles.vibesHint}>
                 {vibes.length > 0
-                  ? "Used to personalize your daily outfits"
-                  : "Style vibes help tailor recommendations"}
+                  ? 'Used to personalize your daily outfits'
+                  : 'Style vibes help tailor recommendations'}
               </Text>
             </View>
           </View>
 
           <Pressable
-            style={({ pressed }) => [styles.editBtn, pressed && styles.editBtnPressed]}
-            onPress={() => router.push("/profile/edit")}
+            style={({ pressed }) => [
+              styles.editBtn,
+              pressed && styles.editBtnPressed,
+            ]}
+            onPress={() => router.push('/profile/edit')}
             accessibilityLabel="Edit profile"
             accessibilityRole="button"
           >
@@ -160,6 +191,8 @@ export default function ProfileScreen() {
           outfitCount={stats.outfitCount}
           totalWears={stats.totalWears}
         />
+
+        {usage ? <ProfileUsageCard usage={usage} /> : null}
 
         <View style={styles.menuCard}>
           <Text style={styles.menuTitle}>Settings</Text>
@@ -193,8 +226,8 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   centered: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     paddingBottom: 24,
@@ -209,8 +242,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   row: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     gap: 12,
   },
   avatar: {
@@ -218,8 +251,8 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 26,
     backgroundColor: colors.cream,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   avatarText: {
     fontFamily: fonts.sansSemi,
@@ -245,8 +278,8 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   locationRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 3,
     marginTop: 2,
   },
@@ -268,8 +301,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 12,
     backgroundColor: colors.cream,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   editBtnPressed: {
     opacity: 0.9,
@@ -284,7 +317,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: colors.border,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   menuTitle: {
     fontFamily: fonts.serif,

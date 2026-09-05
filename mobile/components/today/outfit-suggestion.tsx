@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/auth-context';
 import { queryKeys } from '@/lib/query-client';
-import { invalidateOutfitsQueries } from '@/lib/queries/invalidate';
+import { invalidateOutfitsQueries, invalidateBillingUsage } from '@/lib/queries/invalidate';
 import {
   checkWardrobeReadiness,
   fetchWardrobe,
@@ -77,6 +77,7 @@ export function OutfitSuggestion() {
 
       lastOutfitIdsRef.current = result.outfit.item_ids;
       hasShownOutfit.current = true;
+      invalidateBillingUsage(queryClient);
       return { kind: 'result', outfit: result.outfit };
     },
   });
@@ -176,10 +177,21 @@ export function OutfitSuggestion() {
   if (query.data?.kind !== 'result') return null;
 
   const outfit = query.data.outfit;
+  const showRulesHint =
+    outfit.generated_by === 'rules' && outfit.quota?.aiAllowed === false;
 
   return (
     <View style={styles.content}>
       {outfit.weather && <WeatherCard weather={outfit.weather} />}
+
+      {showRulesHint ? (
+        <Pressable onPress={() => router.push('/profile/upgrade')}>
+          <Text style={styles.quotaHint}>
+            Using quick picks for now — AI refreshes tomorrow. Upgrade for
+            unlimited AI.
+          </Text>
+        </Pressable>
+      ) : null}
 
       <OutfitCard
         outfit={outfit}
@@ -198,6 +210,13 @@ export function OutfitSuggestion() {
 const styles = StyleSheet.create({
   content: {
     gap: 20,
+  },
+  quotaHint: {
+    fontFamily: fonts.sans,
+    fontSize: 13,
+    lineHeight: 18,
+    color: colors.inkMuted,
+    textAlign: 'center',
   },
   stateCard: {
     backgroundColor: colors.surface,

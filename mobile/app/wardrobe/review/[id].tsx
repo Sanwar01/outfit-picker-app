@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { needsReview } from '@shared/types/clothing';
 import {
   draftReviewColorSeasonLine,
@@ -23,6 +24,7 @@ import {
   discardClothingDraft,
   getClothingDraft,
 } from '@/lib/wardrobe-drafts';
+import { invalidateBillingUsage } from '@/lib/queries/invalidate';
 import {
   editDraftRoute,
   navigateAfterDraftSaved,
@@ -46,6 +48,7 @@ export default function DraftReviewScreen() {
     total?: string;
     bulk?: string;
   }>();
+  const queryClient = useQueryClient();
   const fromBulk = parseBulkParam(bulkParam);
   const remainingQueue = parseReviewQueueParam(queue);
   const total = parseReviewTotal(totalParam, remainingQueue.length);
@@ -123,6 +126,7 @@ export default function DraftReviewScreen() {
       Alert.alert("Couldn't save item", result.error);
       return;
     }
+    invalidateBillingUsage(queryClient);
     navigateAfterDraftSaved(remainingQueue, total, fromBulk);
   }
 

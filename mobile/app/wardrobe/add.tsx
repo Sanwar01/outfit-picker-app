@@ -1,18 +1,25 @@
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useQueryClient } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { Screen } from '@/components/ui/screen';
 import { ScreenSubtitle, ScreenTitle } from '@/components/ui/primitives';
 import { Button } from '@/components/ui/primitives';
 import { useAuth } from '@/lib/auth-context';
+import { formatUsageFraction } from '@/lib/billing';
 import { createClothingDraft } from '@/lib/wardrobe-drafts';
 import { createItemId } from '@/lib/create-item-id';
+import { invalidateBillingUsage } from '@/lib/queries/invalidate';
+import { useUsageSnapshotQuery } from '@/lib/queries/billing';
 import { navigateToBulkReview, navigateToDraftReview } from '@/lib/review-queue';
 import { supabase } from '@/lib/supabase';
 import { colors, fonts } from '@/lib/theme';
 
 export default function AddClothingScreen() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { data: usage } = useUsageSnapshotQuery(Boolean(user?.id));
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<string | null>(null);
 
@@ -95,6 +102,8 @@ export default function AddClothingScreen() {
         return;
       }
 
+      invalidateBillingUsage(queryClient);
+
       if (uploadedIds.length < result.assets.length) {
         Alert.alert(
           "Some photos couldn't be added",
@@ -121,6 +130,18 @@ export default function AddClothingScreen() {
         confirm before it joins your wardrobe.
       </ScreenSubtitle>
 
+      {usage?.aiTags.limit != null ? (
+        <Pressable
+          onPress={() => router.push('/profile/upgrade')}
+          disabled={usage.plan !== 'free'}
+        >
+          <Text style={styles.quotaHint}>
+            AI tagging {formatUsageFraction(usage.aiTags)} this month
+            {usage.plan === 'free' ? ' · Upgrade for more' : ''}
+          </Text>
+        </Pressable>
+      ) : null}
+
       {progress ? <Text style={styles.progress}>{progress}</Text> : null}
 
       <View style={styles.actions}>
@@ -142,6 +163,12 @@ export default function AddClothingScreen() {
 
 const styles = StyleSheet.create({
   actions: { marginTop: 24, gap: 12 },
+  quotaHint: {
+    marginTop: 10,
+    fontSize: 13,
+    color: colors.inkMuted,
+    fontFamily: fonts.sans,
+  },
   progress: {
     marginTop: 16,
     fontSize: 14,

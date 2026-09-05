@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useQueryClient } from "@tanstack/react-query";
 import { Screen } from "@/components/ui/screen";
 import { DraftEditForm } from "@/components/wardrobe/draft-edit-form";
 import {
@@ -16,6 +17,7 @@ import {
   getClothingDraft,
   updateClothingDraft,
 } from "@/lib/wardrobe-drafts";
+import { invalidateBillingUsage } from "@/lib/queries/invalidate";
 import {
   navigateAfterDraftSaved,
   parseBulkParam,
@@ -33,6 +35,7 @@ export default function DraftEditScreen() {
     total?: string;
     bulk?: string;
   }>();
+  const queryClient = useQueryClient();
   const fromBulk = parseBulkParam(bulkParam);
   const remainingQueue = parseReviewQueueParam(queue);
   const total = parseReviewTotal(totalParam, remainingQueue.length);
@@ -83,6 +86,7 @@ export default function DraftEditScreen() {
       return;
     }
 
+    invalidateBillingUsage(queryClient);
     navigateAfterDraftSaved(remainingQueue, total, fromBulk);
   }
 
